@@ -39,24 +39,30 @@ const data = {
   ],
   projects: [
     {
+      title: "داشبۆڕد",
+      url: "/",
+      icon: Frame,
+      isActive: true,
+    },
+    {
       title: "بەرهەماکانمان",
-      url: "#",
+      url: "/products",
       icon: Frame,
       isActive: true,
     },
     {
       title: "فرۆشتن",
-      url: "#",
+      url: "/sale",
       icon: PieChart,
     },
     {
       title: "خەرجیەکان",
-      url: "#",
+      url: "/expenses",
       icon: CreditCard,
     },
     {
       title: "پسووڵەکان",
-      url: "#",
+      url: "/invoice",
       icon: SquareTerminal,
     },
   ],

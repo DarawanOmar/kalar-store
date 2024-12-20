@@ -2,10 +2,11 @@ import "./globals.css";
 import type { Metadata } from "next";
 import localFont from "next/font/local";
 import { cn } from "@/lib/utils";
-import { Toaster } from "sonner";
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import { AppSidebar } from "@/components/layout/app-sidebar";
 import ToggleMode from "@/components/layout/toggle-mode";
+import TitlePage from "@/components/layout/title-page";
+import { NuqsAdapter } from "nuqs/adapters/next/app";
 
 export const sirwan_reguler = localFont({
   src: "./fonts/UniSIRWAN Expo Regular.ttf",
@@ -32,9 +33,10 @@ export default function RootLayout({
   return (
     <SidebarProvider>
       <AppSidebar side="right" />
-      <main className="w-full mx-4 my-2">
+      <main className="w-full mx-1 sm:mx-4 my-2">
         <div className="w-full flex  justify-between items-center ">
           <SidebarTrigger />
+          <TitlePage />
           <ToggleMode />
         </div>
         <div
@@ -42,7 +44,7 @@ export default function RootLayout({
             `${sirwan_reguler.variable}  ${sirwan_bold.variable} ${sirwan_light.variable} ${sirwan_meduim.variable}  `
           )}
         >
-          {children}
+          <NuqsAdapter>{children}</NuqsAdapter>
         </div>
       </main>
     </SidebarProvider>

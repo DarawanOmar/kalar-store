@@ -12,29 +12,4 @@ const withPWA = withPWAInit({
   },
 });
 
-export default withPWA({
-  images: {
-    remotePatterns: [
-      {
-        protocol: "https",
-        hostname: "plus.unsplash.com",
-      },
-      {
-        protocol: "https",
-        hostname: "upload.wikimedia.org",
-      },
-      {
-        protocol: "https",
-        hostname: "i.ytimg.com",
-      },
-      {
-        protocol: "http",
-        hostname: "commondatastorage.googleapis.com",
-      },
-      {
-        protocol: "https",
-        hostname: "img.jakpost.net",
-      },
-    ],
-  },
-});
+export default withPWA({});

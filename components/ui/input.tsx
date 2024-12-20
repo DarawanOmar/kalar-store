@@ -10,16 +10,20 @@ export interface InputProps
   Icon?: IconType | LucideIcon;
   classParent?: string;
   isform?: boolean;
+  sizeIcon?: number;
 }
 
 const Input = React.forwardRef<HTMLInputElement, InputProps>(
-  ({ className, classParent, type, Icon, isform, ...props }, ref) => {
+  (
+    { className, classParent, type, Icon, isform, sizeIcon = 21, ...props },
+    ref
+  ) => {
     return (
       <div className={cn("relative wfull", classParent)}>
         {Icon && (
           <span className="absolute start-2 inset-y-0 flex items-center">
             <Icon
-              size={21}
+              size={sizeIcon}
               className={cn("text-primary ms-1", {
                 "size-7": type === "file",
               })}
