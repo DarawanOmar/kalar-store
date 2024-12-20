@@ -59,12 +59,12 @@ export const metadata: Metadata = {
   twitter: {
     card: "summary_large_image",
   },
-  openGraph: {
-    type: "website",
-    locale: "en_US",
-    url: (process.env.NEXT_PUBLIC_BASE_URL as string) || "",
-    siteName: "Kalar Store",
-  },
-  metadataBase: new URL((process.env.NEXT_PUBLIC_BASE_URL as string) || ""),
+  // openGraph: {
+  //   type: "website",
+  //   locale: "en_US",
+  //   url: (process.env.NEXT_PUBLIC_BASE_URL as string) || "",
+  //   siteName: "Kalar Store",
+  // },
+  // metadataBase: new URL((process.env.NEXT_PUBLIC_BASE_URL as string) || ""),
   manifest: "/manifest.json",
 };
