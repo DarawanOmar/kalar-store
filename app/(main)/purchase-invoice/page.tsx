@@ -9,7 +9,7 @@ import FeedPurchaseInvoice from "./_components/feedPurchaseInvoce";
 function PurchaseInvoice() {
   return (
     <div className="my-10">
-      <div className="flex justify-between items-center">
+      <div className="flex flex-col sm:flex-row gap-4 justify-between items-center">
         <Title text="پسووڵەی کڕدراو" icon={<SquarePercent />} />
         <DatePickerWithRange />
       </div>

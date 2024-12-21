@@ -33,7 +33,7 @@ export default function RootLayout({
   return (
     <SidebarProvider>
       <AppSidebar side="right" />
-      <main className="w-full mx-1 sm:mx-4 my-2">
+      <main className="w-full px-2 sm:px-4 py-2">
         <div className="w-full flex  justify-between items-center ">
           <SidebarTrigger />
           <TitlePage />
@@ -41,7 +41,7 @@ export default function RootLayout({
         </div>
         <div
           className={cn(
-            `${sirwan_reguler.variable}  ${sirwan_bold.variable} ${sirwan_light.variable} ${sirwan_meduim.variable}  `
+            `${sirwan_reguler.variable}  ${sirwan_bold.variable} ${sirwan_light.variable} ${sirwan_meduim.variable}  max-sm:px-2`
           )}
         >
           <NuqsAdapter>{children}</NuqsAdapter>

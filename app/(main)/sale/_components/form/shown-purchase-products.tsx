@@ -6,7 +6,7 @@ import column from "../columns";
 
 function ShownPurchaseProducts() {
   return (
-    <div className="px-6 my-10">
+    <div className="sm:px-6 my-10">
       <Title
         icon={<SquareKanban size={18} />}
         text="بەرهەماکان"

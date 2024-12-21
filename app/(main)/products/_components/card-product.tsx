@@ -10,7 +10,7 @@ type Props = {
 
 function CardProduct({ product }: Props) {
   return (
-    <div className="p-6 bg-white rounded-xl shadow-md border relative">
+    <div className="p-6 bg-background rounded-xl shadow-md border relative">
       <div className="absolute top-4 left-2">
         <DropdownMenuProduct />
       </div>

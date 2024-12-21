@@ -6,6 +6,7 @@ import {
   SidebarGroupLabel,
   SidebarMenu,
   SidebarMenuButton,
+  useSidebar,
 } from "@/components/ui/sidebar";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -25,6 +26,7 @@ export function NavMain({
     isActive?: boolean;
   }[];
 }) {
+  const { isMobile, setOpenMobile } = useSidebar();
   const pathName = usePathname();
   const [pendding, startTransition] = React.useTransition();
   const handleSignOut = () => {
@@ -41,6 +43,9 @@ export function NavMain({
             <SidebarMenuButton
               key={item.title}
               tooltip={item.title}
+              onClick={() => {
+                if (isMobile) setOpenMobile(false);
+              }}
               className={cn(
                 "py-[18px] hover:bg-soft_red hover:text-white  transition-all duration-500",
                 {

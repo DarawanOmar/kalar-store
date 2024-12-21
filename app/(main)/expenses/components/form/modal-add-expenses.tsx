@@ -18,7 +18,7 @@ function ModalAddExpenses() {
       icon={<Plus size={20} strokeWidth={2.5} />}
       text_button="زیادکردنی خەرجی"
       title="زیادکردنی خەرجی"
-      className="max-sm:text-sm max-sm:max-w-max"
+      className="max-sm:text-sm max-sm:max-w-w-full"
     >
       <AddExpenses handleClose={handleClose} />
     </CustomDialog>

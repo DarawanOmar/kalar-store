@@ -58,7 +58,7 @@ export default function AddSale({
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="  px-6">
+      <form onSubmit={form.handleSubmit(onSubmit)} className="sm:px-6">
         <Title
           icon={<FileText size={18} />}
           text="دروستکردنی پسووڵە"

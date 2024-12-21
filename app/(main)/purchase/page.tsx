@@ -9,7 +9,7 @@ import GetAllinvoice from "./_components/getAllinvoice";
 function Purchase() {
   return (
     <div className="mb-10 mt-5">
-      <div className="mb-5 px-6 flex justify-between items-center ">
+      <div className="mb-5 sm:px-6 flex justify-between items-center ">
         <Title icon={<FileText size={18} />} text="دروستکردنی پسووڵە" />
         <GetAllinvoice />
       </div>

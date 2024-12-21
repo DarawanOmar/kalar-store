@@ -15,7 +15,7 @@ function ModalAddProcut() {
       open={open}
       onOpenChange={setOpen}
       classContent="max-w-5xl"
-      icon={<Plus size={20} strokeWidth={2.5} />}
+      icon={<Plus size={20} strokeWidth={2.5} className="max-sm:hidden" />}
       text_button="زیادکردنی کاڵا"
       title="زیادکردنی کاڵا"
       className="max-sm:text-sm max-sm:max-w-max"

@@ -20,7 +20,7 @@ function GetAllinvoice() {
         <Trash size={16} strokeWidth={2} />
       </Button>
       <Select>
-        <SelectTrigger className="w-[120px]">
+        <SelectTrigger className="max-w-max">
           <SelectValue placeholder="Theme" />
         </SelectTrigger>
         <SelectContent>

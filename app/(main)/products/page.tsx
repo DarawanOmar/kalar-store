@@ -11,7 +11,7 @@ async function Products() {
   // const allProducts = await getAllProducts();
   // console.log(allProducts);
   return (
-    <div>
+    <div className="">
       <div className="flex justify-between items-center my-10 max-sm:gap-4">
         <ModalAddProcut />
         <Search palceHolder="گەڕانی کاڵا..." />

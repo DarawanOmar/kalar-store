@@ -9,7 +9,7 @@ import PaginatedComponent from "@/components/ui/pagination";
 function SaleInvoice() {
   return (
     <div className="my-10">
-      <div className="flex justify-between items-center">
+      <div className="flex flex-col sm:flex-row gap-3 justify-between items-center">
         <Title text="پسووڵەی فرۆشراو" icon={<SquarePercent />} />
         <DatePickerWithRange />
       </div>

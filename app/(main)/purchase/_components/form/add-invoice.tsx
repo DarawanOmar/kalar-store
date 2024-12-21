@@ -61,7 +61,7 @@ export default function Addinvoice({
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="  px-6">
+      <form onSubmit={form.handleSubmit(onSubmit)} className="  sm:px-6">
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5  gap-5 items-end">
           {Object.entries(form.getValues()).map(([key, value]) => (
             <FormField
