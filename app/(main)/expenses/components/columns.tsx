@@ -121,7 +121,7 @@ const column: ColumnDef<Expenses>[] = [
                   message: "Deleted",
                   success: true,
                 })}
-                id={"1"}
+                id={1}
               />
             </DropdownMenuContent>
           </DropdownMenu>
