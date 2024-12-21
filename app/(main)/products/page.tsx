@@ -1,6 +1,4 @@
 import React, { Suspense } from "react";
-import { getAllProducts } from "./_action";
-import { Button } from "@/components/ui/button";
 import Search from "@/components/reuseable/search";
 import ModalAddProcut from "./_components/form/modal-add-product";
 import FeedProducts from "./_components/feed-products";
@@ -8,8 +6,6 @@ import SkelotonCard from "@/components/reuseable/skeloton-card";
 import PaginatedComponent from "@/components/ui/pagination";
 
 async function Products() {
-  // const allProducts = await getAllProducts();
-  // console.log(allProducts);
   return (
     <div className="">
       <div className="flex justify-between items-center my-10 max-sm:gap-4">

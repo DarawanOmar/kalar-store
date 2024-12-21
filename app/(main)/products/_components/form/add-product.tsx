@@ -26,6 +26,7 @@ import {
 import Image from "next/image";
 import { sizeImage } from "@/lib/globals";
 import { AspectRatio } from "@/components/ui/aspect-ratio";
+import { addProducts, updateProducts } from "../../_action";
 
 type filmFormProps = {
   isEdit?: boolean;
@@ -48,15 +49,15 @@ export default function AddProduct({
 
   function onSubmit(values: addProductType) {
     setPendding(async () => {
-      //   const result = isEdit
-      //     ? await updatedOffer(id as number, values)
-      //     : await addOffer(values);
-      //   if (result.success) {
-      //     toast.success(result.message);
-      //     handleClose && handleClose();
-      //   } else {
-      //     toast.error(result.message);
-      //   }
+      const result = isEdit
+        ? await updateProducts(id as number, values)
+        : await addProducts(values);
+      if (result.success) {
+        toast.success(result.message);
+        handleClose && handleClose();
+      } else {
+        toast.error(result.message);
+      }
     });
   }
 
@@ -168,11 +169,18 @@ export default function AddProduct({
   );
 }
 
+// name           String
+// barcode        String
+// sale_price     Int
+// purchase_price Int
+// quantity       Int
+// note           String?
+
 const getDefaultValues = (values: Partial<addProductType> = {}) => {
   const defaultValues: addProductType = {
     name: "",
     barcode: "",
-    description: "",
+    note: "",
     quantity: 0,
     purchase_price: 0,
     sale_price: 0,
@@ -188,7 +196,7 @@ function labelTranslate(name: string) {
       return "ناو";
     case "barcode":
       return "بارکۆد";
-    case "description":
+    case "note":
       return "تێبینی";
     case "purchase_price":
       return "نرخی کڕین";

@@ -16,7 +16,7 @@ export const addProduct = z.object({
     .number({ message: "ژمارە داخڵ بکە" })
     .positive({ message: "ژمارەی نرخ بەرزترە لە سفر بێت" })
     .min(1, { message: "نرخی کڕین داخڵ بکە" }),
-  description: z.string().min(1, { message: "تێبینی داخڵ بکە" }),
+  note: z.string().min(1, { message: "تێبینی داخڵ بکە" }),
   image: z
     .instanceof(File) // Ensure the value is of type `File`
     .refine((file) => file.size < sizeImage, {
@@ -26,3 +26,15 @@ export const addProduct = z.object({
 });
 
 export type addProductType = z.infer<typeof addProduct>;
+
+export interface Product {
+  id: number;
+  name: string;
+  barcode: string;
+  sale_price: number;
+  purchase_price: number;
+  quantity: number;
+  note: string | null;
+  createdAt: Date;
+  updatedAt: Date;
+}

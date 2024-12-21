@@ -9,8 +9,14 @@ import { EditIcon, EllipsisVertical, TrashIcon } from "lucide-react";
 import React from "react";
 import AddProduct from "./form/add-product";
 import ReusableDeleteDailog from "@/components/reuseable/reusable-delete-dialog";
+import { Product } from "../_type";
+import { deleteProducts } from "../_action";
 
-function DropdownMenuProduct() {
+type Props = {
+  product: Product;
+};
+
+function DropdownMenuProduct({ product }: Props) {
   const [open, setOpen] = React.useState(false);
   const handleClose = () => {
     setOpen((prev) => !prev);
@@ -27,6 +33,7 @@ function DropdownMenuProduct() {
               open={open}
               onOpenChange={setOpen}
               isFreshButtonPass
+              classContent="max-w-5xl"
               title="گۆرانکاری"
               button={
                 <button className="flex gap-2 items-center font-sirwan_reguler  hover:bg-primary p-2 rounded-t-lg ">
@@ -35,7 +42,20 @@ function DropdownMenuProduct() {
                 </button>
               }
             >
-              <AddProduct isEdit handleClose={handleClose} />
+              <AddProduct
+                isEdit
+                id={product?.id}
+                info={{
+                  name: product?.name,
+                  barcode: product?.barcode,
+                  purchase_price: product?.purchase_price,
+                  sale_price: product?.sale_price,
+                  quantity: product?.quantity,
+                  note: product?.note || "",
+                  image: null,
+                }}
+                handleClose={handleClose}
+              />
             </CustomDialog>
             <hr className="border-gray" />
             <ReusableDeleteDailog
@@ -47,8 +67,8 @@ function DropdownMenuProduct() {
                   <span className="text-sm">سڕینەوە</span>
                 </button>
               }
-              actionDelete={async () => ({ message: "Deleted", success: true })}
-              id={"1"}
+              actionDelete={deleteProducts}
+              id={product?.id}
             />
           </div>
         </PopoverContent>

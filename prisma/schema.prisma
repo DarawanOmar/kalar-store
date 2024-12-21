@@ -8,11 +8,81 @@ datasource db {
 }
 
 model Products {
-  id          Int      @id @default(autoincrement())
-  name        String
-  description String?
-  price       Float
-  quantity    Int
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  id             Int      @id @default(autoincrement())
+  name           String
+  barcode        String
+  sale_price     Int
+  purchase_price Int
+  quantity       Int
+  note           String?
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  Purchase_invoice_items Purchase_invoice_items[]
+  Sale_invoice_items     Sale_invoice_items[]
+}
+
+model Purchase_invoice {
+  id             Int      @id @default(autoincrement())
+  invoice_number String
+  name           String
+  place          String
+  note           String?
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  Purchase_invoice_items Purchase_invoice_items[]
+}
+
+model Purchase_invoice_items {
+  id Int @id @default(autoincrement())
+
+  purchase_invoiceId Int?
+  Purchase_invoice   Purchase_invoice? @relation(fields: [purchase_invoiceId], references: [id])
+
+  Products   Products? @relation(fields: [productsId], references: [id])
+  productsId Int?
+
+  product_id Int
+  quantity   Int
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+}
+
+model Sale_invoice {
+  id                 Int                  @id @default(autoincrement())
+  invoice_number     String
+  name               String
+  phone              String
+  place              String
+  discount           Int
+  note               String?
+  createdAt          DateTime             @default(now())
+  updatedAt          DateTime             @updatedAt
+  Sale_invoice_items Sale_invoice_items[]
+}
+
+model Sale_invoice_items {
+  id Int @id @default(autoincrement())
+
+  Sale_invoice   Sale_invoice? @relation(fields: [sale_invoiceId], references: [id])
+  sale_invoiceId Int?
+
+  Products   Products? @relation(fields: [productsId], references: [id])
+  productsId Int?
+
+  product_id Int
+  quantity   Int
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+}
+
+model Expenses {
+  id        Int      @id @default(autoincrement())
+  name      String
+  price     Int
+  quantity  Int
+  note      String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }

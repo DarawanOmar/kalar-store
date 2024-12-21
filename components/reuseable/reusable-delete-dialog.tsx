@@ -9,9 +9,9 @@ import { LuLoaderCircle } from "react-icons/lu";
 import { StopCircle, TrashIcon } from "lucide-react";
 
 type DialogModalProps = {
-  id: string;
+  id: number;
   actionDelete: (
-    id: string,
+    id: number,
     options?: any
   ) => Promise<{ message: string; success: boolean }>;
   classButton?: string;

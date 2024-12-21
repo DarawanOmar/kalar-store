@@ -1,14 +1,14 @@
-import { ArrayProduct } from "@/constants";
 import React from "react";
 import CardProduct from "./card-product";
-import PaginatedComponent from "@/components/ui/pagination";
+import { getAllProducts } from "../_action";
+import EmptyImage from "@/components/reuseable/empty-image";
 
 async function FeedProducts() {
-  //   Await for a Second
-  await new Promise((resolve) => setTimeout(resolve, 1000));
+  const allProducts = await getAllProducts();
+  if (allProducts.length === 0) return <EmptyImage />;
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-10">
-      {ArrayProduct.map((product, index) => (
+      {allProducts.map((product, index) => (
         <CardProduct key={index} product={product} />
       ))}
     </div>
