@@ -1,5 +1,4 @@
 "use client";
-import { Wallet } from "lucide-react";
 import { usePathname } from "next/navigation";
 import React from "react";
 
@@ -33,6 +32,6 @@ function titleName(path: string) {
     case "/purchase-invoice":
       return "پسوولەی کڕدراوەکان";
     default:
-      return "Page not found";
+      return "";
   }
 }
