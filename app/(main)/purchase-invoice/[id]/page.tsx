@@ -16,7 +16,7 @@ function OneSaleInvoice() {
         </div>
         <Link
           href={`/purchase-invoice`}
-          className="p-1 rounded-full text-soft_primary hover:bg-primary hover:text-white cursor-pointer transition-all duration-500 text-white max-w-max mr-auto"
+          className="p-1 rounded-full text-soft_primary hover:bg-primary hover:text-white cursor-pointer transition-all duration-500  max-w-max mr-auto"
         >
           <ChevronLeft />{" "}
         </Link>
