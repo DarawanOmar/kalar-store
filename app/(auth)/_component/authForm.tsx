@@ -34,7 +34,7 @@ export default function AuthForm() {
     startTransition(async () => {
       const res = await loginAction(values);
       if (res?.success) {
-        login(res.message, "/home");
+        login(res.message, "/");
         toast.success(res.message);
       } else {
         toast.error(res?.message?.toString(), {

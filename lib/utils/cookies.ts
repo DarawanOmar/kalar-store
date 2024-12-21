@@ -26,13 +26,13 @@ export async function decrypt(input: string): Promise<any> {
   return payload;
 }
 
-export async function login(token: string, redirectValues?: string) {
+export async function login(token: string, redirectValues: string) {
   const expires = new Date(Date.now() + expiteTime);
   const session = await encrypt({ token, expires });
 
   // Save the session in a cookie
   (await cookies()).set("session", session, { expires, httpOnly: true });
-  redirect(`/${redirectValues}`);
+  redirect(redirectValues);
 }
 
 export async function logout() {

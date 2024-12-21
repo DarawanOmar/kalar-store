@@ -7,12 +7,16 @@ import { loginSchemaType } from "../_component/lib";
 export async function loginAction(data: loginSchemaType) {
   try {
     // const res = await instance.post(EndPoints.login, { ...data });
-    if (data.email === "admin@gmail.com" || data.password === "admin") {
+    if (data.email === "admin@gmail.com" && data.password === "admin") {
       return {
         success: true,
         message: "Welcome Admin",
       };
     }
+    return {
+      success: false,
+      message: "Invalid Email or Password",
+    };
     // if (res.status === 200) {
     //   return {
     //     success: true,
