@@ -32,12 +32,7 @@ const cardData = [
     count: "$45,231.89",
     description: "+20.1% لە مانگی ڕابردوو",
   },
-  {
-    title: "کۆی قەرزەکان",
-    icon: Users,
-    count: "+2350",
-    description: "+180.1% لە مانگی ڕابردوو",
-  },
+
   {
     title: "کۆی فرۆشراوەکان",
     icon: CreditCard,
