@@ -22,7 +22,7 @@ export default function SignIn() {
         <Image
           src={login}
           alt="Login"
-          className=" max-md:max-h-[300px] md:h-full w-full object-cover"
+          className=" max-md:max-h-[300px] md:h-full w-full max-sm:object-top object-cover"
           priority
         />
       </div>
