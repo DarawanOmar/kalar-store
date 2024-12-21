@@ -14,9 +14,9 @@ import React from "react";
 import { DataTableColumnHeader } from "@/components/reuseable/data-table-column-header";
 import ReusableDeleteDailog from "@/components/reuseable/reusable-delete-dialog";
 import CustomDialog from "@/components/reuseable/resusable-dialog";
-import { PurchaseProducts } from "../../_type";
+import { SaleProducts } from "../_type";
 
-const column: ColumnDef<PurchaseProducts>[] = [
+const column: ColumnDef<SaleProducts>[] = [
   {
     accessorKey: "id",
     header: ({ column }) => (
@@ -58,6 +58,12 @@ const column: ColumnDef<PurchaseProducts>[] = [
     accessorKey: "purchase_price",
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title="نرخی کڕین" />
+    ),
+  },
+  {
+    accessorKey: "sale_price",
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title="نرخی فرۆشتن" />
     ),
   },
 

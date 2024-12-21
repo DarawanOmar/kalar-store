@@ -1,8 +1,8 @@
 import { DataTable } from "@/components/reuseable/table";
 import React from "react";
-import column from "./form/columns";
 import Title from "@/components/reuseable/title";
 import { SquareKanban } from "lucide-react";
+import column from "../columns";
 
 function ShownPurchaseProducts() {
   return (

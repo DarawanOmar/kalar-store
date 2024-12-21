@@ -19,7 +19,7 @@ export default TitlePage;
 function titleName(path: string) {
   switch (path) {
     case "/":
-      return "ماڵەوە";
+      return "داشبۆرد";
     case "/products":
       return "بەرهەمەکان";
     case "/purchase":
