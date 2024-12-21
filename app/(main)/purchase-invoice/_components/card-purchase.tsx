@@ -23,7 +23,7 @@ function CardSale({ product }: Props) {
         </p>
         <Link
           href={`purchase-invoice/${product.name}`}
-          className="p-1 rounded-full text-soft_primary hover:bg-primary hover:text-white cursor-pointer transition-all duration-500 text-white max-w-max ml-auto"
+          className="p-1 rounded-full text-soft_primary hover:bg-primary hover:text-white cursor-pointer transition-all duration-500  max-w-max ml-auto"
         >
           <CircleArrowRight size={20} />
         </Link>
