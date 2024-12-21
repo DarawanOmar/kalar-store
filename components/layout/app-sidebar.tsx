@@ -7,8 +7,12 @@ import {
   CreditCard,
   Frame,
   GalleryVerticalEnd,
+  LayoutDashboard,
   PieChart,
   Settings2,
+  ShoppingBag,
+  ShoppingCart,
+  SquarePercent,
   SquareTerminal,
 } from "lucide-react";
 
@@ -41,7 +45,7 @@ const data = {
     {
       title: "داشبۆڕد",
       url: "/",
-      icon: Frame,
+      icon: LayoutDashboard,
       isActive: true,
     },
     {
@@ -49,6 +53,11 @@ const data = {
       url: "/products",
       icon: Frame,
       isActive: true,
+    },
+    {
+      title: "کڕین",
+      url: "/purchase",
+      icon: ShoppingBag,
     },
     {
       title: "فرۆشتن",
@@ -61,9 +70,14 @@ const data = {
       icon: CreditCard,
     },
     {
-      title: "پسووڵەکان",
-      url: "/invoice",
-      icon: SquareTerminal,
+      title: "پسووڵە فرۆشراوەکان",
+      url: "/sale-invoice",
+      icon: SquarePercent,
+    },
+    {
+      title: "پسووڵە کڕدراوەکان",
+      url: "/purchase-invoice",
+      icon: ShoppingCart,
     },
   ],
 };

@@ -9,7 +9,16 @@ function Expenses() {
     <div className="my-10">
       <div className="flex justify-between items-center my-10">
         <ModalAddExpenses />
-        <Search />
+        <div className="flex gap-4">
+          <div className="bg-soft_primary rounded-xl py-1 px-4 text-white flex flex-col items-center ">
+            <span className="text-xs">کۆی گشتی</span>
+            <div className="flex gap-2 text-xs">
+              <span>IQD</span>
+              {Number(15000000).toLocaleString()}
+            </div>{" "}
+          </div>
+          <Search />
+        </div>
       </div>
       <div className="">
         <DataTable

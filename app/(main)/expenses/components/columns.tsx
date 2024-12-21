@@ -68,6 +68,9 @@ const column: ColumnDef<Expenses>[] = [
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title="بەروار" />
     ),
+    cell: function CellComponent({ row }) {
+      return <div>{row.original.createdAt}</div>;
+    },
   },
   {
     id: "actions",

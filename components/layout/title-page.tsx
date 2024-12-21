@@ -22,12 +22,16 @@ function titleName(path: string) {
       return "ماڵەوە";
     case "/products":
       return "بەرهەمەکان";
+    case "/purchase":
+      return "کڕین";
     case "/sale":
       return "فرۆشتن";
     case "/expenses":
       return "خەرجیەکان";
-    case "/invoice":
-      return "پسووڵەکان";
+    case "/sale-invoice":
+      return "پسوولەی فرۆشراوەکان";
+    case "/purchase-invoice":
+      return "پسوولەی کڕدراوەکان";
     default:
       return "Page not found";
   }
