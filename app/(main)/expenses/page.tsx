@@ -8,7 +8,7 @@ import TotalShown from "@/components/reuseable/total-shown";
 function Expenses() {
   return (
     <div className="my-10">
-      <div className="flex flex-col gap-5 sm:hidden">
+      <div className="flex flex-col gap-5 sm:hidden my-10">
         <Search className="max-sm:w-full" />
         <div className="grid grid-cols-2 gap-4">
           <ModalAddExpenses />
