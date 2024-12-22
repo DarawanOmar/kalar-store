@@ -6,9 +6,25 @@ import { ChevronsUpDown } from "lucide-react";
 import { SidebarMenuButton, useSidebar } from "@/components/ui/sidebar";
 import Image from "next/image";
 import { cn } from "@/lib/utils";
+import { getSession } from "@/lib/utils/cookies";
 
-export function TeamSwitcher() {
+export function TeamSwitcher({ isName }: { isName: boolean }) {
   const { open } = useSidebar();
+  const [user, setUser] = React.useState({
+    name: "",
+    email: "",
+  });
+  React.useEffect(() => {
+    const fetch = async () => {
+      const user = await getSession();
+      const spilt = user.token.split(",between,");
+      setUser({
+        name: spilt[0],
+        email: spilt[1],
+      });
+    };
+    fetch();
+  }, []);
   return (
     <SidebarMenuButton
       size="lg"
@@ -31,8 +47,20 @@ export function TeamSwitcher() {
         />
       </div>
       <div className="flex flex-col">
-        <span className="text-start">کەلار ستۆر</span>
-        <span className="truncate text-xs">داشبۆڕد سیستەم </span>
+        {user.name == "" ? (
+          <span className="h-3.5 bg-primary animate-pulse rounded-sm w-20  mb-1"></span>
+        ) : (
+          <span className="text-start">
+            {isName ? user.name : "کەلار ستۆر"}
+          </span>
+        )}{" "}
+        {user.email == "" ? (
+          <span className="h-2 bg-primary animate-pulse rounded-sm w-32 "></span>
+        ) : (
+          <span className="truncate text-xs">
+            {isName ? user.email : "داشبۆڕد سیستەم"}{" "}
+          </span>
+        )}
       </div>
       <ChevronsUpDown className="mr-auto" />
     </SidebarMenuButton>

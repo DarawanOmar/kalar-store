@@ -18,6 +18,7 @@ import { User } from "../_type";
 import AddUser from "./form/add-user";
 import { format } from "date-fns";
 import { deleteUser } from "../_action";
+import Image from "next/image";
 
 const column: ColumnDef<User>[] = [
   {
@@ -39,6 +40,21 @@ const column: ColumnDef<User>[] = [
         className="text-right"
       />
     ),
+    cell: function CellComponent({ row }) {
+      return (
+        <div className="flex justify-start items-center gap-1 ms-10">
+          <Image
+            src={"/logo.jpg"}
+            className="size-7 items-end rounded-full object-cover object-center"
+            height={200}
+            width={200}
+            alt="user"
+            priority
+          />
+          {row.original.name}
+        </div>
+      );
+    },
   },
 
   {
@@ -95,6 +111,7 @@ const column: ColumnDef<User>[] = [
                     name: row.original.name,
                     email: row.original.email,
                     password: "",
+                    image: null,
                   }}
                   isEdit
                   handleClose={handleClose}

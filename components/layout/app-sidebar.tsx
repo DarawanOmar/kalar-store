@@ -2,22 +2,18 @@
 
 import * as React from "react";
 import {
-  BookOpen,
   Bot,
   CreditCard,
   Frame,
   GalleryVerticalEnd,
   LayoutDashboard,
   PieChart,
-  Settings2,
   ShoppingBag,
   ShoppingCart,
   SquarePercent,
-  SquareTerminal,
 } from "lucide-react";
 
 import { NavMain } from "@/components/layout/nav-main";
-import { NavUser } from "@/components/layout/nav-user";
 import { TeamSwitcher } from "@/components/layout/team-switcher";
 import {
   Sidebar,
@@ -27,7 +23,22 @@ import {
   SidebarRail,
 } from "@/components/ui/sidebar";
 
-// This is sample data.
+export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
+  return (
+    <Sidebar collapsible="icon" {...props}>
+      <SidebarHeader className="bg-background ">
+        <TeamSwitcher isName={false} />
+      </SidebarHeader>
+      <SidebarContent className="bg-background ">
+        <NavMain items={data.projects} />
+      </SidebarContent>
+      <SidebarFooter className="bg-background ">
+        <TeamSwitcher isName />
+      </SidebarFooter>
+      <SidebarRail />
+    </Sidebar>
+  );
+}
 const data = {
   user: {
     name: "کەلار ستۆر",
@@ -86,18 +97,3 @@ const data = {
     },
   ],
 };
-
-export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
-  return (
-    <Sidebar collapsible="icon" {...props}>
-      <SidebarHeader className="bg-background ">
-        <TeamSwitcher />
-      </SidebarHeader>
-      <SidebarContent className="bg-background ">
-        <NavMain items={data.projects} />
-      </SidebarContent>
-
-      <SidebarRail />
-    </Sidebar>
-  );
-}

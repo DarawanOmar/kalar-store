@@ -20,7 +20,7 @@ export const addProduct = z.object({
   image: z
     .instanceof(File) // Ensure the value is of type `File`
     .refine((file) => file.size < sizeImage, {
-      message: "File size must be less than 2MB",
+      message: "File size must be less than 1MB",
     })
     .nullable(),
 });

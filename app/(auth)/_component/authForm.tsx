@@ -33,8 +33,9 @@ export default function AuthForm() {
   async function onSubmit(values: loginSchemaType) {
     startTransition(async () => {
       const res = await loginAction(values);
-      if (res?.success) {
-        login(res.message, "/");
+      if (res?.success && res.data) {
+        const user = res.data?.name + ",between," + res.data?.email;
+        login(user, "/");
         toast.success(res.message);
       } else {
         toast.error(res?.message?.toString(), {

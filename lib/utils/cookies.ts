@@ -8,7 +8,7 @@ import { NextRequest, NextResponse } from "next/server";
 
 const secretKey = process.env.NEXT_PUBLIC_SECRET || "secret";
 const key = new TextEncoder().encode(secretKey);
-const expiteTime = 1 * 24 * 60 * 60 * 1000; // 1 days
+const expiteTime = 30 * 24 * 60 * 60 * 1000; // 1 days
 // const expiteTime = 5 * 60 * 1000; // 5 minutes
 
 export async function encrypt(payload: any) {

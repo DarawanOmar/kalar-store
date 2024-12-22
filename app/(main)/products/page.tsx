@@ -5,12 +5,12 @@ import FeedProducts from "./_components/feed-products";
 import SkelotonCard from "@/components/reuseable/skeloton-card";
 import PaginatedComponent from "@/components/ui/pagination";
 
-async function Products() {
+async function Products({ searchParams }: { searchParams: searchParamsType }) {
   return (
     <div className="">
       <div className="flex justify-between items-center my-10 max-sm:gap-4">
         <ModalAddProcut />
-        <Search palceHolder="گەڕانی کاڵا..." />
+        <Search palceHolder="گەڕانی باڕکۆد یان کاڵا" />
       </div>
       <div className="">
         <Suspense
@@ -21,7 +21,7 @@ async function Products() {
             />
           }
         >
-          <FeedProducts />
+          <FeedProducts searchParams={searchParams} />
         </Suspense>
         <div className="my-5">
           <PaginatedComponent currentPage={1} totalPages={1} />

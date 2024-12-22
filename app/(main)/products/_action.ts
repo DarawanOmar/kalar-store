@@ -4,16 +4,30 @@ import db from "@/lib/prisma";
 import { addProductType } from "./_type";
 import { promises as fs } from "fs";
 
-export const getAllProducts = async () => {
-  const produts = await db.products.findMany();
+export const getAllProducts = async (search: string, page: number) => {
+  const pageSize = 10;
+  let where = {};
+  if (search) {
+    where = {
+      OR: [{ name: { contains: search } }, { barcode: { contains: search } }],
+    };
+  }
+
+  const produts = await db.products.findMany({
+    where,
+    take: 10,
+    skip: (page - 1) * pageSize,
+    orderBy: { id: "desc" },
+  });
   return produts;
 };
 export const addProducts = async (values: addProductType) => {
   const { image, ...rest } = values;
-  const data = (await image?.arrayBuffer()) as ArrayBuffer;
-  const buffer = Buffer.from(data);
-  await fs.writeFile(`public/img/${image?.name}`, buffer);
-
+  if (image) {
+    const data = (await image?.arrayBuffer()) as ArrayBuffer;
+    const buffer = Buffer.from(data);
+    await fs.writeFile(`public/img/${image?.name}`, buffer);
+  }
   try {
     await db.products.create({
       data: {
@@ -34,9 +48,18 @@ export const addProducts = async (values: addProductType) => {
 };
 export const updateProducts = async (id: number, values: addProductType) => {
   const { image, ...rest } = values;
+  if (image) {
+    const data = (await image?.arrayBuffer()) as ArrayBuffer;
+    const buffer = Buffer.from(data);
+    await fs.writeFile(`public/img/${image?.name}`, buffer);
+  }
+
   try {
     await db.products.update({
-      data: rest,
+      data: {
+        ...rest,
+        ...(image ? { image: image.name } : {}),
+      },
       where: { id },
     });
     return {

@@ -1,33 +1,37 @@
 "use server";
-
-import { instance } from "@/lib/utils/requestHandler";
-import { EndPoints } from "@/lib/routes/EndPoints";
+import bcrypt from "bcrypt";
 import { loginSchemaType } from "../_component/lib";
+import db from "@/lib/prisma";
 
 export async function loginAction(data: loginSchemaType) {
   try {
-    // const res = await instance.post(EndPoints.login, { ...data });
-    if (data.email === "admin@gmail.com" && data.password === "admin") {
+    const user = await db.users.findFirst({ where: { email: data.email } });
+    if (!user) {
+      return {
+        success: false,
+        message: "ئیمەیڵ هەڵەیە",
+      };
+    }
+    const isMatch = await bcrypt.compare(
+      data.password,
+      user?.password as string
+    );
+    if (isMatch) {
       return {
         success: true,
-        message: "Welcome Admin",
+        data: user,
+        message: "بە سەرکەوتویی چوویتەژورەوە",
       };
     }
     return {
       success: false,
-      message: "Invalid Email or Password",
+
+      message: "پاسۆرد هەڵەیە",
     };
-    // if (res.status === 200) {
-    //   return {
-    //     success: true,
-    //     message: res.data,
-    //   };
-    // }
   } catch (error: any) {
-    // const message = error?.response?.data[Object.keys(error.response.data)[0]];
     return {
       success: false,
-      message: "Invalid Email or Password",
+      message: "هەڵەیەک هەیە",
     };
   }
 }

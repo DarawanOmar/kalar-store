@@ -1,7 +1,8 @@
 "use server";
-
+import bcrypt from "bcrypt";
 import db from "@/lib/prisma";
 import { addUser, addUserType } from "./_type";
+import { promises as fs } from "fs";
 
 export const getAllUsers = async (search: string, page: number) => {
   try {
@@ -35,20 +36,35 @@ export const getAllUsers = async (search: string, page: number) => {
   }
 };
 
-export const addUserAction = async (data: addUserType) => {
+export const addUserAction = async (values: addUserType) => {
+  const { image, ...rest } = values;
   try {
-    const parasedData = addUser.safeParse(data);
+    if (image) {
+      const data = (await image?.arrayBuffer()) as ArrayBuffer;
+      const buffer = Buffer.from(data);
+      await fs.writeFile(`public/img/${image?.name}`, buffer);
+    }
+
+    const parasedData = addUser.safeParse(values);
     if (parasedData.success === false) {
+      const errors = Object.entries(
+        parasedData.error.flatten().fieldErrors
+      ).map(([field, error]) => `${field}: ${error}`);
       return {
-        message: parasedData.error.flatten().fieldErrors["email"],
+        message: errors.join(", "),
         success: false,
       };
     }
-
+    const hashPassword = await bcrypt.hash(
+      parasedData.data.password as string,
+      12
+    );
+    const { image: rasm, password, ...restSend } = parasedData.data;
     await db.users.create({
       data: {
-        ...parasedData.data,
-        password: parasedData.data.password as string,
+        ...restSend,
+        password: hashPassword,
+        image: image?.name,
       },
     });
     return {
@@ -56,6 +72,7 @@ export const addUserAction = async (data: addUserType) => {
       success: true,
     };
   } catch (error) {
+    console.dir(error, { depth: null });
     return {
       message: "هەڵەیەک هەیە",
       success: false,
@@ -65,8 +82,18 @@ export const addUserAction = async (data: addUserType) => {
 
 export const updateUser = async (id: number, data: addUserType) => {
   try {
+    const { image, ...rest } = data;
+    if (image) {
+      const data = (await image?.arrayBuffer()) as ArrayBuffer;
+      const buffer = Buffer.from(data);
+      await fs.writeFile(`public/img/${image?.name}`, buffer);
+    }
+
     await db.users.update({
-      data,
+      data: {
+        ...rest,
+        ...(image ? { image: image.name } : {}),
+      },
       where: { id },
     });
     return {
