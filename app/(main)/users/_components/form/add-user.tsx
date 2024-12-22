@@ -91,53 +91,6 @@ export default function AddUser({
                 )}
               />
             ))}
-          <div className="">
-            <FormField
-              control={form.control}
-              name="image"
-              render={({ field }) => (
-                <>
-                  <FormLabel>وێنە</FormLabel>
-                  <FileUploader
-                    value={field.value ? [field.value] : null}
-                    onValueChange={(files) => {
-                      const selectedFile = files?.[0] || null;
-                      field.onChange(selectedFile);
-                    }}
-                    dropzoneOptions={{
-                      multiple: false,
-                      maxFiles: 19,
-                      maxSize: sizeImage,
-                    }}
-                    reSelect={true}
-                    className="relative bg-background rounded-lg p-2"
-                  >
-                    <FileInput className=" outline-dashed outline-1 outline-gray-200 max-w-full w-full">
-                      <div className="flex items-center justify-center flex-col pt-3 pb-4 w-full ">
-                        {field.value && (
-                          <FileUploaderItem
-                            index={0}
-                            aria-roledescription={`file containing ${field.value.name}`}
-                            className="p-0 size-20"
-                          >
-                            <AspectRatio className="size-full">
-                              <Image
-                                src={URL.createObjectURL(field.value)} // Convert File to Object URL
-                                alt={field.value.name} // Use file name as alt
-                                className="object-cover rounded-md"
-                                fill
-                              />
-                            </AspectRatio>
-                          </FileUploaderItem>
-                        )}
-                        {!field.value && <FileSvgDraw />}
-                      </div>
-                    </FileInput>
-                  </FileUploader>
-                </>
-              )}
-            />
-          </div>
         </div>
 
         <div className=" max-w-lg mx-auto gap-16 w-full mt-10 flex  justify-between items-center ">
@@ -174,7 +127,6 @@ const getDefaultValues = (values: Partial<addUserType> = {}) => {
     name: "",
     email: "",
     password: "",
-    image: null,
   };
 
   return { ...defaultValues, ...values };

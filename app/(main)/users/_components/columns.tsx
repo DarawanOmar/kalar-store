@@ -111,7 +111,6 @@ const column: ColumnDef<User>[] = [
                     name: row.original.name,
                     email: row.original.email,
                     password: "",
-                    image: null,
                   }}
                   isEdit
                   handleClose={handleClose}

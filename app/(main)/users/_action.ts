@@ -37,14 +37,7 @@ export const getAllUsers = async (search: string, page: number) => {
 };
 
 export const addUserAction = async (values: addUserType) => {
-  const { image, ...rest } = values;
   try {
-    if (image) {
-      const data = (await image?.arrayBuffer()) as ArrayBuffer;
-      const buffer = Buffer.from(data);
-      await fs.writeFile(`public/img/${image?.name}`, buffer);
-    }
-
     const parasedData = addUser.safeParse(values);
     if (parasedData.success === false) {
       const errors = Object.entries(
@@ -59,7 +52,7 @@ export const addUserAction = async (values: addUserType) => {
       parasedData.data.password as string,
       12
     );
-    const { image: rasm, password, ...restSend } = parasedData.data;
+    const { password, ...restSend } = parasedData.data;
     await db.users.create({
       data: {
         ...restSend,
@@ -81,16 +74,23 @@ export const addUserAction = async (values: addUserType) => {
 
 export const updateUser = async (id: number, data: addUserType) => {
   try {
-    const { image, ...rest } = data;
-    if (image) {
-      const data = (await image?.arrayBuffer()) as ArrayBuffer;
-      const buffer = Buffer.from(data);
-      await fs.writeFile(`public/img/${image?.name}`, buffer);
+    const parasedData = addUser.safeParse(data);
+    if (parasedData.success === false) {
+      const errors = Object.entries(
+        parasedData.error.flatten().fieldErrors
+      ).map(([field, error]) => `${field}: ${error}`);
+      return {
+        message: errors.join(", "),
+        success: false,
+      };
     }
+
     const hashPassword = await bcrypt.hash(data.password as string, 12);
+    const { password, ...restSend } = parasedData.data;
+
     await db.users.update({
       data: {
-        ...rest,
+        ...restSend,
         password: hashPassword,
       },
       where: { id },
