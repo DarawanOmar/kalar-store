@@ -7,6 +7,27 @@ import {
 } from "./(main)/layout";
 import { ThemeProvider } from "@/providers/theme-providers";
 import { Toaster } from "sonner";
+import { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: {
+    default: "Kalar Store",
+    template: "%s - Kalar Store",
+  },
+  description:
+    "Kalar Store is a place where you can find all the products you need.",
+  twitter: {
+    card: "summary_large_image",
+  },
+  openGraph: {
+    type: "website",
+    locale: "en_US",
+    url: "https://kalar-store.vercel.app",
+    siteName: "Kalar Store",
+  },
+  metadataBase: new URL("https://kalar-store.vercel.app"),
+  manifest: "/manifest.json",
+};
 
 export default function MainLayout({
   children,
