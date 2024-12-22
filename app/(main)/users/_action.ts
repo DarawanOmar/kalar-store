@@ -64,7 +64,6 @@ export const addUserAction = async (values: addUserType) => {
       data: {
         ...restSend,
         password: hashPassword,
-        image: image?.name,
       },
     });
     return {
@@ -88,11 +87,11 @@ export const updateUser = async (id: number, data: addUserType) => {
       const buffer = Buffer.from(data);
       await fs.writeFile(`public/img/${image?.name}`, buffer);
     }
-
+    const hashPassword = await bcrypt.hash(data.password as string, 12);
     await db.users.update({
       data: {
         ...rest,
-        ...(image ? { image: image.name } : {}),
+        password: hashPassword,
       },
       where: { id },
     });
