@@ -79,6 +79,11 @@ const data = {
       url: "/purchase-invoice",
       icon: ShoppingCart,
     },
+    {
+      title: "بەکارهێنەرەکان",
+      url: "/users",
+      icon: Bot,
+    },
   ],
 };
 

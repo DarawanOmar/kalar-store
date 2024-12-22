@@ -44,7 +44,7 @@ function CustomDialog({
           <Button
             variant={"gooeyRight"}
             className={cn(
-              "flex items-center gap-2 gradient-blue px-4 py-2 rounded-xl cursor-pointer font-sirwan_reguler",
+              "flex items-center gap-2 gradient-blue px-4 py-2 rounded-xl cursor-pointer font-sirwan_reguler ",
               className
             )}
           >

@@ -2,14 +2,11 @@ const { PrismaClient } = require("@prisma/client");
 const prisma = new PrismaClient();
 async function main() {
   await Promise.all([
-    await prisma.products.create({
+    await prisma.users.create({
       data: {
-        name: "Product 1",
-        price: 100,
-        quantity: 10,
-        description: "Product 1 Description",
-        createdAt: new Date(),
-        updatedAt: new Date(),
+        email: "admin@gmail.com",
+        password: "admin",
+        name: "Admin",
       },
     }),
   ]).then(() => {

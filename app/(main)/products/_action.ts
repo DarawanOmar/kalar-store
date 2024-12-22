@@ -2,6 +2,7 @@
 
 import db from "@/lib/prisma";
 import { addProductType } from "./_type";
+import { promises as fs } from "fs";
 
 export const getAllProducts = async () => {
   const produts = await db.products.findMany();
@@ -9,9 +10,16 @@ export const getAllProducts = async () => {
 };
 export const addProducts = async (values: addProductType) => {
   const { image, ...rest } = values;
+  const data = (await image?.arrayBuffer()) as ArrayBuffer;
+  const buffer = Buffer.from(data);
+  await fs.writeFile(`public/img/${image?.name}`, buffer);
+
   try {
     await db.products.create({
-      data: rest,
+      data: {
+        ...rest,
+        image: image?.name,
+      },
     });
     return {
       message: "بە سەرکەوتویی زیاد کرا",

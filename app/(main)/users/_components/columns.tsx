@@ -11,15 +11,15 @@ import {
 import { Button } from "@/components/ui/button";
 import { EditIcon, MoreVertical, TrashIcon } from "lucide-react";
 import React from "react";
-import { Expenses } from "../_type";
 import { DataTableColumnHeader } from "@/components/reuseable/data-table-column-header";
 import ReusableDeleteDailog from "@/components/reuseable/reusable-delete-dialog";
 import CustomDialog from "@/components/reuseable/resusable-dialog";
-import AddExpenses from "./form/add-expenses";
-import { deleteExpenses } from "../_action";
+import { User } from "../_type";
+import AddUser from "./form/add-user";
 import { format } from "date-fns";
+import { deleteUser } from "../_action";
 
-const column: ColumnDef<Expenses>[] = [
+const column: ColumnDef<User>[] = [
   {
     accessorKey: "id",
     header: ({ column }) => (
@@ -42,33 +42,15 @@ const column: ColumnDef<Expenses>[] = [
   },
 
   {
-    accessorKey: "quantity",
+    accessorKey: "email",
     header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="بڕ" />
-    ),
-  },
-  {
-    accessorKey: "price",
-    header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="نرخ" />
-    ),
-  },
-  {
-    accessorKey: "total",
-    header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="کۆی گشتی" />
-    ),
-  },
-  {
-    accessorKey: "note",
-    header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="تێبینی" />
+      <DataTableColumnHeader column={column} title="ئیمەیڵ" />
     ),
   },
   {
     accessorKey: "createdAt",
     header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="بەروار" />
+      <DataTableColumnHeader column={column} title="بەرواری دروستکردن" />
     ),
     cell: function CellComponent({ row }) {
       return <div>{format(row.original.createdAt, "yyyy-M-d")}</div>;
@@ -107,21 +89,20 @@ const column: ColumnDef<Expenses>[] = [
                   </button>
                 }
               >
-                <AddExpenses
+                <AddUser
+                  id={id}
                   info={{
                     name: row.original.name,
-                    price: row.original.price,
-                    quantity: row.original.quantity,
-                    note: row.original.note || "",
+                    email: row.original.email,
+                    password: "",
                   }}
-                  id={id}
                   isEdit
                   handleClose={handleClose}
                 />
               </CustomDialog>
               <hr className="border-gray" />
               <ReusableDeleteDailog
-                title="دڵنیایت لە سڕینەوەی خەرجی"
+                title="دڵنیایت لە سڕینەوەی بەکارهێنەر"
                 isFreshButtonPass
                 button={
                   <button className="flex gap-2 items-center font-sirwan_reguler  hover:bg-primary hover:text-white transition-all duration-500 p-2 rounded-b-lg w-full ">
@@ -129,7 +110,7 @@ const column: ColumnDef<Expenses>[] = [
                     <span className="text-sm">سڕینەوە</span>
                   </button>
                 }
-                actionDelete={deleteExpenses}
+                actionDelete={deleteUser}
                 id={id}
               />
             </DropdownMenuContent>

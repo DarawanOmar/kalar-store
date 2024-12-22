@@ -9,6 +9,7 @@ type Props = {
 };
 
 function CardProduct({ product }: Props) {
+  console.log(product.image);
   return (
     <div className="p-6 bg-background rounded-xl shadow-md border relative">
       <div className="absolute top-4 left-2">
@@ -28,7 +29,7 @@ function CardProduct({ product }: Props) {
       </div>
       <AspectRatio ratio={3 / 2} className="overflow-hidden rounded-md ">
         <Image
-          src={"/film/1899.jpg"}
+          src={`/img/${product.image}`}
           alt={product.name}
           fill
           className="rounded object-cover transition-all "

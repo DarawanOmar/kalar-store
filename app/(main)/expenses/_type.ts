@@ -10,7 +10,7 @@ export const addExpenses = z.object({
     .number({ message: "ژمارە داخڵ بکە" })
     .positive({ message: "ژمارەی نرخ بەرزترە لە سفر بێت" })
     .min(1, { message: "نرخی فرۆشتن داخڵ بکە" }),
-  description: z.string().min(1, { message: "تێبینی داخڵ بکە" }),
+  note: z.string().min(1, { message: "تێبینی داخڵ بکە" }),
 });
 
 export type addExpensesType = z.infer<typeof addExpenses>;
@@ -18,9 +18,10 @@ export type addExpensesType = z.infer<typeof addExpenses>;
 export interface Expenses {
   id: number;
   name: string;
-  quantity: number;
   price: number;
-  totalAmount: number;
-  description: string;
-  createdAt: string;
+  quantity: number;
+  note: string | null;
+  total: number;
+  createdAt: Date;
+  updatedAt: Date;
 }

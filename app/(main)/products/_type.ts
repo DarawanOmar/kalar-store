@@ -31,6 +31,7 @@ export interface Product {
   id: number;
   name: string;
   barcode: string;
+  image: string | null;
   sale_price: number;
   purchase_price: number;
   quantity: number;

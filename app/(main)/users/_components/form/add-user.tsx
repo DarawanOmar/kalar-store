@@ -16,34 +16,33 @@ import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
 import { useTransition } from "react";
 import { LuLoaderCircle } from "react-icons/lu";
-import { addExpenses, addExpensesType } from "../../_type";
-import { Textarea } from "@/components/ui/textarea";
-import { addExpensesAction, updateExpenses } from "../../_action";
+import { addUser, addUserType } from "../../_type";
+import { addUserAction, updateUser } from "../../_action";
 
 type filmFormProps = {
   isEdit?: boolean;
-  info?: addExpensesType;
+  info?: addUserType;
   handleClose?: () => void;
   id?: number;
 };
 
-export default function AddExpenses({
+export default function AddUser({
   isEdit,
   info,
   handleClose,
   id,
 }: filmFormProps) {
   const [pendding, setPendding] = useTransition();
-  const form = useForm<addExpensesType>({
-    resolver: zodResolver(addExpenses),
+  const form = useForm<addUserType>({
+    resolver: zodResolver(addUser),
     defaultValues: getDefaultValues(info),
   });
 
-  function onSubmit(values: addExpensesType) {
+  function onSubmit(values: addUserType) {
     setPendding(async () => {
       const result = isEdit
-        ? await updateExpenses(id as number, values)
-        : await addExpensesAction(values);
+        ? await updateUser(id as number, values)
+        : await addUserAction(values);
       if (result.success) {
         toast.success(result.message);
         handleClose && handleClose();
@@ -83,27 +82,6 @@ export default function AddExpenses({
                 )}
               />
             ))}
-          <FormField
-            control={form.control}
-            name="note"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>
-                  {labelTranslate(
-                    field.name as keyof typeof form.formState.errors
-                  )}
-                </FormLabel>
-                <FormControl>
-                  <Textarea
-                    placeholder="تێبینی"
-                    className="resize-none border border-soft_red rounded-xl"
-                    {...field}
-                  />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
         </div>
 
         <div className=" max-w-lg mx-auto gap-16 w-full mt-10 flex  justify-between items-center ">
@@ -135,12 +113,11 @@ export default function AddExpenses({
   );
 }
 
-const getDefaultValues = (values: Partial<addExpensesType> = {}) => {
-  const defaultValues: addExpensesType = {
+const getDefaultValues = (values: Partial<addUserType> = {}) => {
+  const defaultValues: addUserType = {
     name: "",
-    price: 0,
-    quantity: 0,
-    note: "",
+    email: "",
+    password: "",
   };
 
   return { ...defaultValues, ...values };
@@ -150,12 +127,10 @@ function labelTranslate(name: string) {
   switch (name) {
     case "name":
       return "ناو";
-    case "note":
-      return "تێبینی";
-    case "price":
-      return "نرخ";
-    case "quantity":
-      return "بڕ";
+    case "email":
+      return "ئیمەیڵ";
+    case "password":
+      return "پاسۆرد";
     default:
       return name;
   }

@@ -23,6 +23,8 @@ function titleName(path: string) {
       return "بەرهەمەکان";
     case "/purchase":
       return "کڕین";
+    case "/users":
+      return "بەکارهێنەرەکان";
     case "/sale":
       return "فرۆشتن";
     case "/expenses":

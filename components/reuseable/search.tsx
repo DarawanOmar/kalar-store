@@ -19,6 +19,7 @@ function Search({
   const [name, setName] = useQueryState(nameSearch, {
     clearOnDefault: true,
     defaultValue: "",
+    shallow: false,
   });
   return (
     <div>
