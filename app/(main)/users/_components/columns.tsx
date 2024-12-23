@@ -110,7 +110,8 @@ const column: ColumnDef<User>[] = [
                   info={{
                     name: row.original.name,
                     email: row.original.email,
-                    password: "",
+                    // password: "",
+                    image: (row?.original?.image as string) || "",
                   }}
                   isEdit
                   handleClose={handleClose}
