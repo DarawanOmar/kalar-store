@@ -17,12 +17,7 @@ export const addProduct = z.object({
     .positive({ message: "ژمارەی نرخ بەرزترە لە سفر بێت" })
     .min(1, { message: "نرخی کڕین داخڵ بکە" }),
   note: z.string().min(1, { message: "تێبینی داخڵ بکە" }),
-  image: z
-    .instanceof(File) // Ensure the value is of type `File`
-    .refine((file) => file.size < sizeImage, {
-      message: "File size must be less than 1MB",
-    })
-    .nullable(),
+  image: z.string().nullable(),
 });
 
 export type addProductType = z.infer<typeof addProduct>;

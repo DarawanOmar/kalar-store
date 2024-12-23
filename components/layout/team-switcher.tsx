@@ -13,6 +13,7 @@ export function TeamSwitcher({ isName }: { isName: boolean }) {
   const [user, setUser] = React.useState({
     name: "",
     email: "",
+    image: "",
   });
   React.useEffect(() => {
     const fetch = async () => {
@@ -21,6 +22,7 @@ export function TeamSwitcher({ isName }: { isName: boolean }) {
       setUser({
         name: spilt[0],
         email: spilt[1],
+        image: spilt[2],
       });
     };
     fetch();
@@ -28,7 +30,7 @@ export function TeamSwitcher({ isName }: { isName: boolean }) {
   return (
     <SidebarMenuButton
       size="lg"
-      className="data-[state=open]:bg-primary data-[state=open]:text-sidebar-accent-foreground "
+      className="data-[state=open]:bg-primary data-[state=open]:text-sidebar-accent-foreground flex items-center"
     >
       <div
         className={cn(
@@ -38,13 +40,23 @@ export function TeamSwitcher({ isName }: { isName: boolean }) {
           }
         )}
       >
-        <Image
-          src={"/logo.jpg"}
-          alt="Kalar-Store"
-          height={70}
-          width={70}
-          className="rounded-full"
-        />
+        {isName ? (
+          <Image
+            src={user.image ? user.image : "/logo.jpg"}
+            alt="Kalar-Store"
+            height={50}
+            width={50}
+            className=" rounded-full object-cover"
+          />
+        ) : (
+          <Image
+            src="/logo.jpg"
+            alt="Kalar-Store"
+            height={70}
+            width={70}
+            className="rounded-full"
+          />
+        )}
       </div>
       <div className="flex flex-col">
         {user.name == "" ? (

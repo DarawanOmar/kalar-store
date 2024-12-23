@@ -1,8 +1,10 @@
 "use server";
 
 import db from "@/lib/prisma";
-import { addProductType } from "./_type";
+import { addProduct, addProductType } from "./_type";
 import { promises as fs } from "fs";
+import { UTApi } from "uploadthing/server";
+import { utapi } from "@/server/uploadthing";
 
 export const getAllProducts = async (search: string, page: number) => {
   const pageSize = 10;
@@ -22,19 +24,20 @@ export const getAllProducts = async (search: string, page: number) => {
   return produts;
 };
 export const addProducts = async (values: addProductType) => {
-  const { image, ...rest } = values;
-  if (image) {
-    console.log("We Have Image");
-    const data = (await image?.arrayBuffer()) as ArrayBuffer;
-    const buffer = Buffer.from(data);
-    await fs.writeFile(`public/img/${image?.name}`, buffer);
-  }
   try {
+    const parasedData = addProduct.safeParse(values);
+    if (parasedData.success === false) {
+      const errors = Object.entries(
+        parasedData.error.flatten().fieldErrors
+      ).map(([field, error]) => `${field}: ${error}`);
+      return {
+        message: errors.join(", "),
+        success: false,
+      };
+    }
+
     await db.products.create({
-      data: {
-        ...rest,
-        image: image?.name,
-      },
+      data: { ...parasedData.data },
     });
     return {
       message: "بە سەرکەوتویی زیاد کرا",
@@ -48,19 +51,20 @@ export const addProducts = async (values: addProductType) => {
   }
 };
 export const updateProducts = async (id: number, values: addProductType) => {
-  const { image, ...rest } = values;
-  if (image) {
-    console.log("We Have Image");
-    const data = (await image?.arrayBuffer()) as ArrayBuffer;
-    const buffer = Buffer.from(data);
-    await fs.writeFile(`public/img/${image?.name}`, buffer);
-  }
-
   try {
+    const parasedData = addProduct.safeParse(values);
+    if (parasedData.success === false) {
+      const errors = Object.entries(
+        parasedData.error.flatten().fieldErrors
+      ).map(([field, error]) => `${field}: ${error}`);
+      return {
+        message: errors.join(", "),
+        success: false,
+      };
+    }
     await db.products.update({
       data: {
-        ...rest,
-        ...(image ? { image: image.name } : {}),
+        ...parasedData.data,
       },
       where: { id },
     });
@@ -80,6 +84,21 @@ export const deleteProducts = async (id: number) => {
     await db.products.delete({
       where: { id },
     });
+    return {
+      message: "بە سەرکەوتویی سڕایەوە",
+      success: true,
+    };
+  } catch (error) {
+    return {
+      message: "هەڵەیەک هەیە",
+      success: false,
+    };
+  }
+};
+
+export const deleteIamge = async (imageKey: string) => {
+  try {
+    await utapi.deleteFiles(imageKey);
     return {
       message: "بە سەرکەوتویی سڕایەوە",
       success: true,

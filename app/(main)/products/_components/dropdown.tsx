@@ -52,7 +52,7 @@ function DropdownMenuProduct({ product }: Props) {
                   sale_price: product?.sale_price,
                   quantity: product?.quantity,
                   note: product?.note || "",
-                  image: null,
+                  image: product.image,
                 }}
                 handleClose={handleClose}
               />

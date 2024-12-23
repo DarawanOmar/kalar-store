@@ -16,7 +16,17 @@ function SkelotonCard({ className, height = "h-96" }: Props) {
       )}
     >
       {Array.from({ length: 8 }).map((_, index) => (
-        <div key={index} className="grid gap-5">
+        <div
+          key={index}
+          className="grid gap-5 border border-zinc-300/30 rounded-xl p-6 bg-background"
+        >
+          <div className="flex justify-between items-center">
+            <div className="flex flex-col gap-3">
+              <Skeleton className="h-2 w-20 rounded" />
+              <Skeleton className="h-2 w-40 rounded" />
+            </div>
+            <Skeleton className="h-5 w-5 rounded-full" />
+          </div>
           <Skeleton className={cn("h-96 w-full rounded-lg", height)} />
           <div className="flex justify-between items-center">
             <div className="flex flex-col gap-3">

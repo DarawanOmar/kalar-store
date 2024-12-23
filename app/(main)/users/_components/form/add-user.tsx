@@ -27,6 +27,9 @@ import {
 } from "@/components/ui/file-upload";
 import { AspectRatio } from "@/components/ui/aspect-ratio";
 import Image from "next/image";
+import { UploadDropzone } from "@/utils/uploadthing";
+import { UploadCloud } from "lucide-react";
+import { deleteIamge } from "@/app/(main)/products/_action";
 
 type filmFormProps = {
   isEdit?: boolean;
@@ -91,6 +94,39 @@ export default function AddUser({
                 )}
               />
             ))}
+          <div className="">
+            <FormLabel>وێنە</FormLabel>
+            <UploadDropzone
+              endpoint="imageUploader"
+              appearance={{
+                button: "bg-primary text-white ",
+                allowedContent: "text-primary",
+                label: "text-primary",
+                container: "border border-primary",
+              }}
+              className="text-primary "
+              content={{
+                label: "کلیک بکە یان وێنەکە ڕابکێشە",
+                allowedContent: "وێنەکە کەمتر لە ١ MB بێت",
+                uploadIcon(arg) {
+                  return <UploadCloud size={40} />;
+                },
+              }}
+              onClientUploadComplete={async (res) => {
+                if (isEdit && info?.image) {
+                  console.log("Deleted Image");
+                  const url = info?.image;
+                  const key = url.split("/").pop();
+                  await deleteIamge(key as string);
+                }
+                form.setValue("image", res[0].url);
+                toast.success("بە سەرکەوتووی ئەپڵۆد کرا");
+              }}
+              onUploadError={(error: Error) => {
+                toast.error(`کێشە: ${error.message}`);
+              }}
+            />
+          </div>
         </div>
 
         <div className=" max-w-lg mx-auto gap-16 w-full mt-10 flex  justify-between items-center ">
@@ -127,6 +163,7 @@ const getDefaultValues = (values: Partial<addUserType> = {}) => {
     name: "",
     email: "",
     password: "",
+    image: "",
   };
 
   return { ...defaultValues, ...values };

@@ -12,4 +12,16 @@ const withPWA = withPWAInit({
   },
 });
 
-export default withPWA({});
+export default withPWA({
+  experimental: {
+    ppr: true,
+  },
+  images: {
+    remotePatterns: [
+      {
+        hostname: "utfs.io",
+        protocol: "https",
+      },
+    ],
+  },
+});

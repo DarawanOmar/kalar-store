@@ -26,7 +26,9 @@ import {
 import Image from "next/image";
 import { sizeImage } from "@/lib/globals";
 import { AspectRatio } from "@/components/ui/aspect-ratio";
-import { addProducts, updateProducts } from "../../_action";
+import { addProducts, deleteIamge, updateProducts } from "../../_action";
+import { UploadDropzone } from "@/utils/uploadthing";
+import { UploadCloud } from "lucide-react";
 
 type filmFormProps = {
   isEdit?: boolean;
@@ -92,50 +94,36 @@ export default function AddProduct({
               />
             ))}
           <div className="">
-            <FormField
-              control={form.control}
-              name="image"
-              render={({ field }) => (
-                <>
-                  <FormLabel>وێنە</FormLabel>
-                  <FileUploader
-                    value={field.value ? [field.value] : null}
-                    onValueChange={(files) => {
-                      const selectedFile = files?.[0] || null;
-                      field.onChange(selectedFile);
-                    }}
-                    dropzoneOptions={{
-                      multiple: false,
-                      maxFiles: 19,
-                      maxSize: sizeImage,
-                    }}
-                    reSelect={true}
-                    className="relative bg-background rounded-lg p-2"
-                  >
-                    <FileInput className=" outline-dashed outline-1 outline-gray-200 max-w-[300px] w-full">
-                      <div className="flex items-center justify-center flex-col pt-3 pb-4 w-full ">
-                        {field.value && (
-                          <FileUploaderItem
-                            index={0}
-                            aria-roledescription={`file containing ${field.value.name}`}
-                            className="p-0 size-20"
-                          >
-                            <AspectRatio className="size-full">
-                              <Image
-                                src={URL.createObjectURL(field.value)} // Convert File to Object URL
-                                alt={field.value.name} // Use file name as alt
-                                className="object-cover rounded-md"
-                                fill
-                              />
-                            </AspectRatio>
-                          </FileUploaderItem>
-                        )}
-                        {!field.value && <FileSvgDraw />}
-                      </div>
-                    </FileInput>
-                  </FileUploader>
-                </>
-              )}
+            <FormLabel>وێنە</FormLabel>
+            <UploadDropzone
+              endpoint="imageUploader"
+              appearance={{
+                button: "bg-primary text-white ",
+                allowedContent: "text-primary",
+                label: "text-primary",
+                container: "border border-primary",
+              }}
+              className="text-primary "
+              content={{
+                label: "کلیک بکە یان وێنەکە ڕابکێشە",
+                allowedContent: "وێنەکە کەمتر لە ١ MB بێت",
+                uploadIcon(arg) {
+                  return <UploadCloud size={40} />;
+                },
+              }}
+              onClientUploadComplete={async (res) => {
+                if (isEdit && info?.image) {
+                  console.log("Deleted Image");
+                  const url = info?.image;
+                  const key = url.split("/").pop();
+                  await deleteIamge(key as string);
+                }
+                form.setValue("image", res[0].url);
+                toast.success("بە سەرکەوتووی ئەپڵۆد کرا");
+              }}
+              onUploadError={(error: Error) => {
+                toast.error(`کێشە: ${error.message}`);
+              }}
             />
           </div>
         </div>
@@ -169,13 +157,6 @@ export default function AddProduct({
   );
 }
 
-// name           String
-// barcode        String
-// sale_price     Int
-// purchase_price Int
-// quantity       Int
-// note           String?
-
 const getDefaultValues = (values: Partial<addProductType> = {}) => {
   const defaultValues: addProductType = {
     name: "",
@@ -184,7 +165,7 @@ const getDefaultValues = (values: Partial<addProductType> = {}) => {
     quantity: 0,
     purchase_price: 0,
     sale_price: 0,
-    image: null,
+    image: "",
   };
 
   return { ...defaultValues, ...values };

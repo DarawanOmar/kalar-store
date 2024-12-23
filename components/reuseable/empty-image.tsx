@@ -1,7 +1,7 @@
 import { cn } from "@/lib/utils";
 import Image from "next/image";
 import React from "react";
-import Empty from "@/public/empty.svg";
+import Empty from "@/public/empty-data.svg";
 
 function EmptyImage({
   height = 300,

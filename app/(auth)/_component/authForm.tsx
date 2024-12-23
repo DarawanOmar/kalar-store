@@ -34,7 +34,12 @@ export default function AuthForm() {
     startTransition(async () => {
       const res = await loginAction(values);
       if (res?.success && res.data) {
-        const user = res.data?.name + ",between," + res.data?.email;
+        const user =
+          res.data?.name +
+          ",between," +
+          res.data?.email +
+          ",between," +
+          res.data?.image;
         login(user, "/");
         toast.success(res.message);
       } else {

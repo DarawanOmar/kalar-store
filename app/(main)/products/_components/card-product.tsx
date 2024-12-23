@@ -1,9 +1,10 @@
 import { AspectRatio } from "@radix-ui/react-aspect-ratio";
-import Image from "next/image";
 import React from "react";
 import DropdownMenuProduct from "./dropdown";
 import { Product } from "../_type";
-
+import DynamicImageBuler from "@/components/reuseable/dynamic-blur-image";
+import Image from "next/image";
+import placeholder from "@/public/empty-data.svg";
 type Props = {
   product: Product;
 };
@@ -28,11 +29,16 @@ function CardProduct({ product }: Props) {
         </div>
       </div>
       <AspectRatio ratio={3 / 2} className="overflow-hidden rounded-md ">
+        {/* <DynamicImageBuler
+          src={product.image as string}
+          alt={product.name}
+          className="rounded object-cover transition-all "
+        /> */}
         <Image
-          src={`/img/${product.image}`}
+          src={product.image ? product.image : placeholder}
           alt={product.name}
           fill
-          className="rounded object-cover transition-all "
+          className="rounded object-cover transition-all"
         />
       </AspectRatio>
       <div className="flex justify-between items-center  w-full mt-5">

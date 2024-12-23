@@ -8,6 +8,9 @@ import {
 import { ThemeProvider } from "@/providers/theme-providers";
 import { Toaster } from "sonner";
 import { Metadata } from "next";
+import { NextSSRPlugin } from "@uploadthing/react/next-ssr-plugin";
+import { extractRouterConfig } from "uploadthing/server";
+import { ourFileRouter } from "@/app/api/uploadthing/core";
 
 export const metadata: Metadata = {
   title: {
@@ -29,6 +32,13 @@ export const metadata: Metadata = {
   manifest: "/manifest.json",
 };
 
+import { connection } from "next/server";
+import { Suspense } from "react";
+async function UTSSR() {
+  await connection();
+  return <NextSSRPlugin routerConfig={extractRouterConfig(ourFileRouter)} />;
+}
+
 export default function MainLayout({
   children,
 }: Readonly<{
@@ -46,6 +56,9 @@ export default function MainLayout({
       >
         <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
           <main>
+            <Suspense>
+              <UTSSR />
+            </Suspense>
             {children}
             <Toaster dir="rtl" className="font-sirwan_meduim" />
           </main>
