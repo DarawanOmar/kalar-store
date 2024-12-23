@@ -42,10 +42,10 @@ const column: ColumnDef<User>[] = [
     ),
     cell: function CellComponent({ row }) {
       return (
-        <div className="flex justify-start items-center gap-1 ms-10">
+        <div className="flex justify-center items-center gap-1">
           <Image
             src={"/logo.jpg"}
-            className="size-7 items-end rounded-full object-cover object-center"
+            className="size-7 items-end rounded-full object-cover object-center "
             height={200}
             width={200}
             alt="user"

@@ -65,7 +65,7 @@ export function NavMain({
           className="py-[18px]   hover:bg-primary hover:text-white  transition-all duration-500"
         >
           {pendding ? (
-            <LuLoaderCircle className="text-white animate-spin transition-all duration-500" />
+            <LuLoaderCircle className="animate-spin transition-all duration-500" />
           ) : (
             <LogOut />
           )}

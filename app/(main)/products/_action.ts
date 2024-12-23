@@ -24,6 +24,7 @@ export const getAllProducts = async (search: string, page: number) => {
 export const addProducts = async (values: addProductType) => {
   const { image, ...rest } = values;
   if (image) {
+    console.log("We Have Image");
     const data = (await image?.arrayBuffer()) as ArrayBuffer;
     const buffer = Buffer.from(data);
     await fs.writeFile(`public/img/${image?.name}`, buffer);
@@ -49,6 +50,7 @@ export const addProducts = async (values: addProductType) => {
 export const updateProducts = async (id: number, values: addProductType) => {
   const { image, ...rest } = values;
   if (image) {
+    console.log("We Have Image");
     const data = (await image?.arrayBuffer()) as ArrayBuffer;
     const buffer = Buffer.from(data);
     await fs.writeFile(`public/img/${image?.name}`, buffer);
