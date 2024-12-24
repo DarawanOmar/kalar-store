@@ -42,16 +42,18 @@ const column: ColumnDef<User>[] = [
     ),
     cell: function CellComponent({ row }) {
       return (
-        <div className="flex justify-center items-center gap-1">
-          <Image
-            src={row.original.image ? row.original.image : "/logo.jpg"}
-            className="size-7 items-end rounded-full object-cover object-center "
-            height={200}
-            width={200}
-            alt="user"
-            priority
-          />
-          {row.original.name}
+        <div className="grid  place-items-center text-right">
+          <div className="flex items-center gap-1">
+            <Image
+              src={row.original.image ? row.original.image : "/logo.jpg"}
+              className="size-7 items-end rounded-full object-cover object-center  "
+              height={200}
+              width={200}
+              alt="user"
+              priority
+            />
+            <span>{row.original.name}</span>
+          </div>{" "}
         </div>
       );
     },

@@ -6,7 +6,7 @@ function TitlePage() {
   const pathname = usePathname();
   return (
     <div>
-      <h1 className="flex items-center gap-2 text-lg text-primary font-sirwan_meduim">
+      <h1 className="flex items-center gap-2 text-lg text-soft_primary font-sirwan_meduim">
         {titleName(pathname)}
       </h1>
     </div>

@@ -81,6 +81,21 @@ export const updateProducts = async (id: number, values: addProductType) => {
 };
 export const deleteProducts = async (id: number) => {
   try {
+    const product = await db.products.findUnique({
+      where: { id },
+    });
+    if (!product) {
+      return {
+        message: "ببورە، ئەم کاڵایە بوونی نییە",
+        success: false,
+      };
+    }
+    const url = product.image as string;
+    if (url) {
+      const key = url.split("/").pop();
+      await deleteIamge(key as string);
+    }
+
     await db.products.delete({
       where: { id },
     });

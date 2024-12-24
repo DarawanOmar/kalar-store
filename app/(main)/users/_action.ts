@@ -3,6 +3,7 @@ import bcrypt from "bcrypt";
 import db from "@/lib/prisma";
 import { addUser, addUserType } from "./_type";
 import { promises as fs } from "fs";
+import { deleteIamge } from "../products/_action";
 
 export const getAllUsers = async (search: string, page: number) => {
   try {
@@ -48,6 +49,16 @@ export const addUserAction = async (values: addUserType) => {
         success: false,
       };
     }
+    const existUser = await db.users.findUnique({
+      where: { email: parasedData.data.email },
+    });
+    if (existUser) {
+      return {
+        message: "ببورە، ئەم بەکارهێنەرە بوونی هەیە",
+        success: false,
+      };
+    }
+
     const hashPassword = await bcrypt.hash(
       parasedData.data.password as string,
       12
@@ -84,14 +95,31 @@ export const updateUser = async (id: number, data: addUserType) => {
         success: false,
       };
     }
+    const existUser = await db.users.findUnique({
+      where: { id },
+    });
+    if (!existUser) {
+      return {
+        message: "ببورە، ئەم بەکارهێنەرە بوونی نییە",
+        success: false,
+      };
+    }
 
-    const hashPassword = await bcrypt.hash(data.password as string, 12);
-    const { password, ...restSend } = parasedData.data;
+    let hashPassword;
+    if (data.password) {
+      hashPassword = await bcrypt.hash(data.password as string, 12);
+    }
 
+    let imageValue;
+    if (parasedData.data.image) {
+      imageValue = parasedData.data.image;
+    }
     await db.users.update({
       data: {
-        ...restSend,
+        name: parasedData.data.name,
+        email: parasedData.data.email,
         password: hashPassword,
+        image: imageValue,
       },
       where: { id },
     });
@@ -109,6 +137,21 @@ export const updateUser = async (id: number, data: addUserType) => {
 
 export const deleteUser = async (id: number) => {
   try {
+    const existUser = await db.users.findUnique({
+      where: { id },
+    });
+    if (!existUser) {
+      return {
+        message: "ببورە، ئەم بەکارهێنەرە بوونی نییە",
+        success: false,
+      };
+    }
+
+    const url = existUser.image as string;
+    if (url) {
+      const key = url.split("/").pop();
+      await deleteIamge(key as string);
+    }
     await db.users.delete({
       where: { id },
     });

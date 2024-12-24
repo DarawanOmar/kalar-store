@@ -16,7 +16,7 @@ function Title({
   return (
     <p
       className={cn(
-        "text-primary font-normal max-sm:text-sm flex gap-1 items-center  border-b-2 border-primary max-w-max pb-1",
+        "text-soft_primary font-normal max-sm:text-sm flex gap-1 items-center  border-b-2 border-soft_primary max-w-max pb-1",
         className
       )}
     >
