@@ -6,8 +6,7 @@ import { ourFileRouter } from "./core";
 export const { GET, POST } = createRouteHandler({
   router: ourFileRouter,
   config: {
-    token: process.env.UPLOADTHING_TOKEN,
+    token:
+      "eyJhcGlLZXkiOiJza19saXZlXzJiMDI3MDhlYWVhYmM3YWM4MjlhNDE2ZDkzYzQ5NDUxYmE5MWMyYWRmMDQ2YjQyOGQ5ZTk2Y2VlZDkyYjhkYTYiLCJhcHBJZCI6InlrYmNya3BsNW4iLCJyZWdpb25zIjpbInNlYTEiXX0=",
   },
-  // Apply an (optional) custom config:
-  // config: { ... },
 });
