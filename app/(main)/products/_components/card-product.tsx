@@ -61,6 +61,9 @@ function CardProduct({ product }: Props) {
           </span>
         </div>
       </div>
+      <div className="text-center text-muted-foreground mt-4 text-xs">
+        تێبینی: {product.note || "هیچ تێبینیەک نییە"}
+      </div>
     </div>
   );
 }

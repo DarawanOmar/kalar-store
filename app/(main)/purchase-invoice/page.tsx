@@ -5,8 +5,10 @@ import { SquarePercent } from "lucide-react";
 import React, { Suspense } from "react";
 import PaginatedComponent from "@/components/ui/pagination";
 import FeedPurchaseInvoice from "./_components/feedPurchaseInvoce";
+import { getAllCompleteInvoice } from "./_lib";
 
-function PurchaseInvoice() {
+async function PurchaseInvoice() {
+  // console.dir(allPurchaseInvoice, { depth: null });
   return (
     <div className="my-10">
       <div className="flex flex-col sm:flex-row gap-4 justify-between items-center">

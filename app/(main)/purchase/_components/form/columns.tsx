@@ -1,22 +1,17 @@
 "use client";
 
 import { ColumnDef } from "@tanstack/react-table";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import { Button } from "@/components/ui/button";
-import { EditIcon, MoreVertical, Trash2, TrashIcon } from "lucide-react";
+import { Trash2 } from "lucide-react";
 import React from "react";
 import { DataTableColumnHeader } from "@/components/reuseable/data-table-column-header";
-import ReusableDeleteDailog from "@/components/reuseable/reusable-delete-dialog";
-import CustomDialog from "@/components/reuseable/resusable-dialog";
-import { PurchaseProducts } from "../../_type";
 
-const column: ColumnDef<PurchaseProducts>[] = [
+const column: ColumnDef<{
+  id: number | undefined;
+  name: string | undefined;
+  barcode: string | undefined;
+  quantity: number;
+  purchase_price: number | undefined;
+}>[] = [
   {
     accessorKey: "id",
     header: ({ column }) => (

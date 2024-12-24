@@ -3,8 +3,15 @@ import React from "react";
 import column from "./form/columns";
 import Title from "@/components/reuseable/title";
 import { SquareKanban } from "lucide-react";
+import { getPurchasePorudcts, getUnFinishPurchaseProducts } from "../_actions";
 
-function ShownPurchaseProducts() {
+type Props = {
+  invoice_id: number;
+};
+
+async function ShownPurchaseProducts({ invoice_id }: Props) {
+  const getUnFinishedProducts = await getPurchasePorudcts(invoice_id);
+  // console.log(getUnFinishedProducts.data);
   return (
     <div className="sm:px-6 my-10">
       <Title
@@ -13,7 +20,7 @@ function ShownPurchaseProducts() {
         className="mb-8"
       />
       <DataTable
-        data={[]}
+        data={getUnFinishedProducts.data || []}
         columns={column}
         havePagination={false}
         isSearch={false}

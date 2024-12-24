@@ -2,8 +2,6 @@
 
 import db from "@/lib/prisma";
 import { addProduct, addProductType } from "./_type";
-import { promises as fs } from "fs";
-import { UTApi } from "uploadthing/server";
 import { utapi } from "@/server/uploadthing";
 
 export const getAllProducts = async (search: string, page: number) => {
@@ -16,7 +14,12 @@ export const getAllProducts = async (search: string, page: number) => {
   }
 
   const produts = await db.products.findMany({
-    where,
+    where: {
+      OR: [
+        { name: { contains: search, mode: "insensitive" } },
+        { barcode: { contains: search, mode: "insensitive" } },
+      ],
+    },
     take: 10,
     skip: (page - 1) * pageSize,
     orderBy: { id: "desc" },

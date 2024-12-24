@@ -9,31 +9,16 @@ import {
   FormField,
   FormItem,
   FormLabel,
-  FormMessage,
 } from "@/components/ui/form";
-import { DialogClose } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
 import { useTransition } from "react";
 import { LuLoaderCircle } from "react-icons/lu";
-import { Textarea } from "@/components/ui/textarea";
 import { addInvoice, addInvoiceType } from "../../_type";
-import { CheckCheck, FileText } from "lucide-react";
-import Title from "@/components/reuseable/title";
+import { CheckCheck } from "lucide-react";
+import { addInvoiceAction } from "../../_actions";
 
-type filmFormProps = {
-  isEdit?: boolean;
-  info?: addInvoiceType;
-  handleClose?: () => void;
-  id?: number;
-};
-
-export default function Addinvoice({
-  isEdit,
-  info,
-  handleClose,
-  id,
-}: filmFormProps) {
+export default function Addinvoice() {
   const [pendding, setPendding] = useTransition();
   const form = useForm<addInvoiceType>({
     resolver: zodResolver(addInvoice),
@@ -47,15 +32,13 @@ export default function Addinvoice({
 
   function onSubmit(values: addInvoiceType) {
     setPendding(async () => {
-      //   const result = isEdit
-      //     ? await updatedOffer(id as number, values)
-      //     : await addOffer(values);
-      //   if (result.success) {
-      //     toast.success(result.message);
-      //     handleClose && handleClose();
-      //   } else {
-      //     toast.error(result.message);
-      //   }
+      const result = await addInvoiceAction(values);
+      if (result.success) {
+        toast.success(result.message);
+        form.reset();
+      } else {
+        toast.error(result.message);
+      }
     });
   }
 
@@ -88,15 +71,12 @@ export default function Addinvoice({
             />
           ))}
           <Button type="submit" variant={"gooeyRight"} className="flex gap-1">
-            <CheckCheck size={18} />
-
             {pendding ? (
               <LuLoaderCircle className="animate-spin transition-all duration-500" />
-            ) : isEdit ? (
-              "گۆرانکاری"
             ) : (
-              "تۆمارکردن"
+              <CheckCheck size={18} />
             )}
+            تۆمارکردن
           </Button>
         </div>
         <p className="text-muted-foreground font-normal my-5 text-sm">
