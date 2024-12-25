@@ -5,10 +5,10 @@ import Link from "next/link";
 
 async function FeedPurchaseInvoice() {
   const allPurchaseInvoice = await getAllCompleteInvoice();
-
+  console.log(allPurchaseInvoice.data?.formattedInvoices);
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-10">
-      {allPurchaseInvoice.data?.invoices?.map((invoice, index) => (
+      {allPurchaseInvoice.data?.formattedInvoices?.map((invoice, index) => (
         <div className="bg-background p-4 border rounded-md" key={invoice.id}>
           <div className="flex flex-col gap-2">
             <div className="p-2 rounded-full bg-primary text-white max-w-max mx-auto">
@@ -20,7 +20,7 @@ async function FeedPurchaseInvoice() {
             </p>
             <p className="flex justify-center items-center gap-1 text-muted-foreground text-center">
               <span>IQD</span>
-              {allPurchaseInvoice.data.total.toLocaleString()}
+              {invoice?.total?.toLocaleString()}
             </p>
             <Link
               href={`purchase-invoice/${invoice.id}`}

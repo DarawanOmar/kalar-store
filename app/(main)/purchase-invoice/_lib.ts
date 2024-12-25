@@ -6,26 +6,51 @@ export const getAllCompleteInvoice = async () => {
       where: {
         is_done: true,
       },
-      include: {
+      select: {
+        name: true,
+        invoice_number: true,
+        id: true,
         Purchase_invoice_items: {
-          include: {
-            Products: true,
+          select: {
+            quantity: true,
+            Products: {
+              select: {
+                purchase_price: true,
+              },
+            },
           },
         },
       },
     });
 
-    let total = 0;
-    invoices.forEach((invoice) => {
-      invoice.Purchase_invoice_items.forEach((item) => {
-        if (item.Products) {
-          total += item.quantity * item.Products.purchase_price;
-        }
-      });
+    // let total = 0;
+    // invoices.forEach((invoice) => {
+    //   invoice.Purchase_invoice_items.forEach((item) => {
+    //     if (item.Products) {
+    //       total += item.quantity * item.Products.purchase_price;
+    //     }
+    //   });
+    // });
+
+    // Calculate total of the each invoice
+
+    const formattedInvoices = invoices.map((invoice) => {
+      const total = invoice.Purchase_invoice_items.reduce(
+        (sum, item) =>
+          sum + (item.Products?.purchase_price || 0) * item.quantity,
+        0
+      );
+
+      return {
+        id: invoice.id,
+        name: invoice.name,
+        invoice_number: invoice.invoice_number,
+        total,
+      };
     });
 
     return {
-      data: { invoices, total: total },
+      data: { formattedInvoices },
       success: true,
     };
   } catch (error) {

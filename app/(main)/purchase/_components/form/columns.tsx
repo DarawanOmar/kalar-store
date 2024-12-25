@@ -4,6 +4,8 @@ import { ColumnDef } from "@tanstack/react-table";
 import { Trash2 } from "lucide-react";
 import React from "react";
 import { DataTableColumnHeader } from "@/components/reuseable/data-table-column-header";
+import { deletePurchaseItemProdcut } from "../../_actions";
+import { toast, Toaster } from "sonner";
 
 const column: ColumnDef<{
   id: number | undefined;
@@ -63,12 +65,19 @@ const column: ColumnDef<{
       <DataTableColumnHeader column={column} title="سڕینەوە" />
     ),
     cell: function CellComponent({ row }) {
-      const [open, setOpen] = React.useState(false);
-      const handleClose = () => setOpen((prev) => !prev);
       const { id } = row.original;
+      const handleDelete = async () => {
+        const res = await deletePurchaseItemProdcut(id as number);
+        if (res.success) {
+          toast.success("بە سەرکەوتویی سڕایەوە");
+        } else {
+          toast.error("هەڵەیەک هەیە");
+        }
+      };
       return (
-        <div className="">
+        <div className="flex justify-center items-center">
           <Trash2
+            onClick={handleDelete}
             color="red"
             className="size-9 rounded-lg ms-4 bg-red200 p-2 cursor-pointer"
           />

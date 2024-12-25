@@ -184,7 +184,7 @@ export const getPurchasePorudcts = async (id: number) => {
     });
     const products = res.map((item) => {
       return {
-        id: item.Products?.id,
+        id: item?.id,
         name: item.Products?.name,
         barcode: item.Products?.barcode,
         quantity: item.quantity,
@@ -195,6 +195,36 @@ export const getPurchasePorudcts = async (id: number) => {
     return {
       success: true,
       data: products,
+    };
+  } catch (error) {
+    return {
+      message: "هەڵەیەک هەیە",
+      success: false,
+    };
+  }
+};
+
+export const deletePurchaseItemProdcut = async (id: number) => {
+  try {
+    const existItem = await db.purchase_invoice_items.findUnique({
+      where: {
+        id,
+      },
+    });
+    if (!existItem) {
+      return {
+        message: "ئەم بەرهەمە بوونی نییە",
+        success: false,
+      };
+    }
+    await db.purchase_invoice_items.delete({
+      where: {
+        id,
+      },
+    });
+    return {
+      success: true,
+      message: "بە سەرکەوتویی سڕایەوە",
     };
   } catch (error) {
     return {

@@ -3,7 +3,7 @@ import React from "react";
 import column from "./form/columns";
 import Title from "@/components/reuseable/title";
 import { SquareKanban } from "lucide-react";
-import { getPurchasePorudcts, getUnFinishPurchaseProducts } from "../_actions";
+import { getPurchasePorudcts } from "../_actions";
 
 type Props = {
   invoice_id: number;
