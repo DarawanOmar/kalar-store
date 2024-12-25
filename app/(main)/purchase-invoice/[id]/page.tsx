@@ -8,9 +8,9 @@ import TotalShown from "@/components/reuseable/total-shown";
 import { format } from "date-fns";
 
 type Props = {
-  params: {
+  params: Promise<{
     id: string;
-  };
+  }>;
   searchParams: searchParamsType;
 };
 
