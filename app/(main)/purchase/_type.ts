@@ -5,7 +5,6 @@ export const addInvoice = z.object({
   name: z.string().min(1, { message: "ناو داخڵ بکە" }),
   place: z.string().min(1, { message: "شوێن داخڵ بکە" }),
   note: z.string().min(1, { message: "تێبینی داخڵ بکە" }),
-  is_done: z.boolean().default(false),
 });
 
 export type addInvoiceType = z.infer<typeof addInvoice>;

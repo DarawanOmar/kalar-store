@@ -74,23 +74,27 @@ export default function AddProduct({
                 key={key}
                 control={form.control}
                 name={key as any}
-                render={({ field }) => (
-                  <FormItem className=" w-full  max-w-full">
-                    <FormLabel>{labelTranslate(field.name)}</FormLabel>
-                    <FormControl>
-                      <Input
-                        {...field}
-                        className={cn("w-full ", {
-                          "border-red-500":
-                            form.formState.errors[
-                              field.name as keyof typeof form.formState.errors
-                            ],
-                        })}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
+                render={({ field }) => {
+                  const readOnly = key === "quantity";
+                  return (
+                    <FormItem className=" w-full  max-w-full">
+                      <FormLabel>{labelTranslate(field.name)}</FormLabel>
+                      <FormControl>
+                        <Input
+                          readOnly={readOnly}
+                          {...field}
+                          className={cn("w-full ", {
+                            "border-red-500":
+                              form.formState.errors[
+                                field.name as keyof typeof form.formState.errors
+                              ],
+                          })}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  );
+                }}
               />
             ))}
           <div className="">

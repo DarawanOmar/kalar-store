@@ -18,16 +18,22 @@ import { addInvoice, addInvoiceType } from "../../_type";
 import { CheckCheck } from "lucide-react";
 import { addInvoiceAction } from "../../_actions";
 
-export default function Addinvoice() {
+type Props = {
+  invoice: {
+    invoice_number: string;
+    name: string;
+    place: string;
+    note: string;
+  };
+};
+
+export default function Addinvoice({ invoice }: Props) {
   const [pendding, setPendding] = useTransition();
+  console.log("Invoice => ", invoice);
+
   const form = useForm<addInvoiceType>({
     resolver: zodResolver(addInvoice),
-    defaultValues: {
-      invoice_number: "",
-      name: "",
-      place: "",
-      note: "",
-    },
+    defaultValues: getDefaultValues(invoice),
   });
 
   function onSubmit(values: addInvoiceType) {
@@ -46,7 +52,8 @@ export default function Addinvoice() {
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="  sm:px-6">
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5  gap-5 items-end">
-          {Object.entries(form.getValues()).map(([key, value]) => (
+          {Object.entries(form.getValues())
+          .map(([key, value]) => (
             <FormField
               key={key}
               control={form.control}
@@ -86,6 +93,17 @@ export default function Addinvoice() {
     </Form>
   );
 }
+
+const getDefaultValues = (values: Partial<addInvoiceType> = {}) => {
+  const defaultValues: addInvoiceType = {
+    invoice_number: "",
+    name: "",
+    place: "",
+    note: "",
+  };
+
+  return { ...defaultValues, ...values };
+};
 
 function labelTranslate(name: string) {
   switch (name) {

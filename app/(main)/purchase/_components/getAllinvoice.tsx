@@ -28,8 +28,11 @@ function GetAllinvoice({ unFinishInvoice }: Props) {
   });
 
   const deleteInvoice = () => {
+    const invoice_id = Number(name);
+    if (!invoice_id) {
+      return toast.error(" تکایە پسوڵەکە دیاری بکە یان دانەیەک دروست بکە");
+    }
     setPendding(async () => {
-      const invoice_id = Number(name);
       const result = await deletePurchaseInvoiceAction(invoice_id);
       if (result.success) {
         toast.success(result.message);
@@ -42,11 +45,17 @@ function GetAllinvoice({ unFinishInvoice }: Props) {
 
   return (
     <div className="flex items-center gap-3">
+      <button
+        onClick={() => setName("")}
+        className="text-xs font-sirwan_meduim text-soft_red"
+      >
+        Rest
+      </button>
       <Button
         onClick={deleteInvoice}
         size={"icon"}
         variant={"outline"}
-        className="rounded-md hover:bg-red-500 hover:text-white transition-all duration-500"
+        className="rounded-xl hover:bg-red-500 hover:text-white text-red-500 transition-all duration-500  border border-soft_red"
       >
         {pendding ? (
           <LuLoaderCircle className="animate-spin transition-all duration-500" />

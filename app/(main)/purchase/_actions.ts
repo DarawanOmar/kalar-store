@@ -10,6 +10,9 @@ export const unFinishedInvoice = async () => {
       where: {
         is_done: false,
       },
+      orderBy: {
+        createdAt: "desc",
+      },
     });
 
     return {
@@ -45,6 +48,45 @@ export const unFinishedInvoice = async () => {
   }
 };
 
+export const getOneInvoice = async (id: number) => {
+  try {
+    if (!id) {
+      return {
+        message: "ئەم وەسڵە بوونی نییە",
+        success: false,
+      };
+    }
+    const res = await db.purchase_invoice.findUnique({
+      where: {
+        id,
+      },
+      select: {
+        invoice_number: true,
+        name: true,
+        place: true,
+        note: true,
+      },
+    });
+    if (!res) {
+      return {
+        message: "ئەم وەسڵە بوونی نییە",
+        success: false,
+      };
+    }
+
+    return {
+      success: true,
+      data: res,
+    };
+  } catch (error: any) {
+    console.error("Error fetching invoice:", error.stack);
+    return {
+      message: "هەڵەیەک هەیە",
+      success: false,
+    };
+  }
+};
+
 export const addInvoiceAction = async (values: addInvoiceType) => {
   try {
     const parasedData = addInvoice.safeParse(values);
@@ -60,6 +102,7 @@ export const addInvoiceAction = async (values: addInvoiceType) => {
     await db.purchase_invoice.create({
       data: {
         ...parasedData.data,
+        is_done: false,
       },
     });
     return {
@@ -236,30 +279,58 @@ export const deletePurchaseItemProdcut = async (id: number) => {
 
 export const completeInvoiceAction = async (id: number) => {
   try {
-    const existPurchase = await db.purchase_invoice.findUnique({
-      where: {
-        id,
-      },
+    // Fetch the purchase invoice and its items in a single query
+    const purchaseInvoice = await db.purchase_invoice.findUnique({
+      where: { id },
+      include: { Purchase_invoice_items: true },
     });
-    if (!existPurchase) {
+
+    if (!purchaseInvoice) {
       return {
         message: "ئەم وەسكە بوونی نییە",
         success: false,
       };
     }
-    await db.purchase_invoice.update({
-      where: {
-        id,
-      },
-      data: {
-        is_done: true,
-      },
+
+    const items = purchaseInvoice.Purchase_invoice_items;
+
+    if (items.length === 0) {
+      return {
+        message: "ئەم وەسڵە هیچ کاڵایەکی تێدا تۆمارنەکراوە",
+        success: false,
+      };
+    }
+
+    // Fetch all product IDs and quantities in a single query
+    const productUpdates = items.map((item) => ({
+      product_id: item.product_id,
+      quantity: item.quantity,
+    }));
+
+    // Use a transaction for atomic updates
+    await db.$transaction(async (tx) => {
+      for (const { product_id, quantity } of productUpdates) {
+        if (product_id) {
+          await tx.products.update({
+            where: { id: product_id },
+            data: { quantity: { increment: quantity } },
+          });
+        }
+      }
+
+      // Mark the purchase invoice as done
+      await tx.purchase_invoice.update({
+        where: { id },
+        data: { is_done: true },
+      });
     });
+
     return {
       success: true,
       message: "بە سەرکەوتویی تەواوکرایەوە",
     };
   } catch (error) {
+    console.error(error);
     return {
       message: "هەڵەیەک هەیە",
       success: false,

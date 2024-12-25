@@ -6,7 +6,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-
 import { toast } from "sonner";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -33,14 +32,16 @@ import {
 import { useRouter } from "next/navigation";
 import { useQueryState } from "nuqs";
 
-type Props = {
-  getUnFinishedProducts: any;
-};
-
 export default function AddPurchaseProduct() {
   const router = useRouter();
   const [pendding, setPendding] = useTransition();
-  const [invoice_id, setInvoice_Id] = useQueryState("invoice_id");
+  const [invoice_id, setInvoice_Id] = useQueryState("invoice_id", {
+    clearOnDefault: true,
+    defaultValue: "",
+    shallow: false,
+  });
+
+  // const [invoice_id, setInvoice_Id] = useQueryState("invoice_id");
   const [products, setProducts] = useState<
     {
       id: number;
@@ -74,14 +75,10 @@ export default function AddPurchaseProduct() {
     },
   });
 
-  const barcodeForm = form.watch("barcode");
   useEffect(() => {
     const fetchProduct = async () => {
       try {
         const res = await getProductByBarcode(barcodeQuery);
-        // if (!res.data || res.data.length === 0) {
-        //   return toast.error("ئەم بارکۆدە بەرهەم نییە");
-        // }
         const data = res.data;
         setProducts(data || []);
       } catch (error) {
@@ -115,6 +112,8 @@ export default function AddPurchaseProduct() {
   );
 
   function onSubmit(values: addProductPurchaseType) {
+    if (!invoice_id)
+      return toast.error(" تکایە پسوڵەکە دیاری بکە یان دانەیەک دروست بکە");
     setPendding(async () => {
       const result = await addProductPurchaseAction(
         Number(invoice_id),
@@ -133,6 +132,8 @@ export default function AddPurchaseProduct() {
   }
 
   const completeInvoice = () => {
+    if (!invoice_id)
+      return toast.error(" تکایە پسوڵەکە دیاری بکە یان دانەیەک دروست بکە");
     setPenddingComplete(async () => {
       const result = await completeInvoiceAction(Number(invoice_id));
       if (result.success) {

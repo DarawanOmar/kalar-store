@@ -17,8 +17,8 @@ function SaleInvoice() {
         <Suspense
           fallback={
             <SkelotonCard
-              height="h-40 rounded-3xl"
-              className="grid-cols-1 sm:grid-cols-2 xl:grid-cols-3"
+              height="h-32 rounded-3xl"
+              className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-10"
             />
           }
         >

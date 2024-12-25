@@ -40,7 +40,7 @@ export const addProducts = async (values: addProductType) => {
     }
 
     await db.products.create({
-      data: { ...parasedData.data },
+      data: { ...parasedData.data, quantity: 0 },
     });
     return {
       message: "بە سەرکەوتویی زیاد کرا",

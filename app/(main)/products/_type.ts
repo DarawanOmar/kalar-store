@@ -4,10 +4,7 @@ import { z } from "zod";
 export const addProduct = z.object({
   name: z.string().min(1, { message: "ناو داخڵ بکە" }),
   barcode: z.string().min(1, { message: "ناو داخڵ بکە" }),
-  quantity: z.coerce
-    .number({ message: "ژمارە داخڵ بکە" })
-    .positive({ message: "ژمارەی نرخ بەرزترە لە سفر بێت" })
-    .min(1, { message: "بڕ داخڵ بکە" }),
+  quantity: z.coerce.number({ message: "ژمارە داخڵ بکە" }).optional(),
   sale_price: z.coerce
     .number({ message: "ژمارە داخڵ بکە" })
     .positive({ message: "ژمارەی نرخ بەرزترە لە سفر بێت" })

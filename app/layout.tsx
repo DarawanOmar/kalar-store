@@ -29,7 +29,7 @@ export const metadata: Metadata = {
     siteName: "Kalar Store",
   },
   metadataBase: new URL("https://kalar-store.vercel.app"),
-  manifest: "/manifest.json",
+  // manifest: "/manifest.json",
 };
 
 import { connection } from "next/server";

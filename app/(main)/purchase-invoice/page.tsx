@@ -5,7 +5,7 @@ import { SquarePercent } from "lucide-react";
 import React, { Suspense } from "react";
 import PaginatedComponent from "@/components/ui/pagination";
 import FeedPurchaseInvoice from "./_components/feedPurchaseInvoce";
-import { getAllCompleteInvoice } from "./_lib";
+// import { getAllCompleteInvoice } from "./_lib";
 
 async function PurchaseInvoice() {
   // console.dir(allPurchaseInvoice, { depth: null });
@@ -19,8 +19,8 @@ async function PurchaseInvoice() {
         <Suspense
           fallback={
             <SkelotonCard
-              height="h-40 rounded-3xl"
-              className="grid-cols-1 sm:grid-cols-2 xl:grid-cols-3"
+              height="h-32 rounded-3xl"
+              className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-10"
             />
           }
         >
