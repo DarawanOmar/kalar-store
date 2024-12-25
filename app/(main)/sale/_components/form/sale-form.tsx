@@ -14,27 +14,16 @@ import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
 import { useTransition } from "react";
 import { LuLoaderCircle } from "react-icons/lu";
-import { CheckCheck, FileText } from "lucide-react";
+import { CheckCheck } from "lucide-react";
 import { addSale, addSaleType } from "../../_type";
-import Title from "@/components/reuseable/title";
+import { createSaleInvoice } from "../../_actions";
 
-type filmFormProps = {
-  isEdit?: boolean;
-  info?: addSaleType;
-  handleClose?: () => void;
-  id?: number;
-};
-
-export default function AddSale({
-  isEdit,
-  info,
-  handleClose,
-  id,
-}: filmFormProps) {
+export default function AddSale() {
   const [pendding, setPendding] = useTransition();
   const form = useForm<addSaleType>({
     resolver: zodResolver(addSale),
     defaultValues: {
+      invoice_number: "",
       name: "",
       place: "",
       phone: "",
@@ -44,26 +33,18 @@ export default function AddSale({
 
   function onSubmit(values: addSaleType) {
     setPendding(async () => {
-      //   const result = isEdit
-      //     ? await updatedOffer(id as number, values)
-      //     : await addOffer(values);
-      //   if (result.success) {
-      //     toast.success(result.message);
-      //     handleClose && handleClose();
-      //   } else {
-      //     toast.error(result.message);
-      //   }
+      const result = await createSaleInvoice(values);
+      if (result.success) {
+        toast.success(result.message);
+      } else {
+        toast.error(result.message);
+      }
     });
   }
 
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="sm:px-6">
-        <Title
-          icon={<FileText size={18} />}
-          text="دروستکردنی پسووڵە"
-          className="mb-8"
-        />
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5  gap-5 items-end">
           {Object.entries(form.getValues()).map(([key, value]) => (
             <FormField
@@ -90,15 +71,12 @@ export default function AddSale({
             />
           ))}
           <Button type="submit" variant={"gooeyRight"} className="flex gap-1">
-            <CheckCheck size={18} />
-
             {pendding ? (
               <LuLoaderCircle className="animate-spin transition-all duration-500" />
-            ) : isEdit ? (
-              "گۆرانکاری"
             ) : (
-              "تۆمارکردن"
+              <CheckCheck size={18} />
             )}
+            تۆمارکردن
           </Button>
         </div>
         <p className="text-muted-foreground font-normal my-5 text-sm">
@@ -119,6 +97,8 @@ function labelTranslate(name: string) {
       return "ژمارەی مۆبایل";
     case "place":
       return "شوێن";
+    case "invoice_number":
+      return "ژمارەی پسووڵە";
     default:
       return name;
   }

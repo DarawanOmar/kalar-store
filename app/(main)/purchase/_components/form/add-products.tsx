@@ -23,7 +23,7 @@ import { cn } from "@/lib/utils";
 import { useCallback, useEffect, useState, useTransition } from "react";
 import { LuLoaderCircle } from "react-icons/lu";
 import { addProductPurchase, addProductPurchaseType } from "../../_type";
-import { FileText, Grid2x2Check, Plus } from "lucide-react";
+import { Barcode, FileText, Grid2x2Check, Plus } from "lucide-react";
 import Title from "@/components/reuseable/title";
 import {
   addProductPurchaseAction,
@@ -175,8 +175,8 @@ export default function AddPurchaseProduct() {
             )}
           /> */}
 
-          <div>
-            <label> باڕکۆد </label>
+          <div className="grid gap-3">
+            <FormLabel>باڕکۆد</FormLabel>
             <Select
               dir="rtl"
               value={barcodeState}
@@ -186,7 +186,7 @@ export default function AddPurchaseProduct() {
             >
               <FormControl>
                 <SelectTrigger>
-                  <SelectValue placeholder="باڕکۆد" />
+                  <SelectValue placeholder="" />
                 </SelectTrigger>
               </FormControl>
               <SelectContent>
@@ -195,7 +195,8 @@ export default function AddPurchaseProduct() {
                   onChange={(e) => {
                     setBarcodeQuery(e.target.value);
                   }}
-                  className="rounded-md border-zinc-400 placeholder:text-muted-foreground placeholder:text-sm"
+                  Icon={Barcode}
+                  className="rounded-md border-zinc-400 placeholder:text-muted-foreground placeholder:text-sm my-2"
                   placeholder="بارکۆد بنوسە..."
                 />
                 {products.length === 0 ? (

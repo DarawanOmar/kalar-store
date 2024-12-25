@@ -56,8 +56,9 @@ model Sale_invoice {
   name               String
   phone              String
   place              String
-  discount           Int
+  is_done            Boolean
   note               String?
+  discount           Int?
   createdAt          DateTime             @default(now())
   updatedAt          DateTime             @updatedAt
   Sale_invoice_items Sale_invoice_items[]

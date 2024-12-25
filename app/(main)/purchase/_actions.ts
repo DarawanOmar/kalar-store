@@ -1,14 +1,8 @@
 "use server";
 
 import db from "@/lib/prisma";
-import {
-  addInvoice,
-  addInvoiceType,
-  addProductPurchase,
-  addProductPurchaseType,
-} from "./_type";
+import { addInvoice, addInvoiceType } from "./_type";
 import { PrismaClientKnownRequestError } from "@prisma/client/runtime/library";
-import { Product } from "../products/_type";
 
 export const unFinishedInvoice = async () => {
   try {

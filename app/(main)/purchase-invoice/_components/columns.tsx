@@ -6,7 +6,12 @@ import React from "react";
 import { DataTableColumnHeader } from "@/components/reuseable/data-table-column-header";
 import { SaleInvoice } from "../_type";
 
-const column: ColumnDef<SaleInvoice>[] = [
+const column: ColumnDef<{
+  name: string | undefined;
+  barcode: string | undefined;
+  quantity: number;
+  purchase_price: number | undefined;
+}>[] = [
   {
     accessorKey: "id",
     header: ({ column }) => (
@@ -45,28 +50,15 @@ const column: ColumnDef<SaleInvoice>[] = [
     ),
   },
   {
-    accessorKey: "sale_price",
+    accessorKey: "purchase_price",
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title="نرخی فرۆشتن" />
     ),
-  },
-
-  {
-    id: "actions",
-    accessorKey: "delete",
-    header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="سڕینەوە" />
-    ),
     cell: function CellComponent({ row }) {
-      const [open, setOpen] = React.useState(false);
-      const handleClose = () => setOpen((prev) => !prev);
-      const { id } = row.original;
       return (
-        <div className="">
-          <Trash2
-            color="red"
-            className="size-9 rounded-lg ms-4 bg-red200 p-2 cursor-pointer"
-          />
+        <div className="flex justify-center gap-1 items-center">
+          <span>IQD</span>
+          <span>{row.original.purchase_price?.toLocaleString()}</span>
         </div>
       );
     },

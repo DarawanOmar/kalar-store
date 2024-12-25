@@ -17,6 +17,9 @@ function CardSale({ product }: Props) {
         <p className="text-muted-foreground text-center text-sm">
           {product.name}
         </p>
+        <p className="text-muted-foreground text-center text-sm">
+          {product.name}
+        </p>
         <p className="flex justify-center items-center gap-1 text-muted-foreground text-center">
           <span>IQD</span>
           {product.sale_price}
