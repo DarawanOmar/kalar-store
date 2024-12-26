@@ -1,22 +1,14 @@
 "use client";
 
 import { ColumnDef } from "@tanstack/react-table";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import { Button } from "@/components/ui/button";
-import { EditIcon, MoreVertical, Trash2, TrashIcon } from "lucide-react";
+import { Trash2 } from "lucide-react";
 import React from "react";
 import { DataTableColumnHeader } from "@/components/reuseable/data-table-column-header";
-import ReusableDeleteDailog from "@/components/reuseable/reusable-delete-dialog";
-import CustomDialog from "@/components/reuseable/resusable-dialog";
-import { SaleProducts } from "../_type";
+import { SaleInvoiceItem } from "../_type";
+import { deleteSaleItemProdcut } from "../_actions";
+import { toast } from "sonner";
 
-const column: ColumnDef<SaleProducts>[] = [
+const column: ColumnDef<SaleInvoiceItem>[] = [
   {
     accessorKey: "id",
     header: ({ column }) => (
@@ -55,12 +47,6 @@ const column: ColumnDef<SaleProducts>[] = [
     ),
   },
   {
-    accessorKey: "purchase_price",
-    header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="نرخی کڕین" />
-    ),
-  },
-  {
     accessorKey: "sale_price",
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title="نرخی فرۆشتن" />
@@ -74,12 +60,20 @@ const column: ColumnDef<SaleProducts>[] = [
       <DataTableColumnHeader column={column} title="سڕینەوە" />
     ),
     cell: function CellComponent({ row }) {
-      const [open, setOpen] = React.useState(false);
-      const handleClose = () => setOpen((prev) => !prev);
       const { id } = row.original;
+      const handleDelete = async () => {
+        const res = await deleteSaleItemProdcut(id as number);
+        if (res.success) {
+          toast.success("بە سەرکەوتویی سڕایەوە");
+        } else {
+          toast.error("هەڵەیەک هەیە");
+        }
+      };
+
       return (
-        <div className="">
+        <div className="flex justify-center items-center">
           <Trash2
+            onClick={handleDelete}
             color="red"
             className="size-9 rounded-lg ms-4 bg-red200 p-2 cursor-pointer"
           />

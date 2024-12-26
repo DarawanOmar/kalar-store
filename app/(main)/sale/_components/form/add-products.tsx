@@ -26,14 +26,12 @@ import { Barcode, FileText, Plus } from "lucide-react";
 import Title from "@/components/reuseable/title";
 import { addProductSale, addProductSaleType } from "../../_type";
 import { addProductSaleAction } from "../../_actions";
-import { useRouter } from "next/navigation";
 import { useQueryState } from "nuqs";
 import { getProductByBarcode } from "@/app/(main)/purchase/_actions";
 
 export default function AddsaleProduct() {
-  const router = useRouter();
   const [pendding, setPendding] = useTransition();
-  const [invoice_id, setInvoice_Id] = useQueryState("invoice_id");
+  const [invoice_id] = useQueryState("invoice_id");
   const [products, setProducts] = useState<
     {
       id: number;
@@ -55,8 +53,6 @@ export default function AddsaleProduct() {
     shallow: false,
     throttleMs: 500,
   });
-  const [penddingComplete, setPenddingComplete] = useTransition();
-  const [penddingSale, setPenddingSale] = useTransition();
   const form = useForm<addProductSaleType>({
     resolver: zodResolver(addProductSale),
     defaultValues: {
@@ -72,9 +68,6 @@ export default function AddsaleProduct() {
     const fetchProduct = async () => {
       try {
         const res = await getProductByBarcode(barcodeQuery);
-        // if (!res.data || res.data.length === 0) {
-        //   return toast.error("ئەم بارکۆدە بەرهەم نییە");
-        // }
         const data = res.data;
         setProducts(data || []);
       } catch (error) {
@@ -108,6 +101,9 @@ export default function AddsaleProduct() {
   );
 
   function onSubmit(values: addProductSaleType) {
+    if (!invoice_id)
+      return toast.error(" تکایە پسوڵەکە دیاری بکە یان دانەیەک دروست بکە");
+
     setPendding(async () => {
       const result = await addProductSaleAction(
         Number(invoice_id),
@@ -116,14 +112,15 @@ export default function AddsaleProduct() {
       );
       if (result.success) {
         toast.success(result.message);
+        form.reset();
+        setBarcodeQuery("");
+        setBarcodeState("");
       } else {
         toast.error(result.message);
       }
     });
   }
-  const saleProduct = () => {
-    setPenddingSale(async () => {});
-  };
+
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="sm:px-6">

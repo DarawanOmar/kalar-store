@@ -49,3 +49,21 @@ export interface SaleInvoice {
   createdAt: Date;
   updatedAt: Date;
 }
+
+export interface SaleInvoiceItems {
+  invoice_number: string;
+  name: string;
+  phone: string;
+  place: string;
+  note: string | null;
+  Products: SaleInvoiceItem[];
+}
+
+export type SaleInvoiceItem = {
+  id: number;
+  product_id: number | null;
+  quantity: number;
+  name: string;
+  barcode: string;
+  sale_price: number;
+};

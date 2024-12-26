@@ -117,10 +117,9 @@ export default function AddProduct({
               }}
               onClientUploadComplete={async (res) => {
                 if (isEdit && info?.image) {
-                  console.log("Deleted Image");
                   const url = info?.image;
                   const key = url.split("/").pop();
-                  await deleteIamge(key as string);
+                  const response = await deleteIamge(key as string);
                 }
                 form.setValue("image", res[0].url);
                 toast.success("بە سەرکەوتووی ئەپڵۆد کرا");

@@ -45,17 +45,11 @@ function GetAllinvoice({ unFinishInvoice }: Props) {
 
   return (
     <div className="flex items-center gap-3">
-      <button
-        onClick={() => setName("")}
-        className="text-xs font-sirwan_meduim text-soft_red"
-      >
-        Rest
-      </button>
       <Button
         onClick={deleteInvoice}
         size={"icon"}
         variant={"outline"}
-        className="rounded-xl hover:bg-red-500 hover:text-white text-red-500 transition-all duration-500  border border-soft_red"
+        className="rounded-lg hover:bg-red-500 hover:text-white text-red-500 transition-all duration-500  border border-soft_red w-16"
       >
         {pendding ? (
           <LuLoaderCircle className="animate-spin transition-all duration-500" />
@@ -64,13 +58,13 @@ function GetAllinvoice({ unFinishInvoice }: Props) {
         )}
       </Button>
       <Select
+        dir="rtl"
         onValueChange={(e) => {
-          console.log(e);
           setName(e);
         }}
         value={name}
       >
-        <SelectTrigger className="max-w-max">
+        <SelectTrigger className="rounded-lg">
           <SelectValue placeholder="پسوڵە" />
         </SelectTrigger>
         <SelectContent className="min-w-max max-w-max">
@@ -81,7 +75,7 @@ function GetAllinvoice({ unFinishInvoice }: Props) {
           ) : (
             unFinishInvoice.map((invoice) => (
               <SelectItem key={invoice.id} value={invoice.id.toString()}>
-                {invoice.invoice_number}
+                {invoice.name}
               </SelectItem>
             ))
           )}

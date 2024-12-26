@@ -163,14 +163,6 @@ export const addProductPurchaseAction = async (
   product_id: number,
   quantity: number
 ) => {
-  console.log(
-    "Invoice ID => ",
-    invoice_id,
-    "Product ID => ",
-    product_id,
-    "Qunatity => ",
-    quantity
-  );
   try {
     await db.purchase_invoice_items.create({
       data: {
@@ -184,7 +176,6 @@ export const addProductPurchaseAction = async (
       message: "بە سەرکەوتویی زیاد کرا",
     };
   } catch (error: any) {
-    console.log(error.message);
     return {
       message: "هەڵەیەک هەیە",
       success: false,

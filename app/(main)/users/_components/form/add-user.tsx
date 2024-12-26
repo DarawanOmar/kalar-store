@@ -114,7 +114,6 @@ export default function AddUser({
               }}
               onClientUploadComplete={async (res) => {
                 if (isEdit && info?.image) {
-                  console.log("Deleted Image");
                   const url = info?.image;
                   const key = url.split("/").pop();
                   await deleteIamge(key as string);

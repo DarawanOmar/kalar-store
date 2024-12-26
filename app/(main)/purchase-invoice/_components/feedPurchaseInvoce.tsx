@@ -5,7 +5,6 @@ import Link from "next/link";
 
 async function FeedPurchaseInvoice() {
   const allPurchaseInvoice = await getAllCompleteInvoice();
-  console.log(allPurchaseInvoice.data?.formattedInvoices);
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-10">
       {allPurchaseInvoice.data?.formattedInvoices?.map((invoice, index) => (

@@ -1,15 +1,10 @@
-import { Product } from "@/constants";
-import {
-  ChevronsRight,
-  CircleArrowRight,
-  FastForward,
-  FileText,
-} from "lucide-react";
+import { CircleArrowRight, FileText } from "lucide-react";
 import Link from "next/link";
 import React from "react";
+import { SaleInvoice } from "../_type";
 
 type Props = {
-  product: Product;
+  product: SaleInvoice;
 };
 
 function CardSale({ product }: Props) {
@@ -22,12 +17,15 @@ function CardSale({ product }: Props) {
         <p className="text-muted-foreground text-center text-sm">
           {product.name}
         </p>
+        <p className="text-muted-foreground text-center text-sm">
+          پسووڵەی : {product.invoice_number}
+        </p>
         <p className="flex justify-center items-center gap-1 text-muted-foreground text-center">
           <span>IQD</span>
-          {product.sale_price}
+          {product.total.toLocaleString()}
         </p>
         <Link
-          href={`sale-invoice/${product.name}`}
+          href={`sale-invoice/${product.id}`}
           className="p-1 rounded-full text-soft_primary hover:bg-primary hover:text-white cursor-pointer transition-all duration-500  max-w-max ml-auto"
         >
           <CircleArrowRight size={20} />

@@ -46,7 +46,7 @@ function GetAllSaleinvoice({ unFinishInvoice }: Props) {
         onClick={deleteInvoice}
         size={"icon"}
         variant={"outline"}
-        className="rounded-md hover:bg-red-500 hover:text-white transition-all duration-500"
+        className="rounded-md hover:bg-red-500 hover:text-white transition-all duration-500 w-16 border border-soft_red text-red-500"
       >
         {pendding ? (
           <LuLoaderCircle className="animate-spin transition-all duration-500" />
@@ -55,6 +55,7 @@ function GetAllSaleinvoice({ unFinishInvoice }: Props) {
         )}
       </Button>
       <Select
+        dir="rtl"
         onValueChange={(e) => {
           if (e === "0") {
             setName("");
@@ -64,7 +65,7 @@ function GetAllSaleinvoice({ unFinishInvoice }: Props) {
         }}
         value={name}
       >
-        <SelectTrigger className="max-w-max">
+        <SelectTrigger className="rounded-md">
           <SelectValue placeholder="پسوڵە" />
         </SelectTrigger>
         <SelectContent className="min-w-max max-w-max">
@@ -75,7 +76,7 @@ function GetAllSaleinvoice({ unFinishInvoice }: Props) {
           ) : (
             unFinishInvoice.map((invoice) => (
               <SelectItem key={invoice.id} value={invoice.id.toString()}>
-                {invoice.invoice_number}
+                {invoice.name}
               </SelectItem>
             ))
           )}

@@ -15,20 +15,18 @@ import { cn } from "@/lib/utils";
 import { useTransition } from "react";
 import { LuLoaderCircle } from "react-icons/lu";
 import { CheckCheck } from "lucide-react";
-import { addSale, addSaleType } from "../../_type";
+import { addSale, addSaleType, SaleInvoiceItems } from "../../_type";
 import { createSaleInvoice } from "../../_actions";
 
-export default function AddSale() {
+type Props = {
+  info: Partial<addSaleType>;
+};
+
+export default function AddSale({ info }: Props) {
   const [pendding, setPendding] = useTransition();
   const form = useForm<addSaleType>({
     resolver: zodResolver(addSale),
-    defaultValues: {
-      invoice_number: "",
-      name: "",
-      place: "",
-      phone: "",
-      note: "",
-    },
+    defaultValues: getDefaultValues(info),
   });
 
   function onSubmit(values: addSaleType) {
@@ -36,6 +34,7 @@ export default function AddSale() {
       const result = await createSaleInvoice(values);
       if (result.success) {
         toast.success(result.message);
+        form.reset();
       } else {
         toast.error(result.message);
       }
@@ -86,6 +85,18 @@ export default function AddSale() {
     </Form>
   );
 }
+
+const getDefaultValues = (values: Partial<addSaleType> = {}) => {
+  const defaultValues: addSaleType = {
+    invoice_number: "",
+    name: "",
+    place: "",
+    phone: "",
+    note: "",
+  };
+
+  return { ...defaultValues, ...values };
+};
 
 function labelTranslate(name: string) {
   switch (name) {

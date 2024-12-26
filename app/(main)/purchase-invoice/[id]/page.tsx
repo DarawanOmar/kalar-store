@@ -11,10 +11,9 @@ type Props = {
   params: Promise<{
     id: string;
   }>;
-  searchParams: searchParamsType;
 };
 
-async function OneSaleInvoice({ params, searchParams }: Props) {
+async function OneSaleInvoice({ params }: Props) {
   const id = (await params).id;
   const oneInvoice = await getOnePurchaseInvoice(Number(id));
   if (oneInvoice.data)
