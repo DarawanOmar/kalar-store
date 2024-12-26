@@ -17,7 +17,7 @@ export const addProductPurchase = z.object({
     .number({ message: "ژمارە داخڵ بکە" })
     .positive({ message: "ژمارەی نرخ بەرزترە لە سفر بێت" })
     .min(1, { message: "بڕ داخڵ بکە" }),
-  purchase_price: z.coerce.number().optional(),
+  // purchase_price: z.coerce.number().optional(),
 });
 
 export type addProductPurchaseType = z.infer<typeof addProductPurchase>;

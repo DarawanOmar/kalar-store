@@ -51,6 +51,9 @@ const column: ColumnDef<SaleInvoiceItem>[] = [
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title="نرخی فرۆشتن" />
     ),
+    cell: function CellComponent({ row }) {
+      return <div>{row.original.sale_price.toLocaleString()}</div>;
+    },
   },
 
   {

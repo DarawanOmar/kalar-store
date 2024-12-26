@@ -5,10 +5,12 @@ import { SquarePercent } from "lucide-react";
 import React, { Suspense } from "react";
 import PaginatedComponent from "@/components/ui/pagination";
 import FeedPurchaseInvoice from "./_components/feedPurchaseInvoce";
-// import { getAllCompleteInvoice } from "./_lib";
 
-async function PurchaseInvoice() {
-  // console.dir(allPurchaseInvoice, { depth: null });
+async function PurchaseInvoice({
+  searchParams,
+}: {
+  searchParams: searchParamsType;
+}) {
   return (
     <div className="my-10">
       <div className="flex flex-col sm:flex-row gap-4 justify-between items-center">
@@ -24,11 +26,8 @@ async function PurchaseInvoice() {
             />
           }
         >
-          <FeedPurchaseInvoice />
+          <FeedPurchaseInvoice searchParams={searchParams} />
         </Suspense>
-      </div>
-      <div className="">
-        <PaginatedComponent currentPage={1} totalPages={1} />
       </div>
     </div>
   );

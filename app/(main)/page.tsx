@@ -1,5 +1,4 @@
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -16,13 +15,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import {
-  Activity,
-  ArrowUpRight,
-  CreditCard,
-  DollarSign,
-  Users,
-} from "lucide-react";
+import { Activity, ArrowUpRight, CreditCard, DollarSign } from "lucide-react";
 import Link from "next/link";
 
 const cardData = [
@@ -106,15 +99,15 @@ export default function Home() {
           </Card>
         ))}
       </div>
-      <div className="grid gap-4 md:gap-8 lg:grid-cols-2 2xl:grid-cols-3">
-        <Card className="2xl:col-span-2" x-chunk="dashboard-01-chunk-4">
+      <div className="grid gap-4 md:gap-8 lg:grid-cols-2 2xl:grid-cols-2">
+        <Card className="2xl:col-span-1" x-chunk="dashboard-01-chunk-4">
           <CardHeader className="flex flex-row items-center">
             <div className="grid gap-2">
-              <CardTitle>ئاڵوگۆڕەکان</CardTitle>
-              <CardDescription>ئاڵوگۆڕەکان لە ماوەی ڕابردوو</CardDescription>
+              <CardTitle>کڕینەکان</CardTitle>
+              <CardDescription>کڕینەکان لە ماوەی ڕابردوو</CardDescription>
             </div>
             <Button asChild size="sm" className="ms-auto gap-1">
-              <Link href="#">
+              <Link href="/purchase-invoice">
                 <ArrowUpRight className="h-4 w-4" />
                 بینینی هەموویان
               </Link>
@@ -142,8 +135,14 @@ export default function Home() {
           </CardContent>
         </Card>
         <Card x-chunk="dashboard-01-chunk-5">
-          <CardHeader>
+          <CardHeader className="flex flex-row items-center">
             <CardTitle>فرۆشتن لەم دواییانەدا</CardTitle>
+            <Button asChild size="sm" className="ms-auto gap-1">
+              <Link href="/purchase-invoice">
+                <ArrowUpRight className="h-4 w-4" />
+                بینینی هەموویان
+              </Link>
+            </Button>
           </CardHeader>
           <CardContent className="grid gap-8">
             {recentSalesData.map((sale, index) => (

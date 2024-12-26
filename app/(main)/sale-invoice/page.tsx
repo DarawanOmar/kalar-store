@@ -6,7 +6,7 @@ import React, { Suspense } from "react";
 import FeedSaleInvoice from "./_components/feedSaleInvoce";
 import PaginatedComponent from "@/components/ui/pagination";
 
-function SaleInvoice() {
+function SaleInvoice({ searchParams }: { searchParams: searchParamsType }) {
   return (
     <div className="my-10">
       <div className="flex flex-col sm:flex-row gap-3 justify-between items-center">
@@ -22,7 +22,7 @@ function SaleInvoice() {
             />
           }
         >
-          <FeedSaleInvoice />
+          <FeedSaleInvoice searchParams={searchParams} />
         </Suspense>
       </div>
       <div className="">

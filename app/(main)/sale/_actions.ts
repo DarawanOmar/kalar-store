@@ -224,6 +224,31 @@ export const addProductSaleAction = async (
   quantity: number
 ) => {
   try {
+    const product = await db.products.findUnique({
+      where: { id: product_id },
+    });
+
+    if (!product) {
+      return {
+        message: "ئەم کاڵایە بوونی نییە",
+        success: false,
+      };
+    }
+
+    if (product.quantity === 0) {
+      return {
+        message: "ئەم کاڵایە بەردەست نییە",
+        success: false,
+      };
+    }
+
+    if (product.quantity < quantity) {
+      return {
+        message: `${product.quantity}بڕی کاڵای بەردەست  `,
+        success: false,
+      };
+    }
+
     await db.sale_invoice_items.create({
       data: {
         sale_invoiceId: invoice_id,
@@ -286,13 +311,21 @@ export const completeSaleInvoiceAction = async (
           });
 
           if (!product) {
-            throw new Error(`Product with ID ${product_id} not found`);
+            throw new Error(`کاڵایەک بوونی نییە `);
+            // return {
+            // message: `کاڵایەک بوونی نییە`,
+            // success: false,
+            // };
           }
 
           if (product.quantity < quantity) {
             throw new Error(
-              `Insufficient quantity for product ID ${product_id}. Available: ${product.quantity}, Requested: ${quantity}`
+              `بڕی کاڵای بەردەست ${product.quantity} بۆ ${product.name}`
             );
+            // return {
+            //   message: `بڕی کاڵای بەردەست ${product.quantity} بۆ ${product.name}`,
+            //   success: false,
+            // };
           }
 
           await tx.products.update({
@@ -313,9 +346,10 @@ export const completeSaleInvoiceAction = async (
       success: true,
       message: "بە سەرکەوتویی تەواوکرایەوە",
     };
-  } catch (error) {
+  } catch (error: any) {
+    console.log("Error => ", error.message);
     return {
-      message: `هەڵەیەک هەیە`,
+      message: `هەڵەیەک هەیە : ${error.message}`,
       success: false,
     };
   }

@@ -56,6 +56,9 @@ const column: ColumnDef<{
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title="نرخی کڕین" />
     ),
+    cell: function CellComponent({ row }) {
+      return <div>{row.original.purchase_price?.toLocaleString()}</div>;
+    },
   },
 
   {

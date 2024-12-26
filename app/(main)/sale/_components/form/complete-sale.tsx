@@ -1,6 +1,6 @@
 "use client";
 import { zodResolver } from "@hookform/resolvers/zod";
-import React, { useTransition } from "react";
+import React, { useMemo, useTransition } from "react";
 import { useForm } from "react-hook-form";
 import { completeSale, completeSaleType, SaleInvoiceItem } from "../../_type";
 import { toast } from "sonner";
@@ -37,6 +37,13 @@ function CompleteSale({ total }: { total: number }) {
       discount: 0,
     },
   });
+  const discount = form.watch("discount");
+  const handleChangeDiscount = useMemo(() => {
+    if (!total) return total;
+    if (discount) return total - discount;
+    return total;
+  }, [discount, total]);
+
   function onSubmit(values: completeSaleType) {
     if (!invoice_id)
       return toast.error(" تکایە پسوڵەکە دیاری بکە یان دانەیەک دروست بکە");
@@ -85,7 +92,7 @@ function CompleteSale({ total }: { total: number }) {
               </FormItem>
             )}
           />
-          <TotalShown text="کۆی گشتی" total={total} />
+          <TotalShown text="کۆی گشتی" total={handleChangeDiscount} />
           <Button type="submit" variant={"gooeyRight"} className="flex gap-1">
             {pendding ? (
               <LuLoaderCircle className="animate-spin transition-all duration-500" />

@@ -60,7 +60,7 @@ export default function AddsaleProduct() {
       barcode: "",
       name: "",
       quantity: 0,
-      sale_price: "",
+      // sale_price: "",
     },
   });
 
@@ -90,7 +90,7 @@ export default function AddsaleProduct() {
         form.setValue("id", data[0].id);
         form.setValue("barcode", data[0].barcode);
         form.setValue("name", data[0].name);
-        form.setValue("sale_price", data[0].sale_price.toString());
+        // form.setValue("sale_price", data[0].sale_price.toString());
         setBarcodeState(data[0].barcode);
       } catch (error) {
         console.error("Error fetching product:", error);

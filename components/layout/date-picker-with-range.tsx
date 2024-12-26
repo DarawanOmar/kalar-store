@@ -26,6 +26,7 @@ export function DatePickerWithRange({
   const [dataQuery, setDataQuery] = useQueryState(name, {
     clearOnDefault: true,
     defaultValue: "",
+    shallow: false,
   });
   const now = new Date();
   const [date, setDate] = useState<DateRange | undefined>({
@@ -60,7 +61,7 @@ export function DatePickerWithRange({
             {date?.from ? (
               date.to ? (
                 <>
-                  {format(date.from, "LLL dd, y")} -{" "}
+                  {format(date.from, "LLL dd, y")} -
                   {format(date.to, "LLL dd, y")}
                 </>
               ) : (
@@ -68,7 +69,7 @@ export function DatePickerWithRange({
               )
             ) : (
               <span>
-                {format(new Date(), "LLL dd, y")} -{" "}
+                {format(new Date(), "LLL dd, y")} -
                 {format(new Date(), "LLL dd, y")}
               </span>
             )}

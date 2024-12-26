@@ -1,11 +1,25 @@
 import db from "@/lib/prisma";
 
-export const getAllCompleteInvoice = async () => {
+export const getAllCompleteInvoice = async (
+  startDate: Date | undefined,
+  endDate: Date | undefined,
+  page: number
+) => {
   try {
+    let where: any = { is_done: true };
+    console.log(startDate, endDate);
+    if (startDate && endDate) {
+      console.log("Run Where Date");
+      where = {
+        ...where,
+        createdAt: {
+          gte: startDate,
+          lte: endDate,
+        },
+      };
+    }
     const invoices = await db.purchase_invoice.findMany({
-      where: {
-        is_done: true,
-      },
+      where,
       select: {
         name: true,
         invoice_number: true,
@@ -21,18 +35,9 @@ export const getAllCompleteInvoice = async () => {
           },
         },
       },
+      take: 10,
+      skip: (page - 1) * 10,
     });
-
-    // let total = 0;
-    // invoices.forEach((invoice) => {
-    //   invoice.Purchase_invoice_items.forEach((item) => {
-    //     if (item.Products) {
-    //       total += item.quantity * item.Products.purchase_price;
-    //     }
-    //   });
-    // });
-
-    // Calculate total of the each invoice
 
     const formattedInvoices = invoices.map((invoice) => {
       const total = invoice.Purchase_invoice_items.reduce(
@@ -50,7 +55,10 @@ export const getAllCompleteInvoice = async () => {
     });
 
     return {
-      data: { formattedInvoices },
+      data: {
+        formattedInvoices,
+        totalPage: Math.ceil((await db.purchase_invoice.count()) / 10),
+      },
       success: true,
     };
   } catch (error) {

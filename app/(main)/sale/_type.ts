@@ -18,7 +18,7 @@ export const addProductSale = z.object({
     .number({ message: "ژمارە داخڵ بکە" })
     .positive({ message: "ژمارەی نرخ بەرزترە لە سفر بێت" })
     .min(1, { message: "بڕ داخڵ بکە" }),
-  sale_price: z.string().optional(),
+  // sale_price: z.string().optional(),
 });
 
 export type addProductSaleType = z.infer<typeof addProductSale>;

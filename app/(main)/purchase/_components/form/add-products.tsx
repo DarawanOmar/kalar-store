@@ -71,7 +71,7 @@ export default function AddPurchaseProduct() {
       barcode: "",
       name: "",
       quantity: 0,
-      purchase_price: 0,
+      // purchase_price: 0,
     },
   });
 
@@ -101,7 +101,7 @@ export default function AddPurchaseProduct() {
         form.setValue("id", data[0].id);
         form.setValue("barcode", data[0].barcode);
         form.setValue("name", data[0].name);
-        form.setValue("purchase_price", data[0].purchase_price);
+        // form.setValue("purchase_price", data[0].purchase_price);
         setBarcodeState(data[0].barcode);
       } catch (error) {
         console.error("Error fetching product:", error);

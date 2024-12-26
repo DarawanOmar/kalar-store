@@ -1,11 +1,25 @@
 import db from "@/lib/prisma";
 
-export const getAllCompleteSaleInvoice = async () => {
+export const getAllCompleteSaleInvoice = async (
+  startDate: Date | undefined,
+  endDate: Date | undefined,
+  page: number
+) => {
   try {
+    let where: any = { is_done: true };
+    console.log("Start Date", startDate, "End Date", endDate);
+    if (startDate && endDate) {
+      where = {
+        ...where,
+        createdAt: {
+          gte: startDate,
+          lte: endDate,
+        },
+      };
+    }
+
     const invoices = await db.sale_invoice.findMany({
-      where: {
-        is_done: true,
-      },
+      where,
       select: {
         name: true,
         invoice_number: true,
@@ -21,6 +35,8 @@ export const getAllCompleteSaleInvoice = async () => {
           },
         },
       },
+      skip: (page - 1) * 10,
+      take: 10,
     });
 
     const formattedInvoices = invoices.map((invoice) => {
