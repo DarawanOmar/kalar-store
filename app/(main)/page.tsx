@@ -17,6 +17,9 @@ import {
 } from "@/components/ui/table";
 import { Activity, ArrowUpRight, CreditCard, DollarSign } from "lucide-react";
 import Link from "next/link";
+import { getAllCompleteSaleInvoice } from "./sale-invoice/_lib";
+import { getAllCompleteInvoice } from "./purchase-invoice/_lib";
+import { format } from "date-fns";
 
 const cardData = [
   {
@@ -78,7 +81,15 @@ const recentSalesData = [
   },
 ];
 
-export default function Home() {
+export default async function Home() {
+  const now = new Date();
+  const sevenDaysAgo = new Date();
+  sevenDaysAgo.setDate(now.getDate() - 7);
+
+  const [completeSaleInvoices, completeInvoices] = await Promise.all([
+    getAllCompleteSaleInvoice(sevenDaysAgo, now, 1),
+    getAllCompleteInvoice(sevenDaysAgo, now, 1),
+  ]);
   return (
     <div className="flex flex-1 flex-col gap-4 my-10 md:gap-8 md:p-8">
       <div className="grid gap-4 md:grid-cols-2 md:gap-8 lg:grid-cols-4">
@@ -100,11 +111,16 @@ export default function Home() {
         ))}
       </div>
       <div className="grid gap-4 md:gap-8 lg:grid-cols-2 2xl:grid-cols-2">
-        <Card className="2xl:col-span-1" x-chunk="dashboard-01-chunk-4">
+        <Card
+          className="2xl:col-span-1 max-h-max"
+          x-chunk="dashboard-01-chunk-4"
+        >
           <CardHeader className="flex flex-row items-center">
             <div className="grid gap-2">
               <CardTitle>کڕینەکان</CardTitle>
-              <CardDescription>کڕینەکان لە ماوەی ڕابردوو</CardDescription>
+              <CardDescription>
+                کڕینەکان لە ماوەی هەفتەی ڕابردوو
+              </CardDescription>
             </div>
             <Button asChild size="sm" className="ms-auto gap-1">
               <Link href="/purchase-invoice">
@@ -123,20 +139,29 @@ export default function Home() {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                <TableRow>
-                  <TableCell>
-                    <div className="font-medium">Liam Johnson</div>
-                  </TableCell>
-                  <TableCell>2023-06-23</TableCell>
-                  <TableCell>$250.00</TableCell>
-                </TableRow>
+                {completeInvoices.data?.formattedInvoices.map(
+                  (invoice, index) => (
+                    <TableRow key={index}>
+                      <TableCell>
+                        <div>{invoice.name}</div>
+                      </TableCell>
+                      <TableCell>{format(invoice.createdAt, "P")}</TableCell>
+                      <TableCell>{invoice.total.toLocaleString()}-</TableCell>
+                    </TableRow>
+                  )
+                )}
               </TableBody>
             </Table>
           </CardContent>
         </Card>
-        <Card x-chunk="dashboard-01-chunk-5">
+        <Card x-chunk="dashboard-01-chunk-5" className="max-h-max">
           <CardHeader className="flex flex-row items-center">
-            <CardTitle>فرۆشتن لەم دواییانەدا</CardTitle>
+            <div className="grid gap-2">
+              <CardTitle>فرۆشتن لەم دواییانەدا</CardTitle>
+              <CardDescription>
+                فرۆشتنەکان لە ماوەی هەفتەی ڕابردوو
+              </CardDescription>
+            </div>
             <Button asChild size="sm" className="ms-auto gap-1">
               <Link href="/purchase-invoice">
                 <ArrowUpRight className="h-4 w-4" />
@@ -145,19 +170,21 @@ export default function Home() {
             </Button>
           </CardHeader>
           <CardContent className="grid gap-8">
-            {recentSalesData.map((sale, index) => (
+            {completeSaleInvoices.data?.formattedInvoices.map((sale, index) => (
               <div key={index} className="flex items-center gap-4">
                 <Avatar className="hidden h-9 w-9 sm:flex">
-                  <AvatarImage src={sale.avatar} alt="Avatar" />
-                  <AvatarFallback>{sale.fallback}</AvatarFallback>
+                  <AvatarImage src={"/empty-product.jpg"} alt="Avatar" />
+                  <AvatarFallback>{}</AvatarFallback>
                 </Avatar>
                 <div className="grid gap-1">
                   <p className="text-sm font-medium leading-none">
                     {sale.name}
                   </p>
-                  <p className="text-sm text-muted-foreground">{sale.email}</p>
+                  <p className="text-sm text-muted-foreground">{sale.place}</p>
                 </div>
-                <div className="ms-auto font-medium">{sale.amount}</div>
+                <div className="ms-auto font-medium">
+                  {sale.total.toLocaleString()}+
+                </div>
               </div>
             ))}
           </CardContent>

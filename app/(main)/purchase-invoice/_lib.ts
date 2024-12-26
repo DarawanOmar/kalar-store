@@ -24,6 +24,7 @@ export const getAllCompleteInvoice = async (
         name: true,
         invoice_number: true,
         id: true,
+        createdAt: true,
         Purchase_invoice_items: {
           select: {
             quantity: true,
@@ -50,6 +51,7 @@ export const getAllCompleteInvoice = async (
         id: invoice.id,
         name: invoice.name,
         invoice_number: invoice.invoice_number,
+        createdAt: invoice.createdAt,
         total,
       };
     });
