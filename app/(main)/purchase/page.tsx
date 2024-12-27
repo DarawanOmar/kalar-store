@@ -6,6 +6,7 @@ import Title from "@/components/reuseable/title";
 import { FileText } from "lucide-react";
 import GetAllinvoice from "./_components/getAllinvoice";
 import { getOneInvoice, unFinishedInvoice } from "./_actions";
+import CompletePurchase from "./_components/form/complete-purchase";
 
 async function Purchase({ searchParams }: { searchParams: searchParamsType }) {
   const invoice_id = Number((await searchParams).invoice_id);
@@ -21,18 +22,17 @@ async function Purchase({ searchParams }: { searchParams: searchParamsType }) {
       </div>
       <Addinvoice
         key={invoice_id}
-        invoice={
-          getActiveInvoice.data || {
-            invoice_number: "",
-            name: "",
-            place: "",
-            note: "" as any,
-          }
-        }
+        invoice={{
+          invoice_number: getActiveInvoice?.data?.invoice_number || "",
+          name: getActiveInvoice?.data?.name || "",
+          note: (getActiveInvoice?.data?.note as string) || "",
+          place: getActiveInvoice?.data?.place || "",
+        }}
       />
       <div className="my-14">
         <AddPurchaseProduct />
       </div>
+      <CompletePurchase total={getActiveInvoice.data?.total || 0} />
       <ShownPurchaseProducts invoice_id={invoice_id} />
     </div>
   );

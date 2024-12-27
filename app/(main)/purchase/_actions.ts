@@ -65,6 +65,20 @@ export const getOneInvoice = async (id: number) => {
         name: true,
         place: true,
         note: true,
+        Purchase_invoice_items: {
+          select: {
+            id: true,
+            product_id: true,
+            quantity: true,
+            Products: {
+              select: {
+                name: true,
+                barcode: true,
+                purchase_price: true,
+              },
+            },
+          },
+        },
       },
     });
     if (!res) {
@@ -74,9 +88,33 @@ export const getOneInvoice = async (id: number) => {
       };
     }
 
+    // Transform data and calculate total
+    const Products = res.Purchase_invoice_items.map((item) => ({
+      id: item.id,
+      product_id: item.product_id,
+      quantity: item.quantity,
+      name: item.Products?.name || "",
+      barcode: item.Products?.barcode || "",
+      sale_price: item.Products?.purchase_price || 0,
+    }));
+
+    const total = Products.reduce(
+      (sum, product) => sum + product.quantity * product.sale_price,
+      0
+    );
+
+    const resultFormatted = {
+      invoice_number: res.invoice_number,
+      name: res.name,
+      place: res.place,
+      note: res.note,
+      Products,
+      total,
+    };
+
     return {
       success: true,
-      data: res,
+      data: resultFormatted,
     };
   } catch (error: any) {
     console.error("Error fetching invoice:", error.stack);

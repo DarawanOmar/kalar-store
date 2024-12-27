@@ -7,7 +7,6 @@ export const getAllCompleteSaleInvoice = async (
 ) => {
   try {
     let where: any = { is_done: true };
-    console.log("Start Date", startDate, "End Date", endDate);
     if (startDate && endDate) {
       where = {
         ...where,
@@ -23,6 +22,7 @@ export const getAllCompleteSaleInvoice = async (
       select: {
         name: true,
         invoice_number: true,
+        discount: true,
         id: true,
         place: true,
         Sale_invoice_items: {
@@ -51,6 +51,7 @@ export const getAllCompleteSaleInvoice = async (
         name: invoice.name,
         invoice_number: invoice.invoice_number,
         place: invoice.place,
+        discount: invoice.discount,
         total,
       };
     });

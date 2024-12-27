@@ -26,10 +26,10 @@ export const metadata: Metadata = {
     type: "website",
     locale: "en_US",
     url: "https://kalar-store.vercel.app",
-    siteName: "Kalar Store",
+    siteName: "Dr-Kurdistan",
   },
   metadataBase: new URL("https://kalar-store.vercel.app"),
-  // manifest: "/manifest.json",
+  manifest: "/manifest.json",
 };
 
 import { connection } from "next/server";

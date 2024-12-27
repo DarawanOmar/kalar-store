@@ -4,6 +4,7 @@ import { CircleArrowRight, FileText } from "lucide-react";
 import Link from "next/link";
 import EmptyImage from "@/components/reuseable/empty-image";
 import PaginatedComponent from "@/components/ui/pagination";
+import { redirect } from "next/navigation";
 
 async function FeedPurchaseInvoice({
   searchParams,
@@ -28,8 +29,12 @@ async function FeedPurchaseInvoice({
     endDate,
     page
   );
-  if (allPurchaseInvoice.data?.formattedInvoices.length === 0) {
+
+  if (allPurchaseInvoice.data?.formattedInvoices.length === 0 && page === 1) {
     return <EmptyImage />;
+  }
+  if (allPurchaseInvoice.data?.formattedInvoices.length === 0) {
+    redirect("/purchase-invoice");
   }
   return (
     <>

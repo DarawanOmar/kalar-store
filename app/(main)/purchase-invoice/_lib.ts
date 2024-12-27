@@ -7,9 +7,7 @@ export const getAllCompleteInvoice = async (
 ) => {
   try {
     let where: any = { is_done: true };
-    console.log(startDate, endDate);
     if (startDate && endDate) {
-      console.log("Run Where Date");
       where = {
         ...where,
         createdAt: {
