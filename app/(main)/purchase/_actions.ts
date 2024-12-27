@@ -202,13 +202,42 @@ export const addProductPurchaseAction = async (
   quantity: number
 ) => {
   try {
-    await db.purchase_invoice_items.create({
-      data: {
-        purchase_invoiceId: invoice_id,
-        product_id: product_id,
-        quantity: quantity,
-      },
+    // Check if the product purchase invoice exists
+    const purchaseInvoice = await db.purchase_invoice.findUnique({
+      where: { id: invoice_id },
     });
+
+    if (!purchaseInvoice) {
+      return {
+        message: "ئەم وەسڵە بوونی نییە",
+        success: false,
+      };
+    }
+    db.$transaction(async (tx) => {
+      // if product exist in the invoice update the quantity
+      const existItem = await tx.purchase_invoice_items.findFirst({
+        where: {
+          purchase_invoiceId: invoice_id,
+          product_id: product_id,
+        },
+      });
+      if (existItem) {
+        await tx.purchase_invoice_items.update({
+          where: { id: existItem.id },
+          data: { quantity: { increment: quantity } },
+        });
+        return;
+      }
+      // if product not exist in the invoice create new item
+      await db.purchase_invoice_items.create({
+        data: {
+          purchase_invoiceId: invoice_id,
+          product_id: product_id,
+          quantity: quantity,
+        },
+      });
+    });
+
     return {
       success: true,
       message: "بە سەرکەوتویی زیاد کرا",

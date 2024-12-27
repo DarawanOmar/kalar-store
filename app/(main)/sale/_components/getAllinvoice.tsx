@@ -68,9 +68,9 @@ function GetAllSaleinvoice({ unFinishInvoice }: Props) {
         <SelectTrigger className="rounded-md">
           <SelectValue placeholder="پسوڵە" />
         </SelectTrigger>
-        <SelectContent className="min-w-max max-w-max">
+        <SelectContent className="min-w-max max-w-max ">
           {unFinishInvoice.length === 0 ? (
-            <div className="p-2 text-red-500 text-xs font-sirwan_meduim ">
+            <div className="p-2 text-red-500 text-sm text-center font-sirwan_meduim ">
               پسوڵە نییە
             </div>
           ) : (

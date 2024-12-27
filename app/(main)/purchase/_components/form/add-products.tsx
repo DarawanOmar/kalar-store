@@ -22,18 +22,12 @@ import { cn } from "@/lib/utils";
 import { useCallback, useEffect, useState, useTransition } from "react";
 import { LuLoaderCircle } from "react-icons/lu";
 import { addProductPurchase, addProductPurchaseType } from "../../_type";
-import { Barcode, FileText, Grid2x2Check, Plus } from "lucide-react";
+import { Barcode, FileText, Plus } from "lucide-react";
 import Title from "@/components/reuseable/title";
-import {
-  addProductPurchaseAction,
-  completeInvoiceAction,
-  getProductByBarcode,
-} from "../../_actions";
-import { useRouter } from "next/navigation";
+import { addProductPurchaseAction, getProductByBarcode } from "../../_actions";
 import { useQueryState } from "nuqs";
 
 export default function AddPurchaseProduct() {
-  const router = useRouter();
   const [pendding, setPendding] = useTransition();
   const [invoice_id, setInvoice_Id] = useQueryState("invoice_id", {
     clearOnDefault: true,
@@ -41,7 +35,6 @@ export default function AddPurchaseProduct() {
     shallow: false,
   });
 
-  // const [invoice_id, setInvoice_Id] = useQueryState("invoice_id");
   const [products, setProducts] = useState<
     {
       id: number;
@@ -63,7 +56,6 @@ export default function AddPurchaseProduct() {
     shallow: false,
     throttleMs: 500,
   });
-  const [penddingComplete, setPenddingComplete] = useTransition();
   const form = useForm<addProductPurchaseType>({
     resolver: zodResolver(addProductPurchase),
     defaultValues: {
@@ -130,23 +122,6 @@ export default function AddPurchaseProduct() {
       }
     });
   }
-
-  const completeInvoice = () => {
-    if (!invoice_id)
-      return toast.error(" تکایە پسوڵەکە دیاری بکە یان دانەیەک دروست بکە");
-    setPenddingComplete(async () => {
-      const result = await completeInvoiceAction(Number(invoice_id));
-      if (result.success) {
-        toast.success(result.message);
-        router.refresh();
-        form.reset();
-        setInvoice_Id("");
-        setBarcodeState("");
-      } else {
-        toast.error(result.message);
-      }
-    });
-  };
 
   return (
     <Form {...form}>
@@ -233,19 +208,6 @@ export default function AddPurchaseProduct() {
               <Plus size={18} strokeWidth={2.5} />
             )}
             زیادکردن
-          </Button>
-          <Button
-            onClick={completeInvoice}
-            type="button"
-            variant={"gooeyRight"}
-            className="flex gap-2"
-          >
-            {penddingComplete ? (
-              <LuLoaderCircle className="animate-spin transition-all duration-500" />
-            ) : (
-              <Grid2x2Check size={18} strokeWidth={2.5} />
-            )}
-            تەواوکردنی پسوڵە
           </Button>
         </div>
       </form>

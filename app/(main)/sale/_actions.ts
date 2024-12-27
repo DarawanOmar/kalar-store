@@ -83,15 +83,23 @@ export const deleteSaleItemProdcut = async (id: number) => {
     });
     if (!existItem) {
       return {
-        message: "ئەم بەرهەمە بوونی نییە",
+        message: "ئەم وەسڵە بوونی نییە",
         success: false,
       };
     }
-    await db.sale_invoice_items.delete({
-      where: {
-        id,
-      },
+
+    db.$transaction(async (tx) => {
+      await tx.products.update({
+        where: { id: existItem.product_id as number },
+        data: { quantity: { increment: existItem.quantity } },
+      });
+      await db.sale_invoice_items.delete({
+        where: {
+          id,
+        },
+      });
     });
+
     return {
       success: true,
       message: "بە سەرکەوتویی سڕایەوە",
@@ -248,13 +256,33 @@ export const addProductSaleAction = async (
         success: false,
       };
     }
-
-    await db.sale_invoice_items.create({
-      data: {
-        sale_invoiceId: invoice_id,
-        product_id: product_id,
-        quantity: quantity,
-      },
+    db.$transaction(async (tx) => {
+      await tx.products.update({
+        where: { id: product_id },
+        data: { quantity: { decrement: quantity } },
+      });
+      // if product exist in the invoice update the quantity
+      const existItem = await tx.sale_invoice_items.findFirst({
+        where: {
+          sale_invoiceId: invoice_id,
+          product_id: product_id,
+        },
+      });
+      if (existItem) {
+        await tx.sale_invoice_items.update({
+          where: { id: existItem.id },
+          data: { quantity: { increment: quantity } },
+        });
+        return;
+      }
+      // if product not exist in the invoice create new item
+      await tx.sale_invoice_items.create({
+        data: {
+          sale_invoiceId: invoice_id,
+          product_id: product_id,
+          quantity: quantity,
+        },
+      });
     });
     return {
       success: true,
@@ -303,7 +331,7 @@ export const completeSaleInvoiceAction = async (
 
     // Use a transaction for atomic updates
     await db.$transaction(async (tx) => {
-      for (const { product_id, quantity } of productUpdates) {
+      for (const { product_id } of productUpdates) {
         if (product_id) {
           // Decrement the quantity of the product
           const product = await tx.products.findUnique({
@@ -312,26 +340,7 @@ export const completeSaleInvoiceAction = async (
 
           if (!product) {
             throw new Error(`کاڵایەک بوونی نییە `);
-            // return {
-            // message: `کاڵایەک بوونی نییە`,
-            // success: false,
-            // };
           }
-
-          if (product.quantity < quantity) {
-            throw new Error(
-              `بڕی کاڵای بەردەست ${product.quantity} بۆ ${product.name}`
-            );
-            // return {
-            //   message: `بڕی کاڵای بەردەست ${product.quantity} بۆ ${product.name}`,
-            //   success: false,
-            // };
-          }
-
-          await tx.products.update({
-            where: { id: product_id },
-            data: { quantity: { decrement: quantity } },
-          });
         }
       }
 
