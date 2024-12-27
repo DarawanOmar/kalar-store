@@ -93,14 +93,19 @@ export default async function FeedDashboard() {
           className="2xl:col-span-1 max-h-max"
           x-chunk="dashboard-01-chunk-4"
         >
-          <CardHeader className="flex flex-row items-center">
+          <CardHeader className="flex flex-col gap-5 sm:flex-row items-center">
             <div className="grid gap-2">
               <CardTitle>کڕینەکان</CardTitle>
               <CardDescription>
                 کڕینەکان لە ماوەی هەفتەی ڕابردوو
               </CardDescription>
             </div>
-            <Button asChild size="sm" className="ms-auto gap-1">
+            <Button
+              asChild
+              size="sm"
+              className="ms-auto gap-1 gradient-blue"
+              variant={"gooeyRight"}
+            >
               <Link href="/purchase-invoice">
                 <ArrowUpRight className="h-4 w-4" />
                 بینینی هەموویان
@@ -118,8 +123,11 @@ export default async function FeedDashboard() {
               </TableHeader>
               <TableBody>
                 {completeInvoices.data?.formattedInvoices.length === 0 ? (
-                  <TableRow>
-                    <TableCell colSpan={3} className="text-center">
+                  <TableRow className=" h-32">
+                    <TableCell
+                      colSpan={3}
+                      className="text-center  text-primary"
+                    >
                       هیچ کڕینێک تۆمار نەکراوە
                     </TableCell>
                   </TableRow>
@@ -141,14 +149,19 @@ export default async function FeedDashboard() {
           </CardContent>
         </Card>
         <Card x-chunk="dashboard-01-chunk-5" className="max-h-max">
-          <CardHeader className="flex flex-row items-center">
+          <CardHeader className="flex flex-col gap-5 sm:flex-row items-center">
             <div className="grid gap-2">
               <CardTitle>فرۆشتن لەم دواییانەدا</CardTitle>
               <CardDescription>
                 فرۆشتنەکان لە ماوەی هەفتەی ڕابردوو
               </CardDescription>
             </div>
-            <Button asChild size="sm" className="ms-auto gap-1">
+            <Button
+              asChild
+              size="sm"
+              className="ms-auto gap-1 gradient-blue"
+              variant={"gooeyRight"}
+            >
               <Link href="/purchase-invoice">
                 <ArrowUpRight className="h-4 w-4" />
                 بینینی هەموویان
@@ -157,11 +170,11 @@ export default async function FeedDashboard() {
           </CardHeader>
           <CardContent className="grid gap-8">
             {completeInvoices.data?.formattedInvoices.length === 0 ? (
-              <TableRow>
-                <TableCell colSpan={3} className="text-center">
+              <div>
+                <div className="text-center my-[77px] text-primary">
                   هیچ فرۆشتنێک تۆمار نەکراوە
-                </TableCell>
-              </TableRow>
+                </div>
+              </div>
             ) : (
               completeSaleInvoices.data?.formattedInvoices.map(
                 (sale, index) => (

@@ -12,7 +12,7 @@ function TotalShown({ text = "کۆی گشتی", className, total }: Props) {
     <div className={cn("", className)}>
       <div
         className={cn(
-          "bg-soft_primary rounded-lg py-1 px-4 text-white flex flex-col items-center "
+          "bg-primary rounded-lg py-1 px-4 text-white flex flex-col items-center "
         )}
       >
         <span className="text-xs">{text}</span>
