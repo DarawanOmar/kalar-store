@@ -28,8 +28,10 @@ import { addProductSale, addProductSaleType } from "../../_type";
 import { addProductSaleAction } from "../../_actions";
 import { useQueryState } from "nuqs";
 import { getProductByBarcode } from "@/app/(main)/purchase/_actions";
+import { useRouter } from "next/navigation";
 
 export default function AddsaleProduct() {
+  const router = useRouter();
   const [pendding, setPendding] = useTransition();
   const [invoice_id] = useQueryState("invoice_id");
   const [products, setProducts] = useState<
@@ -113,6 +115,7 @@ export default function AddsaleProduct() {
       if (result.success) {
         toast.success(result.message);
         form.reset();
+        router.refresh();
         setBarcodeQuery("");
         setBarcodeState("");
       } else {

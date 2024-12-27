@@ -6,13 +6,7 @@ import {
   CardHeader,
   CardTitle,
 } from "./ui/card";
-import {
-  Activity,
-  ArrowUpRight,
-  CreditCard,
-  DollarSign,
-  Percent,
-} from "lucide-react";
+import { Activity, ArrowUpRight, CreditCard, DollarSign } from "lucide-react";
 import { Button } from "./ui/button";
 import Link from "next/link";
 import {

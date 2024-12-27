@@ -26,8 +26,10 @@ import { Barcode, FileText, Plus } from "lucide-react";
 import Title from "@/components/reuseable/title";
 import { addProductPurchaseAction, getProductByBarcode } from "../../_actions";
 import { useQueryState } from "nuqs";
+import { useRouter } from "next/navigation";
 
 export default function AddPurchaseProduct() {
+  const router = useRouter();
   const [pendding, setPendding] = useTransition();
   const [invoice_id, setInvoice_Id] = useQueryState("invoice_id", {
     clearOnDefault: true,
@@ -115,6 +117,7 @@ export default function AddPurchaseProduct() {
       if (result.success) {
         toast.success(result.message);
         form.reset();
+        router.refresh();
         setBarcodeQuery("");
         setBarcodeState("");
       } else {
