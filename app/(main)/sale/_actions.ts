@@ -145,7 +145,7 @@ export const getAllUnfinishSaleInvoice = async () => {
 };
 export const getOneSaleInvoice = async (id: number) => {
   try {
-    if (!id) {
+    if (!id || id <= 0) {
       return {
         message: "ئەم وەسڵە بوونی نییە",
         success: false,
@@ -188,15 +188,16 @@ export const getOneSaleInvoice = async (id: number) => {
     }
 
     // Transform data and calculate total
-    const Products = res.Sale_invoice_items.map((item) => ({
-      id: item.id,
-      product_id: item.product_id,
-      quantity: item.quantity,
-      name: item.Products?.name || "",
-      barcode: item.Products?.barcode || "",
-      sale_price: item.Products?.sale_price || 0,
-    }));
-
+    const Products = await Promise.all(
+      res.Sale_invoice_items.map((item) => ({
+        id: item.id,
+        product_id: item.product_id,
+        quantity: item.quantity,
+        name: item.Products?.name || "",
+        barcode: item.Products?.barcode || "",
+        sale_price: item.Products?.sale_price || 0,
+      }))
+    );
     const total = Products.reduce(
       (sum, product) => sum + product.quantity * product.sale_price,
       0
@@ -217,8 +218,6 @@ export const getOneSaleInvoice = async (id: number) => {
       data: resultFormatted,
     };
   } catch (error: any) {
-    // Log concise error messages for better performance
-    console.error("Database error:", error.message);
     return {
       message: "هەڵەیەک هەیە",
       success: false,
@@ -343,11 +342,16 @@ export const completeSaleInvoiceAction = async (
           }
         }
       }
-
+      let is_discount;
+      if (diccount) {
+        is_discount = true;
+      } else {
+        is_discount = false;
+      }
       // Mark the sale invoice as done
       await tx.sale_invoice.update({
         where: { id },
-        data: { is_done: true, discount: diccount },
+        data: { is_done: true, discount: diccount, is_discount: is_discount },
       });
     });
 

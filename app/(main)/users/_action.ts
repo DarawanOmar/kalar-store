@@ -2,7 +2,6 @@
 import bcrypt from "bcrypt";
 import db from "@/lib/prisma";
 import { addUser, addUserType } from "./_type";
-import { promises as fs } from "fs";
 import { deleteIamge } from "../products/_action";
 
 export const getAllUsers = async (search: string, page: number) => {
@@ -11,7 +10,6 @@ export const getAllUsers = async (search: string, page: number) => {
       where: {
         name: {
           contains: search,
-          mode: "insensitive",
         },
       },
       take: 10,

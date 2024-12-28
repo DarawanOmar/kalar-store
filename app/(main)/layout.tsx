@@ -7,6 +7,7 @@ import { AppSidebar } from "@/components/layout/app-sidebar";
 import ToggleMode from "@/components/layout/toggle-mode";
 import TitlePage from "@/components/layout/title-page";
 import { NuqsAdapter } from "nuqs/adapters/next/app";
+import QueryClientProviderWrapper from "@/providers/query_provider_wrapper";
 
 export const sirwan_reguler = localFont({
   src: "./fonts/UniSIRWAN Expo Regular.ttf",
@@ -31,22 +32,24 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <SidebarProvider>
-      <AppSidebar side="right" />
-      <main className="w-full px-2 sm:px-4 py-2">
-        <div className="w-full flex  justify-between items-center ">
-          <SidebarTrigger />
-          <TitlePage />
-          <ToggleMode />
-        </div>
-        <div
-          className={cn(
-            `${sirwan_reguler.variable}  ${sirwan_bold.variable} ${sirwan_light.variable} ${sirwan_meduim.variable}  max-sm:px-2`
-          )}
-        >
-          <NuqsAdapter>{children}</NuqsAdapter>
-        </div>
-      </main>
-    </SidebarProvider>
+    <QueryClientProviderWrapper>
+      <SidebarProvider>
+        <AppSidebar side="right" />
+        <main className="w-full px-2 sm:px-4 py-2">
+          <div className="w-full flex  justify-between items-center ">
+            <SidebarTrigger />
+            <TitlePage />
+            <ToggleMode />
+          </div>
+          <div
+            className={cn(
+              `${sirwan_reguler.variable}  ${sirwan_bold.variable} ${sirwan_light.variable} ${sirwan_meduim.variable}  max-sm:px-2`
+            )}
+          >
+            <NuqsAdapter>{children}</NuqsAdapter>
+          </div>
+        </main>
+      </SidebarProvider>
+    </QueryClientProviderWrapper>
   );
 }

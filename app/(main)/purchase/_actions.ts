@@ -400,20 +400,9 @@ export const getProductByBarcode = async (barcode: string) => {
   try {
     const res = await db.products.findMany({
       where: {
-        OR: [
-          {
-            barcode: {
-              contains: barcode,
-              mode: "insensitive",
-            },
-          },
-          {
-            name: {
-              contains: barcode,
-              mode: "insensitive",
-            },
-          },
-        ],
+        barcode: {
+          contains: barcode,
+        },
       },
     });
     return {

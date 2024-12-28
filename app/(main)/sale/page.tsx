@@ -8,16 +8,39 @@ import { FileText, SquareKanban } from "lucide-react";
 import GetAllSaleinvoice from "./_components/getAllinvoice";
 import { getAllUnfinishSaleInvoice, getOneSaleInvoice } from "./_actions";
 import column from "./_components/columns";
+import {
+  dehydrate,
+  HydrationBoundary,
+  QueryClient,
+} from "@tanstack/react-query";
 
 async function Sale({ searchParams }: { searchParams: searchParamsType }) {
+  // const queryClient = new QueryClient();
   const invoice_id = Number((await searchParams).invoice_id);
+
   const [getAllunfinishInvoice, getActiveInvoice] = await Promise.all([
     getAllUnfinishSaleInvoice(),
     getOneSaleInvoice(invoice_id),
   ]);
+
+  // await Promise.all([
+  //   queryClient.prefetchQuery({
+  //     queryKey: ["unfinishSaleInvoice"],
+  //     queryFn: getAllUnfinishSaleInvoice,
+  //   }),
+  //   queryClient.prefetchQuery({
+  //     queryKey: ["oneSaleInvoice"],
+  //     queryFn: () => getOneSaleInvoice(invoice_id),
+  //   }),
+  // ]);
+  // const getAllunfinishInvoice: any = queryClient.getQueryData([
+  //   "unfinishSaleInvoice",
+  // ]);
+  // const getActiveInvoice: any = queryClient.getQueryData(["oneSaleInvoice"]);
   // console.log(getActiveInvoice);
   return (
-    <div>
+    // <HydrationBoundary state={dehydrate(queryClient)}>
+    <>
       <div className="mt-5">
         <div className="mb-5 sm:px-6 flex justify-between items-center ">
           <Title icon={<FileText size={18} />} text="دروستکردنی پسووڵە" />
@@ -55,7 +78,7 @@ async function Sale({ searchParams }: { searchParams: searchParamsType }) {
           isSearch={false}
         />
       </div>
-    </div>
+    </>
   );
 }
 

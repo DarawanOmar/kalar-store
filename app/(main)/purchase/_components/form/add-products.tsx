@@ -19,39 +19,20 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
-import { useCallback, useEffect, useState, useTransition } from "react";
+import React, { useTransition } from "react";
 import { LuLoaderCircle } from "react-icons/lu";
 import { addProductPurchase, addProductPurchaseType } from "../../_type";
-import { Barcode, FileText, Plus } from "lucide-react";
+import { FileText, Plus } from "lucide-react";
 import Title from "@/components/reuseable/title";
 import { addProductPurchaseAction, getProductByBarcode } from "../../_actions";
 import { useQueryState } from "nuqs";
-import { useRouter } from "next/navigation";
+import { useQuery } from "@tanstack/react-query";
 
 export default function AddPurchaseProduct() {
-  const router = useRouter();
   const [pendding, setPendding] = useTransition();
-  const [invoice_id, setInvoice_Id] = useQueryState("invoice_id", {
-    clearOnDefault: true,
-    defaultValue: "",
-    shallow: false,
-  });
-
-  const [products, setProducts] = useState<
-    {
-      id: number;
-      quantity: number;
-      createdAt: Date;
-      updatedAt: Date;
-      name: string;
-      image: string | null;
-      barcode: string;
-      purchase_price: number;
-      sale_price: number;
-      note: string | null;
-    }[]
-  >([]);
-  const [barcodeState, setBarcodeState] = useState("");
+  const [invoice_id] = useQueryState("invoice_id");
+  // This state for empty the barcode input after submit
+  const [barcodeState, setBarcodeState] = React.useState("");
   const [barcodeQuery, setBarcodeQuery] = useQueryState("barcode", {
     defaultValue: "",
     clearOnDefault: true,
@@ -65,45 +46,21 @@ export default function AddPurchaseProduct() {
       barcode: "",
       name: "",
       quantity: 0,
-      // purchase_price: 0,
     },
   });
 
-  useEffect(() => {
-    const fetchProduct = async () => {
-      try {
-        const res = await getProductByBarcode(barcodeQuery);
-        const data = res.data;
-        setProducts(data || []);
-      } catch (error) {
-        console.error("Error fetching product:", error);
-        toast.error("هەڵەیەک ڕوویدا لە کاتی وەرگرتنی زانیاری.");
-      }
-    };
-
-    fetchProduct();
-  }, [barcodeQuery]);
-
-  const getProduct = useCallback(
-    async (e: string) => {
-      try {
-        const res = await getProductByBarcode(e);
-        if (!res.data || res.data.length === 0) {
-          return toast.error("ئەم بارکۆدە بەرهەم نییە");
-        }
-        const data = res.data;
-        form.setValue("id", data[0].id);
-        form.setValue("barcode", data[0].barcode);
-        form.setValue("name", data[0].name);
-        // form.setValue("purchase_price", data[0].purchase_price);
-        setBarcodeState(data[0].barcode);
-      } catch (error) {
-        console.error("Error fetching product:", error);
-        toast.error("هەڵەیەک ڕوویدا لە کاتی وەرگرتنی زانیاری.");
-      }
+  const {
+    data: products = [],
+    isError,
+    isLoading,
+  } = useQuery({
+    queryKey: ["products", barcodeQuery],
+    queryFn: async () => {
+      const res = await getProductByBarcode(barcodeQuery);
+      return res.data || [];
     },
-    [barcodeState]
-  );
+    staleTime: 300000, // Cache data for 5 minutes
+  });
 
   function onSubmit(values: addProductPurchaseType) {
     if (!invoice_id)
@@ -117,7 +74,6 @@ export default function AddPurchaseProduct() {
       if (result.success) {
         toast.success(result.message);
         form.reset();
-        router.refresh();
         setBarcodeQuery("");
         setBarcodeState("");
       } else {
@@ -141,8 +97,21 @@ export default function AddPurchaseProduct() {
             <Select
               dir="rtl"
               value={barcodeState}
-              onValueChange={(e) => {
-                getProduct(e);
+              onValueChange={async (e) => {
+                try {
+                  const barcode = e as string;
+                  const res = await getProductByBarcode(barcode);
+                  if (!res.data || res.data.length === 0) {
+                    return toast.error("ئەم بارکۆدە بەرهەم نییە");
+                  }
+                  const product = res.data[0];
+                  form.setValue("id", product.id);
+                  form.setValue("barcode", product.barcode);
+                  form.setValue("name", product.name);
+                  setBarcodeState(product.barcode);
+                } catch {
+                  toast.error("هەڵەیەک ڕوویدا لە کاتی وەرگرتنی زانیاری.");
+                }
               }}
             >
               <FormControl>
@@ -153,13 +122,29 @@ export default function AddPurchaseProduct() {
               <SelectContent>
                 <Input
                   value={barcodeQuery}
-                  onChange={(e) => {
-                    setBarcodeQuery(e.target.value);
-                  }}
-                  Icon={Barcode}
+                  onChange={(e) => setBarcodeQuery(e.target.value)}
+                  onFocus={(e) =>
+                    e.target.setSelectionRange(
+                      e.target.value.length,
+                      e.target.value.length
+                    )
+                  }
                   className="rounded-md border-zinc-400 placeholder:text-muted-foreground placeholder:text-sm my-2"
                   placeholder="بارکۆد بنوسە..."
+                  onBlur={() => {}}
                 />
+                {isLoading ? (
+                  <div className="flex justify-center items-center gap-2 text-sm text-center my-4 font-sirwan_meduim">
+                    <span>چاوەرێبکە</span>
+                    <LuLoaderCircle className="animate-spin transition-all duration-500" />
+                  </div>
+                ) : null}
+                {isError ? (
+                  <div className="text-red-500 text-sm text-center my-4 font-sirwan_meduim">
+                    هەڵەیەک ڕوویدا
+                  </div>
+                ) : null}
+
                 {products.length === 0 ? (
                   <div className="text-red-500 text-sm text-center my-4 font-sirwan_meduim">
                     هیچ بەرهەمێک نییە

@@ -38,34 +38,33 @@ export default async function FeedDashboard() {
     getAllCompleteSaleInvoice(sevenDaysAgo, now, 1),
     getAllCompleteInvoice(sevenDaysAgo, now, 1),
   ]);
-  // console.log(totals);
+  console.log(totals);
   return (
     <div className="flex flex-1 flex-col gap-4 my-10 md:gap-8 md:p-8">
-      <div className="grid gap-4 md:grid-cols-2 md:gap-8 lg:grid-cols-4">
+      <div className="grid gap-4 md:grid-cols-2 md:gap-8 lg:grid-cols-3 xl:grid-cols-4">
         {[
           {
             title: "کۆی داهات",
             icon: DollarSign,
-            count: totals?.totalRevenue?.toLocaleString(),
+            count: totals?.totalRevenueWithDiscount?.toLocaleString(),
             description: " لە هەفتەی ڕابردوو",
           },
-          // {
-          //   title: "کۆی زەرەر",
-          //   icon: DollarSign,
-          //   count: totals?.lossPrice?.toLocaleString(),
-          //   description: " لە هەفتەی ڕابردوو",
-          // },
-
           {
             title: "کۆی فرۆشراوەکان",
             icon: CreditCard,
-            count: totals?.totalSalePrice?.toLocaleString(),
+            count: totals?.totalSalePrice1?.toLocaleString(),
             description: " لە هەفتەی ڕابردوو",
           },
           {
             title: "کۆی کڕدراوەکان",
             icon: Activity,
             count: totals?.totalPurchasePrice?.toLocaleString(),
+            description: " لە هەفتەی ڕابردوو",
+          },
+          {
+            title: "کۆی خەرجی",
+            icon: Activity,
+            count: totals?.totalExpenses?.toLocaleString(),
             description: " لە هەفتەی ڕابردوو",
           },
         ].map((card, index) => (
@@ -162,7 +161,7 @@ export default async function FeedDashboard() {
               className="ms-auto gap-1 gradient-blue"
               variant={"gooeyRight"}
             >
-              <Link href="/purchase-invoice">
+              <Link href="/sale-invoice">
                 <ArrowUpRight className="h-4 w-4" />
                 بینینی هەموویان
               </Link>

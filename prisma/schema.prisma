@@ -4,6 +4,7 @@ generator client {
 
 datasource db {
   provider = "postgresql"
+  // provider = "mysql"
   url      = env("DATABASE_URL")
 }
 
@@ -58,6 +59,7 @@ model Sale_invoice {
   place              String
   is_done            Boolean
   note               String?
+  is_discount        Boolean              @default(false)
   discount           Int?
   createdAt          DateTime             @default(now())
   updatedAt          DateTime             @updatedAt

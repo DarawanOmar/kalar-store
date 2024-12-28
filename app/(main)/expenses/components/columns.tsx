@@ -52,12 +52,18 @@ const column: ColumnDef<Expenses>[] = [
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title="نرخ" />
     ),
+    cell: function CellComponent({ row }) {
+      return <div>{row.original.price.toLocaleString()}</div>;
+    },
   },
   {
     accessorKey: "total",
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title="کۆی گشتی" />
     ),
+    cell: function CellComponent({ row }) {
+      return <div>{row.original.price.toLocaleString()}</div>;
+    },
   },
   {
     accessorKey: "note",

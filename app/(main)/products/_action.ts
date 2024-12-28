@@ -15,10 +15,7 @@ export const getAllProducts = async (search: string, page: number) => {
 
   const produts = await db.products.findMany({
     where: {
-      OR: [
-        { name: { contains: search, mode: "insensitive" } },
-        { barcode: { contains: search, mode: "insensitive" } },
-      ],
+      OR: [{ name: { contains: search } }, { barcode: { contains: search } }],
     },
     take: 10,
     skip: (page - 1) * pageSize,

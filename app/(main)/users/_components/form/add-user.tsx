@@ -146,7 +146,7 @@ export default function AddUser({
             <Button
               type="button"
               variant={"gooeyRight"}
-              className="w-full py-[23px] bg-transparent border border-primary text-primary"
+              className="w-full py-[23px] bg-transparent border border-primary "
             >
               ڕەتکردنەوە
             </Button>

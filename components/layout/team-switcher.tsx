@@ -42,7 +42,8 @@ export function TeamSwitcher({ isName }: { isName: boolean }) {
       >
         {isName ? (
           <Image
-            src={user.image ? user.image : "/logo.jpg"}
+            src={"/logo.jpg"}
+            // src={user.image ? user.image : "/logo.jpg"}
             alt="Kalar-Store"
             height={50}
             width={50}

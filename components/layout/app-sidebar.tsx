@@ -59,12 +59,7 @@ const data = {
       icon: LayoutDashboard,
       isActive: true,
     },
-    {
-      title: "بەرهەماکانمان",
-      url: "/products",
-      icon: Frame,
-      isActive: true,
-    },
+
     {
       title: "کڕین",
       url: "/purchase",
@@ -74,6 +69,12 @@ const data = {
       title: "فرۆشتن",
       url: "/sale",
       icon: PieChart,
+    },
+    {
+      title: "بەرهەماکانمان",
+      url: "/products",
+      icon: Frame,
+      isActive: true,
     },
     {
       title: "خەرجیەکان",

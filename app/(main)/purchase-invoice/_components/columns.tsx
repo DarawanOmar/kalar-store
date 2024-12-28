@@ -52,7 +52,7 @@ const column: ColumnDef<{
   {
     accessorKey: "purchase_price",
     header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="نرخی فرۆشتن" />
+      <DataTableColumnHeader column={column} title="نرخی کڕین" />
     ),
     cell: function CellComponent({ row }) {
       return (

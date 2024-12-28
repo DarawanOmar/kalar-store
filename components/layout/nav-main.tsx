@@ -14,7 +14,6 @@ import { cn } from "@/lib/utils";
 import React from "react";
 import { logout } from "@/lib/utils/cookies";
 import { LuLoaderCircle } from "react-icons/lu";
-import { Button } from "../ui/button";
 
 export function NavMain({
   items,
