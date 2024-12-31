@@ -22,6 +22,7 @@ export type PropsCustomDialog = {
   classContent?: string;
   title?: string;
   closeButton?: boolean;
+  isWithouTrigger?: boolean;
 } & React.ComponentPropsWithoutRef<typeof Dialog>;
 
 function CustomDialog({
@@ -33,26 +34,29 @@ function CustomDialog({
   text_button,
   title = "زیادکردنی فیلم",
   closeButton = false,
+  isWithouTrigger,
   ...props
 }: PropsCustomDialog) {
   return (
     <Dialog {...props}>
-      <DialogTrigger asChild>
-        {isFreshButtonPass ? (
-          <div>{button}</div>
-        ) : (
-          <Button
-            variant={"gooeyRight"}
-            className={cn(
-              "flex items-center gap-2 gradient-blue px-4 py-2 rounded-xl cursor-pointer font-sirwan_reguler ",
-              className
-            )}
-          >
-            {icon}
-            <span>{text_button}</span>
-          </Button>
-        )}
-      </DialogTrigger>
+      {isWithouTrigger ? null : (
+        <DialogTrigger asChild>
+          {isFreshButtonPass ? (
+            <div>{button}</div>
+          ) : (
+            <Button
+              variant={"gooeyRight"}
+              className={cn(
+                "flex items-center gap-2 gradient-blue-left px-4 py-2 rounded-xl cursor-pointer font-sirwan_reguler ",
+                className
+              )}
+            >
+              {icon}
+              <span>{text_button}</span>
+            </Button>
+          )}
+        </DialogTrigger>
+      )}
       <DialogContent
         className={cn(
           "font-sirwan_reguler max-w-4xl w-full overflow-x-hidden overflow-y-scroll  max-h-[95%] border-none ",

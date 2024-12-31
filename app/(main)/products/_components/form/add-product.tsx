@@ -17,15 +17,6 @@ import { cn } from "@/lib/utils";
 import { useTransition } from "react";
 import { LuLoaderCircle } from "react-icons/lu";
 import { addProduct, addProductType } from "../../_type";
-import {
-  FileInput,
-  FileSvgDraw,
-  FileUploader,
-  FileUploaderItem,
-} from "@/components/ui/file-upload";
-import Image from "next/image";
-import { sizeImage } from "@/lib/globals";
-import { AspectRatio } from "@/components/ui/aspect-ratio";
 import { addProducts, deleteIamge, updateProducts } from "../../_action";
 import { UploadDropzone } from "@/utils/uploadthing";
 import { UploadCloud } from "lucide-react";
@@ -116,10 +107,11 @@ export default function AddProduct({
                 },
               }}
               onClientUploadComplete={async (res) => {
-                if (isEdit && info?.image) {
+                if (isEdit && info?.image && res[0].url) {
                   const url = info?.image;
                   const key = url.split("/").pop();
                   const response = await deleteIamge(key as string);
+                  toast.success(response.message);
                 }
                 form.setValue("image", res[0].url);
                 toast.success("بە سەرکەوتووی ئەپڵۆد کرا");
@@ -129,6 +121,51 @@ export default function AddProduct({
               }}
             />
           </div>
+          {/* <FormField
+            control={form.control}
+            name="image"
+            render={({ field }) => (
+              <>
+                <FormLabel className="text-base">وێنە(مۆبایل)</FormLabel>
+                <FileUploader
+                  value={field.value ? [field.value] : null}
+                  onValueChange={(files) => {
+                    const selectedFile = files?.[0] || null;
+                    field.onChange(selectedFile);
+                  }}
+                  dropzoneOptions={{
+                    multiple: false,
+                    maxFiles: 19,
+                    maxSize: sizeImage,
+                  }}
+                  reSelect={true}
+                  className="relative bg-background rounded-lg p-2"
+                >
+                  <FileInput className="outline-dashed outline-1 outline-white">
+                    <div className="flex items-center justify-center flex-col pt-3 pb-4 w-full ">
+                      {field.value && (
+                        <FileUploaderItem
+                          index={0}
+                          aria-roledescription={`file containing ${field.value.name}`}
+                          className="p-0 size-20"
+                        >
+                          <AspectRatio className="size-full">
+                            <Image
+                              src={URL.createObjectURL(field.value)} // Convert File to Object URL
+                              alt={field.value.name} // Use file name as alt
+                              className="object-cover rounded-md"
+                              fill
+                            />
+                          </AspectRatio>
+                        </FileUploaderItem>
+                      )}
+                      {!field.value && <FileSvgDraw />}
+                    </div>
+                  </FileInput>
+                </FileUploader>
+              </>
+            )}
+          /> */}
         </div>
 
         <div className=" max-w-lg mx-auto gap-16 w-full mt-10 flex  justify-between items-center ">
@@ -168,7 +205,7 @@ const getDefaultValues = (values: Partial<addProductType> = {}) => {
     quantity: 0,
     purchase_price: 0,
     sale_price: 0,
-    image: "",
+    image: null,
   };
 
   return { ...defaultValues, ...values };

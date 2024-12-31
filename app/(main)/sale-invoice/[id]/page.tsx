@@ -6,6 +6,7 @@ import Link from "next/link";
 import { getOneSaleInvoice } from "../_lib";
 import TotalShown from "@/components/reuseable/total-shown";
 import { format } from "date-fns";
+import EmptyImage from "@/components/reuseable/empty-image";
 
 type Props = {
   params: Promise<{
@@ -16,6 +17,9 @@ type Props = {
 async function OneSaleInvoice({ params }: Props) {
   const id = (await params).id;
   const OneSaleInvoice = await getOneSaleInvoice(Number(id));
+  if (OneSaleInvoice.message === "Invoice not found") {
+    return <EmptyImage />;
+  }
   return (
     <div className="my-10">
       <div className="flex justify-between sm:items-center ">

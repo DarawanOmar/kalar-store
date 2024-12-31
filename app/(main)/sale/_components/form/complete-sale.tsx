@@ -65,7 +65,7 @@ function CompleteSale({ total }: { total: number }) {
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="">
+      <form onSubmit={form.handleSubmit(onSubmit)} className="sm:px-6">
         <Title
           icon={<FileText size={18} />}
           text="تەواوکردنی فرۆشتن"

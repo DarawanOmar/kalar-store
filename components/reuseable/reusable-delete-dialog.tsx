@@ -80,7 +80,7 @@ function ReusableDeleteDailog({
         <Button
           type="submit"
           variant={"gooeyLeft"}
-          className="gradient-blue text-lg w-full py-[23px] "
+          className="gradient-blue-left text-lg w-full py-[23px] "
         >
           {pending ? (
             <LuLoaderCircle className="animate-spin transition-all duration-500" />

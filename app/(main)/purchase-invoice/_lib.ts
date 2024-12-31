@@ -81,9 +81,11 @@ export const getOnePurchaseInvoice = async (id: number) => {
         createdAt: true,
         Purchase_invoice_items: {
           select: {
+            id: true,
             quantity: true,
             Products: {
               select: {
+                id: true,
                 name: true,
                 barcode: true,
                 purchase_price: true,
@@ -103,6 +105,8 @@ export const getOnePurchaseInvoice = async (id: number) => {
 
     // Consolidate products into a single array
     const products = invoice.Purchase_invoice_items.map((item) => ({
+      purchase_invoice_item_id: item.id,
+      product_id: item.Products?.id,
       name: item.Products?.name,
       barcode: item.Products?.barcode,
       quantity: item.quantity,
@@ -119,10 +123,8 @@ export const getOnePurchaseInvoice = async (id: number) => {
     const formattedInvoice = {
       name: invoice.name,
       place: invoice.place,
-
       note: invoice.note,
       createdAt: invoice.createdAt,
-
       products,
       total,
     };

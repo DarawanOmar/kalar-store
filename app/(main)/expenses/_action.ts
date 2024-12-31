@@ -12,13 +12,11 @@ export const getAllExpenses = async (search: string, page: number) => {
           {
             name: {
               contains: search,
-              mode: "insensitive",
             },
           },
           {
             note: {
               contains: search,
-              mode: "insensitive",
             },
           },
         ],

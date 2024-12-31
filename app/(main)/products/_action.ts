@@ -14,9 +14,7 @@ export const getAllProducts = async (search: string, page: number) => {
   }
 
   const produts = await db.products.findMany({
-    where: {
-      OR: [{ name: { contains: search } }, { barcode: { contains: search } }],
-    },
+    where,
     take: 10,
     skip: (page - 1) * pageSize,
     orderBy: { id: "desc" },
@@ -90,6 +88,14 @@ export const deleteProducts = async (id: number) => {
         success: false,
       };
     }
+
+    if (product.quantity !== 0) {
+      return {
+        message: "ببورە، ئەم کاڵایە بەرز نییە",
+        success: false,
+      };
+    }
+
     const url = product.image as string;
     if (url) {
       const key = url.split("/").pop();

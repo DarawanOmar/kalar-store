@@ -23,7 +23,9 @@ export const getAllCompleteSaleInvoice = async (
         name: true,
         invoice_number: true,
         discount: true,
+        is_discount: true,
         id: true,
+        createdAt: true,
         place: true,
         Sale_invoice_items: {
           select: {
@@ -50,7 +52,9 @@ export const getAllCompleteSaleInvoice = async (
         id: invoice.id,
         name: invoice.name,
         invoice_number: invoice.invoice_number,
+        is_discount: invoice.is_discount,
         place: invoice.place,
+        createdAt: invoice.createdAt,
         discount: invoice.discount,
         total,
       };
@@ -74,6 +78,7 @@ export const getOneSaleInvoice = async (id: number) => {
     const invoice = await db.sale_invoice.findUnique({
       where: { id },
       select: {
+        id: true,
         name: true,
         note: true,
         place: true,
@@ -83,8 +88,10 @@ export const getOneSaleInvoice = async (id: number) => {
         Sale_invoice_items: {
           select: {
             quantity: true,
+            id: true,
             Products: {
               select: {
+                id: true,
                 name: true,
                 barcode: true,
                 sale_price: true,
@@ -104,6 +111,8 @@ export const getOneSaleInvoice = async (id: number) => {
 
     // Consolidate products into a single array
     const products = invoice.Sale_invoice_items.map((item) => ({
+      sale_invoice_item_id: item.id,
+      product_id: item.Products?.id,
       name: item.Products?.name,
       barcode: item.Products?.barcode,
       quantity: item.quantity,

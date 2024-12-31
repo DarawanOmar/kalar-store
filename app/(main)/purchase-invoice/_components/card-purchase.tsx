@@ -24,12 +24,15 @@ function CardSale({ product }: Props) {
           <span>IQD</span>
           {product.sale_price}
         </p>
-        <Link
-          href={`purchase-invoice/${product.name}`}
-          className="p-1 rounded-full text-soft_primary hover:bg-primary hover:text-white cursor-pointer transition-all duration-500  max-w-max ml-auto"
-        >
-          <CircleArrowRight size={20} />
-        </Link>
+        <div className="flex justify-between items-center">
+          <Link
+            href={`purchase-invoice/${product.name}`}
+            className="p-1 rounded-full text-soft_primary hover:bg-primary hover:text-white cursor-pointer transition-all duration-500  max-w-max ml-auto"
+          >
+            <CircleArrowRight size={20} />
+          </Link>
+          {/* <p>{product.}</p> */}
+        </div>
       </div>
     </div>
   );

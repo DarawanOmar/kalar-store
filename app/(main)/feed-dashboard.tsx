@@ -32,13 +32,11 @@ export default async function FeedDashboard() {
   const now = new Date();
   const sevenDaysAgo = new Date();
   sevenDaysAgo.setDate(now.getDate() - 7);
-
   const [totals, completeSaleInvoices, completeInvoices] = await Promise.all([
     getTotalRevenue(sevenDaysAgo, now),
     getAllCompleteSaleInvoice(sevenDaysAgo, now, 1),
     getAllCompleteInvoice(sevenDaysAgo, now, 1),
   ]);
-  console.log(totals);
   return (
     <div className="flex flex-1 flex-col gap-4 my-10 md:gap-8 md:p-8">
       <div className="grid gap-4 md:grid-cols-2 md:gap-8 lg:grid-cols-3 xl:grid-cols-4">
@@ -52,7 +50,7 @@ export default async function FeedDashboard() {
           {
             title: "کۆی فرۆشراوەکان",
             icon: CreditCard,
-            count: totals?.totalSalePrice1?.toLocaleString(),
+            count: totals?.totalSalePrice?.toLocaleString(),
             description: " لە هەفتەی ڕابردوو",
           },
           {
@@ -102,7 +100,7 @@ export default async function FeedDashboard() {
             <Button
               asChild
               size="sm"
-              className="ms-auto gap-1 gradient-blue"
+              className="ms-auto gap-1 gradient-blue-left"
               variant={"gooeyRight"}
             >
               <Link href="/purchase-invoice">
@@ -158,7 +156,7 @@ export default async function FeedDashboard() {
             <Button
               asChild
               size="sm"
-              className="ms-auto gap-1 gradient-blue"
+              className="ms-auto gap-1 gradient-blue-left"
               variant={"gooeyRight"}
             >
               <Link href="/sale-invoice">

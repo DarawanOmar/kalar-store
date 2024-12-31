@@ -6,6 +6,7 @@ import Link from "next/link";
 import { getOnePurchaseInvoice } from "../_lib";
 import TotalShown from "@/components/reuseable/total-shown";
 import { format } from "date-fns";
+import EmptyImage from "@/components/reuseable/empty-image";
 
 type Props = {
   params: Promise<{
@@ -16,6 +17,9 @@ type Props = {
 async function OneSaleInvoice({ params }: Props) {
   const id = (await params).id;
   const oneInvoice = await getOnePurchaseInvoice(Number(id));
+  if (oneInvoice.message === "Invoice not found") {
+    return <EmptyImage />;
+  }
   if (oneInvoice.data)
     return (
       <div className="my-10">

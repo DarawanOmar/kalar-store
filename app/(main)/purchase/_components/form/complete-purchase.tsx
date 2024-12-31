@@ -36,7 +36,7 @@ function CompletePurchase({ total }: { total: number }) {
   }
 
   return (
-    <div className="">
+    <div className="sm:px-6">
       <Title
         icon={<FileText size={18} />}
         text="تەواوکردنی کڕین"

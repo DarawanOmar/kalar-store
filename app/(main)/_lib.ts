@@ -31,21 +31,8 @@ export const getTotalRevenue = async (startDate?: Date, endDate?: Date) => {
         }),
       ]);
 
-    // Map discounts to their respective sale invoices for quick lookup
-    const invoiceDiscounts = new Map(
-      saleInvoices.map((invoice) => [invoice.id, invoice.discount || 0])
-    );
-
-    // Helper function to calculate the total sale price
-    const calculateTotalSalePrice = () =>
-      saleItems.reduce((total, item) => {
-        const productPrice = item.Products?.sale_price || 0;
-        const discount = invoiceDiscounts.get(item.sale_invoiceId || 0) || 0;
-        return total + productPrice * item.quantity - discount;
-      }, 0);
-
     // Helper function to calculate the total purchase price
-    const calculateTotalSalePrice1 = () =>
+    const calculateTotalSalePrice = () =>
       saleItems.reduce((total, item) => {
         const productPrice = item.Products?.sale_price || 0;
         return total + productPrice * item.quantity;
@@ -69,17 +56,15 @@ export const getTotalRevenue = async (startDate?: Date, endDate?: Date) => {
     // Calculate values
     const totalSalePrice = calculateTotalSalePrice();
     const totalPurchasePrice = calculateTotalPurchasePrice();
-    const totalSalePrice1 = calculateTotalSalePrice1();
     const totalDiscount = calculateTotalDicount();
     const totalExpenses = calculateTotalExpenses();
-    const totalRevenue = totalSalePrice1 - totalPurchasePrice;
+    const totalRevenue = totalSalePrice - totalPurchasePrice;
     const totalRevenueWithDiscount = totalRevenue - totalDiscount;
     // Return calculated results
     return {
       totalRevenue,
       totalSalePrice,
       totalPurchasePrice,
-      totalSalePrice1,
       totalRevenueWithDiscount,
       totalExpenses,
     };

@@ -5,6 +5,7 @@ import Link from "next/link";
 import EmptyImage from "@/components/reuseable/empty-image";
 import PaginatedComponent from "@/components/ui/pagination";
 import { redirect } from "next/navigation";
+import { format } from "date-fns";
 
 async function FeedPurchaseInvoice({
   searchParams,
@@ -55,12 +56,17 @@ async function FeedPurchaseInvoice({
                 <span>IQD</span>
                 {invoice?.total?.toLocaleString()}
               </p>
-              <Link
-                href={`purchase-invoice/${invoice.id}`}
-                className="p-1 rounded-full text-soft_primary hover:bg-primary hover:text-white cursor-pointer transition-all duration-500  max-w-max ml-auto"
-              >
-                <CircleArrowRight size={20} />
-              </Link>
+              <div className="flex justify-between items-center">
+                <Link
+                  href={`purchase-invoice/${invoice.id}`}
+                  className="p-1 rounded-full text-soft_primary hover:bg-primary hover:text-white cursor-pointer transition-all duration-500  max-w-max ml-auto"
+                >
+                  <CircleArrowRight size={20} />
+                </Link>
+                <p className="text-xs text-muted-foreground">
+                  {format(invoice.createdAt, "P")}
+                </p>
+              </div>
             </div>
           </div>
         ))}

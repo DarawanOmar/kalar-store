@@ -30,8 +30,9 @@ export function DatePickerWithRange({
   });
   const now = new Date();
   const [date, setDate] = useState<DateRange | undefined>({
-    from: new Date(2024, now.getMonth(), 1),
-    to: addDays(now, 20),
+    // seven days ago
+    from: addDays(now, -7),
+    to: new Date(),
   });
 
   const handleChangeDate = useCallback(
