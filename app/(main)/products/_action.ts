@@ -22,7 +22,7 @@ export const getAllProducts = async (search: string, page: number) => {
       cacheStrategy: { ttl: 60, swr: 10 },
     })
     .withAccelerateInfo();
-  return produts;
+  return produts.data;
 };
 export const addProducts = async (values: addProductType) => {
   try {
