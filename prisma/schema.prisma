@@ -5,8 +5,8 @@ generator client {
 datasource db {
   provider  = "postgresql"
   // provider = "mysql"
-  url       = env("DATABASE_URL")
-  directUrl = env("DIRECT_URL")
+  url       = env("prisma+postgres://accelerate.prisma-data.net/?api_key=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhcGlfa2V5IjoiY2VjODhhNzctYjEyYi00NThhLWJjYmEtNzJhNzk4NTI3OTJjIiwidGVuYW50X2lkIjoiYjg1NDIzYTU3ZWMwYzNiYTZlNGI4ZTcxNTYwMGI5OGZkZGQxNDk2ODAxZGFmYTcwN2UxMjcwMWFjYzVmOTQyMiIsImludGVybmFsX3NlY3JldCI6ImU3YWFjNGFkLTM0MTktNDU5NC1hYWNjLTZiNGQ0ODA4MDlmYyJ9.Pgu7JCJHLg0s5Avg7hgLynHKpr0GWdYP2WQRsKApN3Y")
+  directUrl = env("prisma+postgres://accelerate.prisma-data.net/?api_key=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhcGlfa2V5IjoiNTk3ZTg3M2QtMDY5NC00Zjg0LWI2YjQtZjFlZGRlNTk4NGE4IiwidGVuYW50X2lkIjoiYjg1NDIzYTU3ZWMwYzNiYTZlNGI4ZTcxNTYwMGI5OGZkZGQxNDk2ODAxZGFmYTcwN2UxMjcwMWFjYzVmOTQyMiIsImludGVybmFsX3NlY3JldCI6ImU3YWFjNGFkLTM0MTktNDU5NC1hYWNjLTZiNGQ0ODA4MDlmYyJ9.6fXiPkkx6BXowYR6_z-S4bbikCGubvuu3OS_9G-2xm4")
 }
 
 model Products {
