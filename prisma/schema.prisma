@@ -3,10 +3,8 @@ generator client {
 }
 
 datasource db {
-  provider  = "postgresql"
-  // provider = "mysql"
-  url       = "prisma+postgres://accelerate.prisma-data.net/?api_key=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhcGlfa2V5IjoiY2VjODhhNzctYjEyYi00NThhLWJjYmEtNzJhNzk4NTI3OTJjIiwidGVuYW50X2lkIjoiYjg1NDIzYTU3ZWMwYzNiYTZlNGI4ZTcxNTYwMGI5OGZkZGQxNDk2ODAxZGFmYTcwN2UxMjcwMWFjYzVmOTQyMiIsImludGVybmFsX3NlY3JldCI6ImU3YWFjNGFkLTM0MTktNDU5NC1hYWNjLTZiNGQ0ODA4MDlmYyJ9.Pgu7JCJHLg0s5Avg7hgLynHKpr0GWdYP2WQRsKApN3Y"
-  directUrl = "prisma+postgres://accelerate.prisma-data.net/?api_key=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhcGlfa2V5IjoiNTk3ZTg3M2QtMDY5NC00Zjg0LWI2YjQtZjFlZGRlNTk4NGE4IiwidGVuYW50X2lkIjoiYjg1NDIzYTU3ZWMwYzNiYTZlNGI4ZTcxNTYwMGI5OGZkZGQxNDk2ODAxZGFmYTcwN2UxMjcwMWFjYzVmOTQyMiIsImludGVybmFsX3NlY3JldCI6ImU3YWFjNGFkLTM0MTktNDU5NC1hYWNjLTZiNGQ0ODA4MDlmYyJ9.6fXiPkkx6BXowYR6_z-S4bbikCGubvuu3OS_9G-2xm4"
+  provider = "mysql"
+  url      = env("DATABASE_URL")
 }
 
 model Products {
@@ -25,15 +23,28 @@ model Products {
   Sale_invoice_items     Sale_invoice_items[]
 }
 
+enum Type_Sale_Purchase {
+  Loan
+  Cash
+}
+
+enum Status {
+  Done
+  Remain
+}
+
 model Purchase_invoice {
-  id             Int      @id @default(autoincrement())
+  id             Int                @id @default(autoincrement())
   invoice_number String
   name           String
+  Status         Status
+  type           Type_Sale_Purchase
+  paid_amount    Float?
   place          String
   is_done        Boolean
   note           String?
-  createdAt      DateTime @default(now())
-  updatedAt      DateTime @updatedAt
+  createdAt      DateTime           @default(now())
+  updatedAt      DateTime           @updatedAt
 
   Purchase_invoice_items Purchase_invoice_items[]
 }
@@ -56,6 +67,9 @@ model Sale_invoice {
   id                 Int                  @id @default(autoincrement())
   invoice_number     String
   name               String
+  Status             Status
+  type               Type_Sale_Purchase
+  paid_amount        Float?
   phone              String
   place              String
   is_done            Boolean
@@ -75,6 +89,7 @@ model Sale_invoice_items {
 
   Products   Products? @relation(fields: [product_id], references: [id])
   product_id Int?
+  loss       Boolean   @default(false)
   quantity   Int
   createdAt  DateTime  @default(now())
   updatedAt  DateTime  @updatedAt
@@ -88,6 +103,23 @@ model Expenses {
   note      String?
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+}
+
+model Business {
+  id         String   @id @default(uuid())
+  name       String
+  amount     Float
+  code       String
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+}
+
+model StaticBusiness {
+  id         String   @id @default(uuid())
+  name       String
+  amount     Float
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
 }
 
 model Users {

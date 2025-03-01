@@ -72,3 +72,29 @@ export const getTotalRevenue = async (startDate?: Date, endDate?: Date) => {
     throw new Error("Could not calculate revenue. Please try again later.");
   }
 };
+
+// Types for better type safety
+export interface CardData {
+  title: string;
+  icon: React.ComponentType<{ className?: string }>;
+  count?: string;
+  description: string;
+}
+
+export interface Invoice {
+  id: number;
+  name: string;
+  invoice_number: string;
+  is_discount: boolean;
+  place: string;
+  createdAt: Date;
+  discount: number | null | undefined;
+  total: number;
+}
+
+export interface DashboardData {
+  totalRevenueWithDiscount?: number;
+  totalSalePrice?: number;
+  totalPurchasePrice?: number;
+  totalExpenses?: number;
+}

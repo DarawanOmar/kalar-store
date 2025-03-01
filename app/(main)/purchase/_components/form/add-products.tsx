@@ -43,8 +43,8 @@ export default function AddPurchaseProduct() {
     resolver: zodResolver(addProductPurchase),
     defaultValues: {
       id: 0,
-      barcode: "",
       name: "",
+      sale_price: 0,
       quantity: 0,
     },
   });
@@ -93,22 +93,24 @@ export default function AddPurchaseProduct() {
 
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5  gap-5 items-end">
           <div className="grid gap-3">
-            <FormLabel>باڕکۆد</FormLabel>
+            <FormLabel>ناو</FormLabel>
             <Select
               dir="rtl"
               value={barcodeState}
               onValueChange={async (e) => {
                 try {
                   const barcode = e as string;
+                  console.log("Barocde", barcode);
                   const res = await getProductByBarcode(barcode);
+                  console.log("Res", res);
                   if (!res.data || res.data.length === 0) {
-                    return toast.error("ئەم بارکۆدە بەرهەم نییە");
+                    return toast.error("ئەم بەرهەم نییە");
                   }
                   const product = res.data[0];
                   form.setValue("id", product.id);
-                  form.setValue("barcode", product.barcode);
+                  form.setValue("sale_price", product.sale_price);
                   form.setValue("name", product.name);
-                  setBarcodeState(product.barcode);
+                  setBarcodeState(product.name);
                 } catch {
                   toast.error("هەڵەیەک ڕوویدا لە کاتی وەرگرتنی زانیاری.");
                 }
@@ -153,7 +155,7 @@ export default function AddPurchaseProduct() {
                   products.map((product) => (
                     <SelectItem
                       key={product.id}
-                      value={product.barcode}
+                      value={product.name}
                       className="flex justify-center items-center text-center"
                     >
                       {product.name}
@@ -207,8 +209,8 @@ function labelTranslate(name: string) {
   switch (name) {
     case "name":
       return "ناو";
-    case "barcode":
-      return "بارکۆد";
+    case "sale_price":
+      return "نرخ";
     case "description":
       return "تێبینی";
     case "purchase_price":

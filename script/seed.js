@@ -10,6 +10,24 @@ async function main() {
         name: "Admin",
       },
     }),
+    await prisma.business.create({
+      data: {
+        id: 1,
+        amount: 0,
+        name: "Business",
+        created_at: new Date(),
+        updated_at: new Date(),
+      },
+    }),
+    await prisma.staticBusiness.create({
+      data: {
+        id: 2,
+        amount: 0,
+        name: "Static Business",
+        created_at: new Date(),
+        updated_at: new Date(),
+      },
+    }),
   ]).then(() => {
     console.log("Data Seeded Successfully");
   });

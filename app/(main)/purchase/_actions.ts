@@ -20,9 +20,6 @@ export const unFinishedInvoice = async () => {
       data: res,
     };
   } catch (error: any) {
-    // Log the detailed error for debugging
-    console.error("Error fetching unfinished invoices:", error.stack);
-
     // Handle specific Prisma errors
     if (error instanceof PrismaClientKnownRequestError) {
       if (error.code === "P2002") {
@@ -141,13 +138,16 @@ export const addInvoiceAction = async (values: addInvoiceType) => {
       data: {
         ...parasedData.data,
         is_done: false,
+        Status: "Remain",
+        type: parasedData.data.type as "Cash" | "Loan",
       },
     });
     return {
       success: true,
       message: "بە سەرکەوتویی زیاد کرا",
     };
-  } catch (error) {
+  } catch (error: any) {
+    console.log("object", error);
     return {
       message: "هەڵەیەک هەیە",
       success: false,
@@ -396,12 +396,12 @@ export const completeInvoiceAction = async (id: number) => {
   }
 };
 
-export const getProductByBarcode = async (barcode: string) => {
+export const getProductByBarcode = async (name: string) => {
   try {
     const res = await db.products.findMany({
       where: {
-        barcode: {
-          contains: barcode,
+        name: {
+          contains: name,
         },
       },
     });

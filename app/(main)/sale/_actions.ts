@@ -20,6 +20,8 @@ export const createSaleInvoice = async (values: addSaleType) => {
       data: {
         ...parasedData.data,
         is_done: false,
+        Status: "Done",
+        type: parasedData.data.type as "Cash" | "Loan",
       },
     });
     return {

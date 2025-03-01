@@ -13,16 +13,13 @@ export const getAllProducts = async (search: string, page: number) => {
     };
   }
 
-  const produts = await db.products
-    .findMany({
-      where,
-      take: 10,
-      skip: (page - 1) * pageSize,
-      orderBy: { id: "desc" },
-      cacheStrategy: { ttl: 60, swr: 10 },
-    })
-    .withAccelerateInfo();
-  return produts.data;
+  const produts = await db.products.findMany({
+    where,
+    take: 10,
+    skip: (page - 1) * pageSize,
+    orderBy: { id: "desc" },
+  });
+  return produts;
 };
 export const addProducts = async (values: addProductType) => {
   try {

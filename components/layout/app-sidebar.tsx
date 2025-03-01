@@ -2,10 +2,12 @@
 
 import * as React from "react";
 import {
+  Banknote,
   Bot,
   CreditCard,
   Frame,
   GalleryVerticalEnd,
+  HandCoins,
   LayoutDashboard,
   PieChart,
   ShoppingBag,
@@ -82,15 +84,26 @@ const data = {
       icon: CreditCard,
     },
     {
-      title: "پسووڵە فرۆشراوەکان",
-      url: "/sale-invoice",
-      icon: SquarePercent,
+      title: "قەرزارەکان",
+      url: "/loans",
+      icon: Banknote,
     },
-    {
-      title: "پسووڵە کڕدراوەکان",
-      url: "/purchase-invoice",
-      icon: ShoppingCart,
-    },
+    // {
+    //   title: "قەرزارەکان",
+    //   url: "/cashs",
+    //   icon: HandCoins,
+    // },
+
+    // {
+    //   title: "پسووڵە فرۆشراوەکان",
+    //   url: "/sale-invoice",
+    //   icon: SquarePercent,
+    // },
+    // {
+    //   title: "پسووڵە کڕدراوەکان",
+    //   url: "/purchase-invoice",
+    //   icon: ShoppingCart,
+    // },
     {
       title: "بەکارهێنەرەکان",
       url: "/users",

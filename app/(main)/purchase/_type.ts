@@ -3,6 +3,7 @@ import { type Product } from "@/app/(main)/products/_type";
 export const addInvoice = z.object({
   invoice_number: z.string().min(1, { message: "ژمارەی پسووڵە داخڵ بکە" }),
   name: z.string().min(1, { message: "ناو داخڵ بکە" }),
+  type: z.string().min(1, { message: "جۆر داخڵ بکە" }),
   place: z.string().min(1, { message: "شوێن داخڵ بکە" }),
   note: z.string().min(1, { message: "تێبینی داخڵ بکە" }),
 });
@@ -12,7 +13,7 @@ export type addInvoiceType = z.infer<typeof addInvoice>;
 export const addProductPurchase = z.object({
   id: z.coerce.number().optional(),
   name: z.string().optional(),
-  barcode: z.string().min(1, { message: "ناو داخڵ بکە" }).optional(),
+  sale_price: z.coerce.number().optional(),
   quantity: z.coerce
     .number({ message: "ژمارە داخڵ بکە" })
     .positive({ message: "ژمارەی نرخ بەرزترە لە سفر بێت" })

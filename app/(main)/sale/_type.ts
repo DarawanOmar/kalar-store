@@ -2,6 +2,7 @@ import { z } from "zod";
 
 export const addSale = z.object({
   invoice_number: z.string().min(1, { message: "ناو داخڵ بکە" }),
+  type: z.string().min(1, { message: "جۆر داخڵ بکە" }),
   name: z.string().min(1, { message: "ناو داخڵ بکە" }),
   phone: z.string().min(1, { message: "ژمارەی مۆبایل داخڵ بکە" }),
   place: z.string().min(1, { message: "شوێن داخڵ بکە" }),
