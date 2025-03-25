@@ -57,7 +57,7 @@ export default function AddProduct({
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="  px-6">
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-10">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 gap-10">
           {Object.entries(form.getValues())
             .slice(0, 6)
             .map(([key, value]) => (
@@ -88,7 +88,7 @@ export default function AddProduct({
                 }}
               />
             ))}
-          <div className="">
+          {/* <div className="">
             <FormLabel>وێنە</FormLabel>
             <UploadDropzone
               endpoint="imageUploader"
@@ -120,7 +120,7 @@ export default function AddProduct({
                 toast.error(`کێشە: ${error.message}`);
               }}
             />
-          </div>
+          </div> */}
           {/* <FormField
             control={form.control}
             name="image"
@@ -201,10 +201,10 @@ const getDefaultValues = (values: Partial<addProductType> = {}) => {
   const defaultValues: addProductType = {
     name: "",
     barcode: "",
-    note: "",
-    quantity: 0,
     purchase_price: 0,
     sale_price: 0,
+    note: "",
+    quantity: 0,
     image: null,
   };
 

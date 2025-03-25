@@ -5,6 +5,7 @@ export const addSale = z.object({
   name: z.string().min(1, { message: "ناو داخڵ بکە" }),
   phone: z.string().min(1, { message: "ژمارەی مۆبایل داخڵ بکە" }),
   place: z.string().min(1, { message: "شوێن داخڵ بکە" }),
+  type: z.string().min(1, { message: "جۆر داخڵ بکە" }),
   note: z.string().min(1, { message: "تێبینی داخڵ بکە" }),
 });
 
@@ -13,18 +14,18 @@ export type addSaleType = z.infer<typeof addSale>;
 export const addProductSale = z.object({
   id: z.coerce.number().optional(),
   name: z.string().optional(),
-  barcode: z.string().optional(),
   quantity: z.coerce
     .number({ message: "ژمارە داخڵ بکە" })
     .positive({ message: "ژمارەی نرخ بەرزترە لە سفر بێت" })
     .min(1, { message: "بڕ داخڵ بکە" }),
-  // sale_price: z.string().optional(),
+  sale_price: z.coerce.number().optional(),
 });
 
 export type addProductSaleType = z.infer<typeof addProductSale>;
 
 export const completeSale = z.object({
   discount: z.coerce.number().optional(),
+  paid_amount: z.coerce.number().optional(),
 });
 
 export type completeSaleType = z.infer<typeof completeSale>;

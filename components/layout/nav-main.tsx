@@ -48,7 +48,8 @@ export function NavMain({
               className={cn(
                 "py-[18px] hover:bg-soft_red hover:text-white  transition-all duration-500",
                 {
-                  "text-white gradient-blue-left ": item.url === pathName,
+                  "text-white gradient-blue-left bg-soft_red ":
+                    item.url === pathName,
                 }
               )}
             >

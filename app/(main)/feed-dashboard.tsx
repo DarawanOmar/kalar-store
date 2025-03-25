@@ -1,3 +1,4 @@
+import { memo } from "react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import {
@@ -20,76 +21,35 @@ import {
   ArrowUpRight,
   CreditCard,
   DollarSign,
+  Edit,
   Percent,
 } from "lucide-react";
 import Link from "next/link";
 import { getAllCompleteSaleInvoice } from "./sale-invoice/_lib";
 import { getAllCompleteInvoice } from "./purchase-invoice/_lib";
 import { format } from "date-fns";
-import { getTotalRevenue } from "./_lib";
+import { CardData, DashboardData, getTotalRevenue, Invoice } from "./_lib";
+import ModalAddCash from "@/components/modal-add-cash";
 
 export default async function FeedDashboard() {
-  const now = new Date();
-  const sevenDaysAgo = new Date();
-  sevenDaysAgo.setDate(now.getDate() - 7);
+  const { now, sevenDaysAgo } = getDateRange();
+
   const [totals, completeSaleInvoices, completeInvoices] = await Promise.all([
     getTotalRevenue(sevenDaysAgo, now),
     getAllCompleteSaleInvoice(sevenDaysAgo, now, 1),
     getAllCompleteInvoice(sevenDaysAgo, now, 1),
   ]);
+
   return (
     <div className="flex flex-1 flex-col gap-4 my-10 md:gap-8 md:p-8">
       <div className="grid gap-4 md:grid-cols-2 md:gap-8 lg:grid-cols-3 xl:grid-cols-4">
-        {[
-          {
-            title: "کۆی داهات",
-            icon: DollarSign,
-            count: totals?.totalRevenueWithDiscount?.toLocaleString(),
-            description: " لە هەفتەی ڕابردوو",
-          },
-          {
-            title: "کۆی فرۆشراوەکان",
-            icon: CreditCard,
-            count: totals?.totalSalePrice?.toLocaleString(),
-            description: " لە هەفتەی ڕابردوو",
-          },
-          {
-            title: "کۆی کڕدراوەکان",
-            icon: Activity,
-            count: totals?.totalPurchasePrice?.toLocaleString(),
-            description: " لە هەفتەی ڕابردوو",
-          },
-          {
-            title: "کۆی خەرجی",
-            icon: Activity,
-            count: totals?.totalExpenses?.toLocaleString(),
-            description: " لە هەفتەی ڕابردوو",
-          },
-        ].map((card, index) => (
-          <Card key={index} x-chunk={`dashboard-01-chunk-${index}`}>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">
-                {card.title}
-              </CardTitle>
-              <card.icon className="h-4 w-4 text-muted-foreground" />
-            </CardHeader>
-            <CardContent>
-              <div className="flex gap-1 items-center text-2xl font-bold">
-                <span className="text-xl">IQD </span>
-                <span>{card.count}</span>
-              </div>
-              <p className="text-xs text-muted-foreground">
-                {card.description}
-              </p>
-            </CardContent>
-          </Card>
+        {DASHBOARD_CARDS(totals).map((card, index) => (
+          <StatCard key={index} data={card} />
         ))}
       </div>
+
       <div className="grid gap-4 md:gap-8 lg:grid-cols-2 2xl:grid-cols-2">
-        <Card
-          className="2xl:col-span-1 max-h-max"
-          x-chunk="dashboard-01-chunk-4"
-        >
+        <Card className="2xl:col-span-1 max-h-max">
           <CardHeader className="flex flex-col gap-5 sm:flex-row items-center">
             <div className="grid gap-2">
               <CardTitle>کڕینەکان</CardTitle>
@@ -101,7 +61,7 @@ export default async function FeedDashboard() {
               asChild
               size="sm"
               className="ms-auto gap-1 gradient-blue-left"
-              variant={"gooeyRight"}
+              variant="gooeyRight"
             >
               <Link href="/purchase-invoice">
                 <ArrowUpRight className="h-4 w-4" />
@@ -119,15 +79,8 @@ export default async function FeedDashboard() {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {completeInvoices.data?.formattedInvoices.length === 0 ? (
-                  <TableRow className=" h-32">
-                    <TableCell
-                      colSpan={3}
-                      className="text-center  text-primary"
-                    >
-                      هیچ کڕینێک تۆمار نەکراوە
-                    </TableCell>
-                  </TableRow>
+                {!completeInvoices.data?.formattedInvoices.length ? (
+                  <EmptyState message="هیچ کڕینێک تۆمار نەکراوە" />
                 ) : (
                   completeInvoices.data?.formattedInvoices.map(
                     (invoice, index) => (
@@ -145,7 +98,8 @@ export default async function FeedDashboard() {
             </Table>
           </CardContent>
         </Card>
-        <Card x-chunk="dashboard-01-chunk-5" className="max-h-max">
+
+        <Card className="max-h-max">
           <CardHeader className="flex flex-col gap-5 sm:flex-row items-center">
             <div className="grid gap-2">
               <CardTitle>فرۆشتن لەم دواییانەدا</CardTitle>
@@ -157,7 +111,7 @@ export default async function FeedDashboard() {
               asChild
               size="sm"
               className="ms-auto gap-1 gradient-blue-left"
-              variant={"gooeyRight"}
+              variant="gooeyRight"
             >
               <Link href="/sale-invoice">
                 <ArrowUpRight className="h-4 w-4" />
@@ -166,43 +120,13 @@ export default async function FeedDashboard() {
             </Button>
           </CardHeader>
           <CardContent className="grid gap-8">
-            {completeInvoices.data?.formattedInvoices.length === 0 ? (
-              <div>
-                <div className="text-center my-[77px] text-primary">
-                  هیچ فرۆشتنێک تۆمار نەکراوە
-                </div>
+            {!completeSaleInvoices.data?.formattedInvoices.length ? (
+              <div className="text-center my-[77px] text-primary">
+                هیچ فرۆشتنێک تۆمار نەکراوە
               </div>
             ) : (
               completeSaleInvoices.data?.formattedInvoices.map(
-                (sale, index) => (
-                  <div key={index} className="flex items-center gap-4">
-                    <Avatar className="hidden h-9 w-9 sm:flex">
-                      <AvatarImage src={"/empty-product.jpg"} alt="Avatar" />
-                      <AvatarFallback>{}</AvatarFallback>
-                    </Avatar>
-                    <div className="grid gap-1">
-                      <p className="text-sm font-medium leading-none">
-                        {sale.name}
-                      </p>
-                      <p className="text-sm text-muted-foreground">
-                        {sale.place}
-                      </p>
-                    </div>
-                    <div className="flex flex-col ms-auto font-medium">
-                      <span>{sale.total.toLocaleString()}+</span>
-                      <span>
-                        {sale.discount ? (
-                          <div className="flex items-center">
-                            <span className="text-xs">
-                              {sale.discount?.toLocaleString()}
-                            </span>
-                            <Percent size={12} />
-                          </div>
-                        ) : null}
-                      </span>
-                    </div>
-                  </div>
-                )
+                (sale, index) => <SaleItem key={index} sale={sale} />
               )
             )}
           </CardContent>
@@ -210,4 +134,119 @@ export default async function FeedDashboard() {
       </div>
     </div>
   );
+}
+
+// Utility function to get date range
+const getDateRange = () => {
+  const now = new Date();
+  const sevenDaysAgo = new Date(now);
+  sevenDaysAgo.setDate(now.getDate() - 7);
+  return { now, sevenDaysAgo };
+};
+
+// Dashboard cards data
+const DASHBOARD_CARDS = (totals: DashboardData): CardData[] => [
+  {
+    isMain: true,
+    isCash: true,
+    title: "قاسەی سەرەکی",
+    icon: DollarSign,
+    count: totals?.mainCashData?.value?.toLocaleString(),
+    description: `کۆتا جار ${
+      totals.mainCashData?.last_amount?.toLocaleString() || 0
+    } ${typeAction(totals.mainCashData?.type || "deposit")}`,
+  },
+  {
+    isMain: false,
+    isCash: true,
+    title: "قاسەی لاوەکی",
+    icon: Edit,
+    count: totals?.subCashData?.value?.toLocaleString(),
+    description: `کۆتا جار ${
+      totals.subCashData?.last_amount?.toLocaleString() || 0
+    } ${typeAction(totals.subCashData?.type || "deposit")}`,
+  },
+  {
+    isMain: false,
+    isCash: false,
+    title: "کۆی فرۆشراوەکان",
+    icon: CreditCard,
+    count: totals?.totalSalePrice?.toLocaleString(),
+    description: " لە هەفتەی ڕابردوو",
+  },
+  {
+    isMain: false,
+    isCash: false,
+    title: "کۆی کڕدراوەکان",
+    icon: Activity,
+    count: totals?.totalPurchasePrice?.toLocaleString(),
+    description: " لە هەفتەی ڕابردوو",
+  },
+  {
+    isMain: false,
+    isCash: false,
+    title: "کۆی خەرجی",
+    icon: Activity,
+    count: totals?.totalExpenses?.toLocaleString(),
+    description: " لە هەفتەی ڕابردوو",
+  },
+];
+
+// Memoized components for better performance
+const StatCard = memo(({ data }: { data: CardData }) => (
+  <Card>
+    <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+      <CardTitle className="text-sm font-medium">{data.title}</CardTitle>
+      {data.isCash ? (
+        data.isMain ? (
+          <ModalAddCash isMain={true} />
+        ) : (
+          <ModalAddCash isMain={false} />
+        )
+      ) : (
+        <data.icon className="h-4 w-4 text-muted-foreground" />
+      )}{" "}
+    </CardHeader>
+    <CardContent>
+      <div className="flex gap-1 items-center text-2xl font-bold">
+        <span className="text-xl">IQD </span>
+        <span>{data.count}</span>
+      </div>
+      <p className="text-xs text-muted-foreground">{data.description}</p>
+    </CardContent>
+  </Card>
+));
+
+const SaleItem = memo(({ sale }: { sale: Invoice }) => (
+  <div className="flex items-center gap-4">
+    <Avatar className="hidden h-9 w-9 sm:flex">
+      <AvatarImage src="/empty-product.jpg" alt="Avatar" />
+      <AvatarFallback />
+    </Avatar>
+    <div className="grid gap-1">
+      <p className="text-sm font-medium leading-none">{sale.name}</p>
+      <p className="text-sm text-muted-foreground">{sale.place}</p>
+    </div>
+    <div className="flex flex-col ms-auto font-medium">
+      <span>{sale.total.toLocaleString()}+</span>
+      {sale.discount && (
+        <div className="flex items-center">
+          <span className="text-xs">{sale.discount.toLocaleString()}</span>
+          <Percent size={12} />
+        </div>
+      )}
+    </div>
+  </div>
+));
+
+const EmptyState = memo(({ message }: { message: string }) => (
+  <TableRow className="h-32">
+    <TableCell colSpan={3} className="text-center text-primary">
+      {message}
+    </TableCell>
+  </TableRow>
+));
+
+function typeAction(value: "deposit" | "withdraw") {
+  return value === "deposit" ? "زیادکراوە" : "کەمکراوە";
 }

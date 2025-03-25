@@ -2,6 +2,7 @@
 
 import * as React from "react";
 import {
+  Banknote,
   Bot,
   CreditCard,
   Frame,
@@ -81,6 +82,12 @@ const data = {
       url: "/expenses",
       icon: CreditCard,
     },
+    {
+      title: "قەرزەکان",
+      url: "/loans",
+      icon: Banknote,
+    },
+
     {
       title: "پسووڵە فرۆشراوەکان",
       url: "/sale-invoice",

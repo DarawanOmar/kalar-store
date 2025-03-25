@@ -1,24 +1,10 @@
 "use client";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+
 import { toast } from "sonner";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Button } from "@/components/ui/button";
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-} from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
-import { cn } from "@/lib/utils";
+import { Form } from "@/components/ui/form";
 import React, { useTransition } from "react";
 import { LuLoaderCircle } from "react-icons/lu";
 import { addProductPurchase, addProductPurchaseType } from "../../_type";
@@ -27,42 +13,42 @@ import Title from "@/components/reuseable/title";
 import { addProductPurchaseAction, getProductByBarcode } from "../../_actions";
 import { useQueryState } from "nuqs";
 import { useQuery } from "@tanstack/react-query";
+import { SelectWithSearchFormField } from "@/components/select-with-search";
+import { TextField } from "@/components/reuseable/input-form-reusable";
 
 export default function AddPurchaseProduct() {
   const [pendding, setPendding] = useTransition();
   const [invoice_id] = useQueryState("invoice_id");
-  // This state for empty the barcode input after submit
-  const [barcodeState, setBarcodeState] = React.useState("");
-  const [barcodeQuery, setBarcodeQuery] = useQueryState("barcode", {
-    defaultValue: "",
-    clearOnDefault: true,
-    shallow: false,
-    throttleMs: 500,
-  });
   const form = useForm<addProductPurchaseType>({
     resolver: zodResolver(addProductPurchase),
     defaultValues: {
       id: 0,
-      barcode: "",
       name: "",
       quantity: 0,
+      purchase_price: 0,
     },
   });
-
-  const {
-    data: products = [],
-    isError,
-    isLoading,
-  } = useQuery({
-    queryKey: ["products", barcodeQuery],
+  const name = form.watch("name");
+  const { data: products = [] } = useQuery({
+    queryKey: ["products"],
     queryFn: async () => {
-      const res = await getProductByBarcode(barcodeQuery);
+      const res = await getProductByBarcode("" as string, "" as string);
       return res.data || [];
     },
-    staleTime: 300000, // Cache data for 5 minutes
   });
-
+  React.useEffect(() => {
+    const nameMatch = products.find((product) => product.name === name);
+    if (nameMatch) {
+      form.reset({
+        id: nameMatch.id || 0,
+        purchase_price: nameMatch?.purchase_price || 0,
+        name: nameMatch?.name || "",
+        quantity: 0,
+      });
+    }
+  }, [name, products]);
   function onSubmit(values: addProductPurchaseType) {
+    console.log(values);
     if (!invoice_id)
       return toast.error(" تکایە پسوڵەکە دیاری بکە یان دانەیەک دروست بکە");
     setPendding(async () => {
@@ -73,9 +59,12 @@ export default function AddPurchaseProduct() {
       );
       if (result.success) {
         toast.success(result.message);
-        form.reset();
-        setBarcodeQuery("");
-        setBarcodeState("");
+        form.reset({
+          id: 0,
+          name: "",
+          quantity: 0,
+          purchase_price: 0,
+        });
       } else {
         toast.error(result.message);
       }
@@ -91,104 +80,24 @@ export default function AddPurchaseProduct() {
           className="mb-8"
         />
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5  gap-5 items-end">
-          <div className="grid gap-3">
-            <FormLabel>باڕکۆد</FormLabel>
-            <Select
-              dir="rtl"
-              value={barcodeState}
-              onValueChange={async (e) => {
-                try {
-                  const barcode = e as string;
-                  const res = await getProductByBarcode(barcode);
-                  if (!res.data || res.data.length === 0) {
-                    return toast.error("ئەم بارکۆدە بەرهەم نییە");
-                  }
-                  const product = res.data[0];
-                  form.setValue("id", product.id);
-                  form.setValue("barcode", product.barcode);
-                  form.setValue("name", product.name);
-                  setBarcodeState(product.barcode);
-                } catch {
-                  toast.error("هەڵەیەک ڕوویدا لە کاتی وەرگرتنی زانیاری.");
-                }
-              }}
-            >
-              <FormControl>
-                <SelectTrigger>
-                  <SelectValue placeholder="" />
-                </SelectTrigger>
-              </FormControl>
-              <SelectContent>
-                <Input
-                  value={barcodeQuery}
-                  onChange={(e) => setBarcodeQuery(e.target.value)}
-                  onFocus={(e) =>
-                    e.target.setSelectionRange(
-                      e.target.value.length,
-                      e.target.value.length
-                    )
-                  }
-                  className="rounded-md border-zinc-400 placeholder:text-muted-foreground placeholder:text-sm my-2"
-                  placeholder="بارکۆد بنوسە..."
-                  onBlur={() => {}}
-                />
-                {isLoading ? (
-                  <div className="flex justify-center items-center gap-2 text-sm text-center my-4 font-sirwan_meduim">
-                    <span>چاوەرێبکە</span>
-                    <LuLoaderCircle className="animate-spin transition-all duration-500" />
-                  </div>
-                ) : null}
-                {isError ? (
-                  <div className="text-red-500 text-sm text-center my-4 font-sirwan_meduim">
-                    هەڵەیەک ڕوویدا
-                  </div>
-                ) : null}
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 2xl:grid-cols-5  gap-5 items-end">
+          <SelectWithSearchFormField
+            control={form.control}
+            name="name"
+            label="ناو"
+            description=""
+            options={products.map((product) => ({
+              value: product.name,
+              label: product.name,
+            }))}
+          />
 
-                {products.length === 0 ? (
-                  <div className="text-red-500 text-sm text-center my-4 font-sirwan_meduim">
-                    هیچ بەرهەمێک نییە
-                  </div>
-                ) : (
-                  products.map((product) => (
-                    <SelectItem
-                      key={product.id}
-                      value={product.barcode}
-                      className="flex justify-center items-center text-center"
-                    >
-                      {product.name}
-                    </SelectItem>
-                  ))
-                )}
-              </SelectContent>
-            </Select>
-          </div>
-
-          {Object.entries(form.getValues())
-            .slice(2)
-            .map(([key, value]) => (
-              <FormField
-                key={key}
-                control={form.control}
-                name={key as any}
-                render={({ field }) => (
-                  <FormItem className=" w-full  max-w-full">
-                    <FormLabel>{labelTranslate(field.name)}</FormLabel>
-                    <FormControl>
-                      <Input
-                        {...field}
-                        className={cn("w-full ", {
-                          "border-red-500":
-                            form.formState.errors[
-                              field.name as keyof typeof form.formState.errors
-                            ],
-                        })}
-                      />
-                    </FormControl>
-                  </FormItem>
-                )}
-              />
-            ))}
+          <TextField
+            control={form.control}
+            name="purchase_price"
+            placeholder="نرخی کڕین"
+          />
+          <TextField control={form.control} name="quantity" placeholder="بڕ" />
           <Button type="submit" variant={"gooeyRight"} className="flex gap-1">
             {pendding ? (
               <LuLoaderCircle className="animate-spin transition-all duration-500" />
@@ -201,23 +110,4 @@ export default function AddPurchaseProduct() {
       </form>
     </Form>
   );
-}
-
-function labelTranslate(name: string) {
-  switch (name) {
-    case "name":
-      return "ناو";
-    case "barcode":
-      return "بارکۆد";
-    case "description":
-      return "تێبینی";
-    case "purchase_price":
-      return "نرخی کڕین";
-    case "sale_price":
-      return "نرخی فرۆشتن";
-    case "quantity":
-      return "بڕ";
-    default:
-      return name;
-  }
 }

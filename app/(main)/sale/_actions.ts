@@ -2,38 +2,9 @@
 
 import db from "@/lib/prisma";
 import { addSale, addSaleType } from "./_type";
-import { PrismaClientKnownRequestError } from "@prisma/client/runtime/library";
+import { Type_Sale_Purchase } from "@prisma/client";
 
-export const createSaleInvoice = async (values: addSaleType) => {
-  try {
-    const parasedData = addSale.safeParse(values);
-    if (parasedData.success === false) {
-      const errors = Object.entries(
-        parasedData.error.flatten().fieldErrors
-      ).map(([field, error]) => `${field}: ${error}`);
-      return {
-        message: errors.join(", "),
-        success: false,
-      };
-    }
-    await db.sale_invoice.create({
-      data: {
-        ...parasedData.data,
-        is_done: false,
-      },
-    });
-    return {
-      success: true,
-      message: "بە سەرکەوتویی زیاد کرا",
-    };
-  } catch (error: any) {
-    return {
-      message: "هەڵەیەک هەیە",
-      success: false,
-    };
-  }
-};
-
+// ------------------------DELETE---------------------------
 export const deleteEmptySaleInvoice = async (id: number) => {
   try {
     const existPurchase = await db.sale_invoice.findUnique({
@@ -74,6 +45,7 @@ export const deleteEmptySaleInvoice = async (id: number) => {
     };
   }
 };
+
 export const deleteSaleItemProdcut = async (id: number) => {
   try {
     const existItem = await db.sale_invoice_items.findUnique({
@@ -111,11 +83,17 @@ export const deleteSaleItemProdcut = async (id: number) => {
     };
   }
 };
+
+// ------------------------GET---------------------------
+
 export const getAllUnfinishSaleInvoice = async () => {
   try {
     const res = await db.sale_invoice.findMany({
       where: {
         is_done: false,
+      },
+      orderBy: {
+        createdAt: "desc",
       },
     });
 
@@ -124,19 +102,6 @@ export const getAllUnfinishSaleInvoice = async () => {
       data: res,
     };
   } catch (error: any) {
-    if (error instanceof PrismaClientKnownRequestError) {
-      if (error.code === "P2002") {
-        return {
-          message: "A duplicate entry error occurred.",
-          success: false,
-        };
-      } else if (error.code === "P2001") {
-        return {
-          message: "No unfinished invoices found.",
-          success: false,
-        };
-      }
-    }
     return {
       message: "هەڵەیەک هەیە",
       success: false,
@@ -158,6 +123,7 @@ export const getOneSaleInvoice = async (id: number) => {
         id,
       },
       select: {
+        type: true,
         invoice_number: true,
         name: true,
         place: true,
@@ -204,6 +170,7 @@ export const getOneSaleInvoice = async (id: number) => {
     );
 
     const resultFormatted = {
+      type: res.type,
       invoice_number: res.invoice_number,
       name: res.name,
       phone: res.phone,
@@ -224,6 +191,8 @@ export const getOneSaleInvoice = async (id: number) => {
     };
   }
 };
+
+// ----------------------POST-------------------------
 
 export const addProductSaleAction = async (
   invoice_id: number,
@@ -256,6 +225,20 @@ export const addProductSaleAction = async (
       };
     }
     db.$transaction(async (tx) => {
+      const sale_invoice = await tx.sale_invoice.findUnique({
+        where: { id: invoice_id },
+      });
+
+      await tx.sale_invoice.update({
+        where: { id: invoice_id },
+        data: {
+          total_amount: { increment: product.sale_price * quantity },
+          remaining_amount:
+            sale_invoice?.type === "cash"
+              ? 0
+              : { increment: product.sale_price * quantity },
+        },
+      });
       await tx.products.update({
         where: { id: product_id },
         data: { quantity: { decrement: quantity } },
@@ -294,10 +277,45 @@ export const addProductSaleAction = async (
     };
   }
 };
+export const createSaleInvoice = async (values: addSaleType) => {
+  try {
+    const parasedData = addSale.safeParse(values);
+    if (parasedData.success === false) {
+      const errors = Object.entries(
+        parasedData.error.flatten().fieldErrors
+      ).map(([field, error]) => `${field}: ${error}`);
+      return {
+        message: errors.join(", "),
+        success: false,
+      };
+    }
+    await db.sale_invoice.create({
+      data: {
+        ...parasedData.data,
+        type: parasedData.data.type as Type_Sale_Purchase,
+        is_done: false,
+        total_amount: 0,
+        discount: 0,
+      },
+    });
+    return {
+      success: true,
+      message: "بە سەرکەوتویی زیاد کرا",
+    };
+  } catch (error: any) {
+    return {
+      message: "هەڵەیەک هەیە",
+      success: false,
+    };
+  }
+};
+
+// ----------------------PUT-------------------------
 
 export const completeSaleInvoiceAction = async (
   id: number,
-  diccount: number | undefined
+  diccount: number | undefined,
+  amount_payment: number
 ) => {
   try {
     // Fetch the sale invoice and its items in a single query
@@ -308,7 +326,7 @@ export const completeSaleInvoiceAction = async (
 
     if (!saleInvoice) {
       return {
-        message: "ئەم وەسكە بوونی نییە",
+        message: "ئەم وەسڵە بوونی نییە",
         success: false,
       };
     }
@@ -348,10 +366,44 @@ export const completeSaleInvoiceAction = async (
       } else {
         is_discount = false;
       }
+
+      // decrease amount in main-cash
+      if (
+        saleInvoice.type === "cash" ||
+        (saleInvoice.type === "loan" && amount_payment)
+      ) {
+        await tx.mainCash.update({
+          where: { id: 1 },
+          data: {
+            amount: {
+              increment:
+                saleInvoice.type === "cash"
+                  ? (saleInvoice.total_amount as number)
+                  : amount_payment,
+            },
+            last_amount: {
+              increment:
+                saleInvoice.type === "cash"
+                  ? (saleInvoice.total_amount as number)
+                  : amount_payment,
+            },
+            type_action: "deposit",
+          },
+        });
+      }
+
       // Mark the sale invoice as done
       await tx.sale_invoice.update({
         where: { id },
-        data: { is_done: true, discount: diccount, is_discount: is_discount },
+        data: {
+          is_done: true,
+          discount: diccount,
+          is_discount: is_discount,
+          paid_amount: amount_payment || 0,
+          remaining_amount: amount_payment
+            ? (saleInvoice.total_amount as number) - amount_payment
+            : (saleInvoice.total_amount as number),
+        },
       });
     });
 

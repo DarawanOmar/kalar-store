@@ -14,7 +14,7 @@ function ModalAddProcut() {
     <CustomDialog
       open={open}
       onOpenChange={setOpen}
-      classContent="max-w-5xl"
+      classContent="max-w-3xl"
       icon={<Plus size={20} strokeWidth={2.5} className="max-sm:hidden" />}
       text_button="زیادکردنی کاڵا"
       title="زیادکردنی کاڵا"

@@ -19,7 +19,7 @@ export const getAllProducts = async (search: string, page: number) => {
       take: 10,
       skip: (page - 1) * pageSize,
       orderBy: { id: "desc" },
-      cacheStrategy: { ttl: 60, swr: 10 },
+      cacheStrategy: { ttl: 60, swr: 10, tags: ["products"] },
     })
     .withAccelerateInfo();
   return produts.data;
@@ -40,6 +40,7 @@ export const addProducts = async (values: addProductType) => {
     await db.products.create({
       data: { ...parasedData.data, quantity: 0 },
     });
+    await db.$accelerate.invalidate({ tags: ["products"] });
     return {
       message: "بە سەرکەوتویی زیاد کرا",
       success: true,
@@ -69,6 +70,8 @@ export const updateProducts = async (id: number, values: addProductType) => {
       },
       where: { id },
     });
+    await db.$accelerate.invalidate({ tags: ["products"] });
+
     return {
       message: "بە سەرکەوتویی نوێکرایەوە",
       success: true,
@@ -108,6 +111,8 @@ export const deleteProducts = async (id: number) => {
     await db.products.delete({
       where: { id },
     });
+    await db.$accelerate.invalidate({ tags: ["products"] });
+
     return {
       message: "بە سەرکەوتویی سڕایەوە",
       success: true,

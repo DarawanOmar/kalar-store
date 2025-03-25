@@ -1,3 +1,9 @@
+- create a cash box static manually decrease and increase
+- add the another cash box connect to the database expense and sale and purchase
+- remove the invoice the sale and purchase
+- add loan to the sale only
+- when sale with discount add the final discount to the cash
+
 This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
 
 ## Getting Started

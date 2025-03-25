@@ -3,20 +3,15 @@ import { toast } from "sonner";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Button } from "@/components/ui/button";
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-} from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
-import { cn } from "@/lib/utils";
+import { Form } from "@/components/ui/form";
+
 import { useTransition } from "react";
 import { LuLoaderCircle } from "react-icons/lu";
 import { addInvoice, addInvoiceType } from "../../_type";
 import { CheckCheck } from "lucide-react";
 import { addInvoiceAction } from "../../_actions";
+
+import { TextField } from "@/components/reuseable/input-form-reusable";
 
 type Props = {
   invoice: {
@@ -50,30 +45,17 @@ export default function Addinvoice({ invoice }: Props) {
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="  sm:px-6">
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5  gap-5 items-end">
-          {Object.entries(form.getValues()).map(([key, value]) => (
-            <FormField
-              key={key}
-              control={form.control}
-              name={key as any}
-              render={({ field }) => (
-                <FormItem className=" w-full  max-w-full">
-                  <FormLabel>{labelTranslate(field.name)}</FormLabel>
-                  <FormControl>
-                    <Input
-                      {...field}
-                      className={cn("w-full ", {
-                        "border-red-500":
-                          form.formState.errors[
-                            field.name as keyof typeof form.formState.errors
-                          ],
-                      })}
-                    />
-                  </FormControl>
-                  {/* <FormMessage /> */}
-                </FormItem>
-              )}
-            />
-          ))}
+          {Object.entries(form.getValues()).map(([key, value]) => {
+            return (
+              <TextField
+                control={form.control}
+                key={key}
+                name={key}
+                // label={labelTranslate(key)}
+                placeholder={labelTranslate(key)}
+              />
+            );
+          })}
           <Button type="submit" variant={"gooeyRight"} className="flex gap-1">
             {pendding ? (
               <LuLoaderCircle className="animate-spin transition-all duration-500" />
@@ -112,6 +94,8 @@ function labelTranslate(name: string) {
       return "ژمارەی پسووڵە";
     case "place":
       return "شوێن";
+    case "type":
+      return "پارەدان";
     default:
       return name;
   }

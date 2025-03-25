@@ -146,4 +146,10 @@ export const cardData = [
     count: "+573",
     description: "+201 since last hour",
   },
+  {
+    title: "کۆی خەرجی",
+    icon: Activity,
+    count: "+573",
+    description: "+201 since last hour",
+  },
 ];

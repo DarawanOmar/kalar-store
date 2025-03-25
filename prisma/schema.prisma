@@ -3,10 +3,11 @@ generator client {
 }
 
 datasource db {
-  provider  = "postgresql"
-  // provider = "mysql"
-  url       = "prisma+postgres://accelerate.prisma-data.net/?api_key=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhcGlfa2V5IjoiY2VjODhhNzctYjEyYi00NThhLWJjYmEtNzJhNzk4NTI3OTJjIiwidGVuYW50X2lkIjoiYjg1NDIzYTU3ZWMwYzNiYTZlNGI4ZTcxNTYwMGI5OGZkZGQxNDk2ODAxZGFmYTcwN2UxMjcwMWFjYzVmOTQyMiIsImludGVybmFsX3NlY3JldCI6ImU3YWFjNGFkLTM0MTktNDU5NC1hYWNjLTZiNGQ0ODA4MDlmYyJ9.Pgu7JCJHLg0s5Avg7hgLynHKpr0GWdYP2WQRsKApN3Y"
-  directUrl = "prisma+postgres://accelerate.prisma-data.net/?api_key=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhcGlfa2V5IjoiNTk3ZTg3M2QtMDY5NC00Zjg0LWI2YjQtZjFlZGRlNTk4NGE4IiwidGVuYW50X2lkIjoiYjg1NDIzYTU3ZWMwYzNiYTZlNGI4ZTcxNTYwMGI5OGZkZGQxNDk2ODAxZGFmYTcwN2UxMjcwMWFjYzVmOTQyMiIsImludGVybmFsX3NlY3JldCI6ImU3YWFjNGFkLTM0MTktNDU5NC1hYWNjLTZiNGQ0ODA4MDlmYyJ9.6fXiPkkx6BXowYR6_z-S4bbikCGubvuu3OS_9G-2xm4"
+  // provider  = "postgresql"
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+  // url       = "prisma+postgres://accelerate.prisma-data.net/?api_key=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhcGlfa2V5IjoiY2VjODhhNzctYjEyYi00NThhLWJjYmEtNzJhNzk4NTI3OTJjIiwidGVuYW50X2lkIjoiYjg1NDIzYTU3ZWMwYzNiYTZlNGI4ZTcxNTYwMGI5OGZkZGQxNDk2ODAxZGFmYTcwN2UxMjcwMWFjYzVmOTQyMiIsImludGVybmFsX3NlY3JldCI6ImU3YWFjNGFkLTM0MTktNDU5NC1hYWNjLTZiNGQ0ODA4MDlmYyJ9.Pgu7JCJHLg0s5Avg7hgLynHKpr0GWdYP2WQRsKApN3Y"
+  // directUrl = "prisma+postgres://accelerate.prisma-data.net/?api_key=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhcGlfa2V5IjoiNTk3ZTg3M2QtMDY5NC00Zjg0LWI2YjQtZjFlZGRlNTk4NGE4IiwidGVuYW50X2lkIjoiYjg1NDIzYTU3ZWMwYzNiYTZlNGI4ZTcxNTYwMGI5OGZkZGQxNDk2ODAxZGFmYTcwN2UxMjcwMWFjYzVmOTQyMiIsImludGVybmFsX3NlY3JldCI6ImU3YWFjNGFkLTM0MTktNDU5NC1hYWNjLTZiNGQ0ODA4MDlmYyJ9.6fXiPkkx6BXowYR6_z-S4bbikCGubvuu3OS_9G-2xm4"
 }
 
 model Products {
@@ -30,8 +31,8 @@ model Purchase_invoice {
   invoice_number String
   name           String
   place          String
-  is_done        Boolean
   note           String?
+  is_done        Boolean
   createdAt      DateTime @default(now())
   updatedAt      DateTime @updatedAt
 
@@ -52,19 +53,36 @@ model Purchase_invoice_items {
   updatedAt DateTime @updatedAt
 }
 
+enum Type_Sale_Purchase {
+  loan
+  cash
+}
+
+enum Status {
+  done
+  remain
+}
+
 model Sale_invoice {
-  id                 Int                  @id @default(autoincrement())
-  invoice_number     String
-  name               String
-  phone              String
-  place              String
-  is_done            Boolean
-  note               String?
-  is_discount        Boolean              @default(false)
-  discount           Int?
-  createdAt          DateTime             @default(now())
-  updatedAt          DateTime             @updatedAt
+  id               Int                @id @default(autoincrement())
+  invoice_number   String
+  name             String
+  status           Status             @default(remain)
+  type             Type_Sale_Purchase @default(cash)
+  total_amount     Float?
+  paid_amount      Float              @default(0)
+  remaining_amount Float              @default(0)
+  phone            String
+  place            String
+  is_done          Boolean            @default(false)
+  note             String?
+  is_discount      Boolean            @default(false)
+  discount         Int?
+  createdAt        DateTime           @default(now())
+  updatedAt        DateTime           @updatedAt
+
   Sale_invoice_items Sale_invoice_items[]
+  LoanPayments       LoanPayment[]
 }
 
 model Sale_invoice_items {
@@ -75,9 +93,20 @@ model Sale_invoice_items {
 
   Products   Products? @relation(fields: [product_id], references: [id])
   product_id Int?
+  loss       Boolean   @default(false)
   quantity   Int
   createdAt  DateTime  @default(now())
   updatedAt  DateTime  @updatedAt
+}
+
+model LoanPayment {
+  id      Int      @id @default(autoincrement())
+  amount  Float
+  paid_at DateTime @default(now())
+  note    String?
+
+  Sale_invoice   Sale_invoice @relation(fields: [sale_invoiceId], references: [id])
+  sale_invoiceId Int
 }
 
 model Expenses {
@@ -90,6 +119,11 @@ model Expenses {
   updatedAt DateTime @updatedAt
 }
 
+enum ActionType {
+  withdraw
+  deposit
+}
+
 model Users {
   id        Int      @id @default(autoincrement())
   name      String
@@ -98,4 +132,44 @@ model Users {
   image     String?
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+}
+
+model MainCash {
+  id          Int        @id @default(autoincrement())
+  name        String
+  amount      Float
+  last_amount Int
+  type_action ActionType
+  created_at  DateTime   @default(now())
+  updated_at  DateTime   @updatedAt
+}
+
+model SubCash {
+  id          Int        @id @default(autoincrement())
+  name        String
+  amount      Float
+  last_amount Int
+  type_action ActionType
+  created_at  DateTime   @default(now())
+  updated_at  DateTime   @updatedAt
+}
+
+model HistoryMainCash {
+  id          Int        @id @default(autoincrement())
+  user_email  String
+  name        String
+  amount      Float
+  type_action ActionType
+  created_at  DateTime   @default(now())
+  updated_at  DateTime   @updatedAt
+}
+
+model HistorySubCash {
+  id          Int        @id @default(autoincrement())
+  user_email  String
+  name        String
+  amount      Float
+  type_action ActionType
+  created_at  DateTime   @default(now())
+  updated_at  DateTime   @updatedAt
 }

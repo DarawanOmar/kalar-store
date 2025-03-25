@@ -25,3 +25,10 @@ export interface Expenses {
   createdAt: Date;
   updatedAt: Date;
 }
+
+export const addCash = z.object({
+  amount: z.coerce.number().min(1, { message: "پارە داخڵ بکە" }),
+  type_action: z.enum(["deposit", "withdraw"]),
+});
+
+export type addCashType = z.infer<typeof addCash>;

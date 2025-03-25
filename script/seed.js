@@ -1,5 +1,5 @@
 const { PrismaClient } = require("@prisma/client");
-const bcrypt = require("bcrypt");
+const bcrypt = require("bcryptjs");
 const prisma = new PrismaClient();
 async function main() {
   await Promise.all([
@@ -8,6 +8,22 @@ async function main() {
         email: "admin@gmail.com",
         password: await bcrypt.hash("admin", 12),
         name: "Admin",
+      },
+    }),
+    await prisma.mainCash.create({
+      data: {
+        name: "Main Cash",
+        amount: 0,
+        last_amount: 0,
+        type_action: "deposit",
+      },
+    }),
+    await prisma.subCash.create({
+      data: {
+        name: "Sub Cash",
+        amount: 0,
+        last_amount: 0,
+        type_action: "deposit",
       },
     }),
   ]).then(() => {

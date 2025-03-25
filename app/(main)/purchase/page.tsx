@@ -5,13 +5,13 @@ import ShownPurchaseProducts from "./_components/shown-purchase-products";
 import Title from "@/components/reuseable/title";
 import { FileText } from "lucide-react";
 import GetAllinvoice from "./_components/getAllinvoice";
-import { getOneInvoice, unFinishedInvoice } from "./_actions";
+import { getOneInvoice, getunFinishedInvoice } from "./_actions";
 import CompletePurchase from "./_components/form/complete-purchase";
 
 async function Purchase({ searchParams }: { searchParams: searchParamsType }) {
   const invoice_id = Number((await searchParams).invoice_id);
   const [getUnFinishedInvoice, getActiveInvoice] = await Promise.all([
-    unFinishedInvoice(),
+    getunFinishedInvoice(),
     getOneInvoice(invoice_id),
   ]);
   return (

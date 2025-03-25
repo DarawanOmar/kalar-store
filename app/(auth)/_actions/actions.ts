@@ -1,7 +1,7 @@
 "use server";
-import bcrypt from "bcrypt";
 import { loginSchemaType } from "../_component/lib";
 import db from "@/lib/prisma";
+import bcrypt from "bcryptjs";
 
 export async function loginAction(data: loginSchemaType) {
   try {
@@ -12,6 +12,7 @@ export async function loginAction(data: loginSchemaType) {
         message: "ئیمەیڵ هەڵەیە",
       };
     }
+    console.log("User => ", user);
     const isMatch = await bcrypt.compare(
       data.password,
       user?.password as string
@@ -25,7 +26,6 @@ export async function loginAction(data: loginSchemaType) {
     }
     return {
       success: false,
-
       message: "پاسۆرد هەڵەیە",
     };
   } catch (error: any) {

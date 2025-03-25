@@ -3,26 +3,20 @@ import { toast } from "sonner";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Button } from "@/components/ui/button";
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-} from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
-import { cn } from "@/lib/utils";
+import { Form } from "@/components/ui/form";
 import { useTransition } from "react";
 import { LuLoaderCircle } from "react-icons/lu";
 import { CheckCheck } from "lucide-react";
-import { addSale, addSaleType, SaleInvoiceItems } from "../../_type";
+import { addSale, addSaleType } from "../../_type";
 import { createSaleInvoice } from "../../_actions";
+import { TextField } from "@/components/reuseable/input-form-reusable";
+import { SelectField } from "@/components/reuseable/select-form-field";
 
 type Props = {
   info: Partial<addSaleType>;
 };
 
-export default function AddSale({ info }: Props) {
+export default function AddSaleInvoice({ info }: Props) {
   const [pendding, setPendding] = useTransition();
   const form = useForm<addSaleType>({
     resolver: zodResolver(addSale),
@@ -44,31 +38,32 @@ export default function AddSale({ info }: Props) {
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="sm:px-6">
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5  gap-5 items-end">
-          {Object.entries(form.getValues()).map(([key, value]) => (
-            <FormField
-              key={key}
-              control={form.control}
-              name={key as any}
-              render={({ field }) => (
-                <FormItem className=" w-full  max-w-full">
-                  <FormLabel>{labelTranslate(field.name)}</FormLabel>
-                  <FormControl>
-                    <Input
-                      {...field}
-                      className={cn("w-full ", {
-                        "border-red-500":
-                          form.formState.errors[
-                            field.name as keyof typeof form.formState.errors
-                          ],
-                      })}
-                    />
-                  </FormControl>
-                  {/* <FormMessage /> */}
-                </FormItem>
-              )}
-            />
-          ))}
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 2xl:grid-cols-5  gap-5 items-end">
+          {Object.entries(form.getValues()).map(([key, value]) => {
+            const isType = key === "type";
+            if (isType) {
+              return (
+                <SelectField
+                  key={key}
+                  name={key}
+                  label={labelTranslate(key)}
+                  control={form.control}
+                  options={[
+                    { value: "cash", label: "کاش" },
+                    { value: "loan", label: "قەرز" },
+                  ]}
+                />
+              );
+            }
+            return (
+              <TextField
+                key={key}
+                name={key}
+                control={form.control}
+                placeholder={labelTranslate(key)}
+              />
+            );
+          })}
           <Button type="submit" variant={"gooeyRight"} className="flex gap-1">
             {pendding ? (
               <LuLoaderCircle className="animate-spin transition-all duration-500" />
@@ -91,6 +86,7 @@ const getDefaultValues = (values: Partial<addSaleType> = {}) => {
     invoice_number: "",
     name: "",
     place: "",
+    type: "cash",
     phone: "",
     note: "",
   };
@@ -108,6 +104,8 @@ function labelTranslate(name: string) {
       return "ژمارەی مۆبایل";
     case "place":
       return "شوێن";
+    case "type":
+      return "جۆری پارەدان";
     case "invoice_number":
       return "ژمارەی پسووڵە";
     default:

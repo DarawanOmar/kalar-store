@@ -1,29 +1,29 @@
 "use client";
 import { zodResolver } from "@hookform/resolvers/zod";
-import React, { useMemo, useTransition } from "react";
+import React, { useTransition } from "react";
 import { useForm } from "react-hook-form";
 import { completeSale, completeSaleType, SaleInvoiceItem } from "../../_type";
 import { toast } from "sonner";
 import { completeSaleInvoiceAction } from "../../_actions";
 import { Button } from "@/components/ui/button";
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-} from "@/components/ui/form";
+import { Form } from "@/components/ui/form";
 import { LuLoaderCircle } from "react-icons/lu";
 import { MdDoneOutline } from "react-icons/md";
-import { Input } from "@/components/ui/input";
-import { cn } from "@/lib/utils";
 import Title from "@/components/reuseable/title";
 import { FileText } from "lucide-react";
 import { useQueryState } from "nuqs";
 import { useRouter } from "next/navigation";
 import TotalShown from "@/components/reuseable/total-shown";
+import { TextField } from "@/components/reuseable/input-form-reusable";
+import { cn } from "@/lib/utils";
 
-function CompleteSale({ total }: { total: number }) {
+function CompleteSale({
+  total,
+  type,
+}: {
+  type: "loan" | "cash";
+  total: number;
+}) {
   const router = useRouter();
   const [pendding, setPenddingComplete] = useTransition();
   const [invoice_id, setInvoice_Id] = useQueryState("invoice_id", {
@@ -35,14 +35,9 @@ function CompleteSale({ total }: { total: number }) {
     resolver: zodResolver(completeSale),
     defaultValues: {
       discount: 0,
+      paid_amount: 0,
     },
   });
-  const discount = form.watch("discount");
-  const handleChangeDiscount = useMemo(() => {
-    if (!total) return total;
-    if (discount) return total - discount;
-    return total;
-  }, [discount, total]);
 
   function onSubmit(values: completeSaleType) {
     if (!invoice_id)
@@ -50,7 +45,8 @@ function CompleteSale({ total }: { total: number }) {
     setPenddingComplete(async () => {
       const result = await completeSaleInvoiceAction(
         Number(invoice_id),
-        values.discount as number
+        values.discount as number,
+        values.paid_amount as number
       );
       if (result.success) {
         toast.success(result.message);
@@ -71,28 +67,27 @@ function CompleteSale({ total }: { total: number }) {
           text="تەواوکردنی فرۆشتن"
           className="mt-14 mb-5"
         />
-        <div className="grid grid-cols-2 sm:grid-cols-3 gap-5 items-end md:max-w-max">
-          <FormField
+        <div
+          className={cn(
+            "grid grid-cols-2 sm:grid-cols-3 gap-5 items-end md:max-w-max",
+            {
+              "sm:grid-cols-4": type === "loan",
+            }
+          )}
+        >
+          <TextField
             control={form.control}
-            name={"discount"}
-            render={({ field }) => (
-              <FormItem className=" w-full  max-w-full">
-                <FormLabel>داشکاندن</FormLabel>
-                <FormControl>
-                  <Input
-                    {...field}
-                    className={cn("w-full ", {
-                      "border-red-500":
-                        form.formState.errors[
-                          field.name as keyof typeof form.formState.errors
-                        ],
-                    })}
-                  />
-                </FormControl>
-              </FormItem>
-            )}
+            name="discount"
+            placeholder="داشکاندن"
           />
-          <TotalShown text="کۆی گشتی" total={handleChangeDiscount} />
+          {type === "loan" ? (
+            <TextField
+              control={form.control}
+              name="paid_amount"
+              placeholder="پارە بۆ دانەوە"
+            />
+          ) : null}
+          <TotalShown text="کۆی گشتی" total={total || 0} />
           <Button type="submit" variant={"gooeyRight"} className="flex gap-1">
             {pendding ? (
               <LuLoaderCircle className="animate-spin transition-all duration-500" />

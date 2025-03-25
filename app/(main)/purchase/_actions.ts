@@ -2,9 +2,10 @@
 
 import db from "@/lib/prisma";
 import { addInvoice, addInvoiceType } from "./_type";
-import { PrismaClientKnownRequestError } from "@prisma/client/runtime/library";
 
-export const unFinishedInvoice = async () => {
+// ----------------------Get------------------------------
+
+export const getunFinishedInvoice = async () => {
   try {
     const res = await db.purchase_invoice.findMany({
       where: {
@@ -20,27 +21,6 @@ export const unFinishedInvoice = async () => {
       data: res,
     };
   } catch (error: any) {
-    // Log the detailed error for debugging
-    console.error("Error fetching unfinished invoices:", error.stack);
-
-    // Handle specific Prisma errors
-    if (error instanceof PrismaClientKnownRequestError) {
-      if (error.code === "P2002") {
-        // Example: Unique constraint violation
-        return {
-          message: "A duplicate entry error occurred.",
-          success: false,
-        };
-      } else if (error.code === "P2001") {
-        // Example: Record not found
-        return {
-          message: "No unfinished invoices found.",
-          success: false,
-        };
-      }
-    }
-
-    // Handle general errors
     return {
       message: "هەڵەیەک هەیە", // Kurdish: "An error occurred"
       success: false,
@@ -125,6 +105,148 @@ export const getOneInvoice = async (id: number) => {
   }
 };
 
+export const getPurchasePorudcts = async (id: number) => {
+  try {
+    const res = await db.purchase_invoice_items.findMany({
+      where: {
+        purchase_invoiceId: id,
+      },
+      include: {
+        Products: true,
+      },
+    });
+    const products = res.map((item) => {
+      return {
+        id: item?.id,
+        name: item.Products?.name,
+        barcode: item.Products?.barcode,
+        quantity: item.quantity,
+        purchase_price: item.Products?.purchase_price,
+      };
+    });
+
+    return {
+      success: true,
+      data: products,
+    };
+  } catch (error) {
+    return {
+      message: "هەڵەیەک هەیە",
+      success: false,
+    };
+  }
+};
+
+export const getProductByBarcode = async (barcode: string, name: string) => {
+  try {
+    const res = await db.products.findMany({
+      where: {
+        OR: [
+          {
+            barcode: {
+              contains: barcode,
+            },
+          },
+          {
+            name: {
+              contains: name,
+            },
+          },
+        ],
+      },
+    });
+    return {
+      success: true,
+      data: res,
+    };
+  } catch (error) {
+    return {
+      message: "هەڵەیەک هەیە",
+      success: false,
+    };
+  }
+};
+
+export const getUnFinishPurchaseProducts = async (id: number) => {
+  try {
+    const res = await db.purchase_invoice_items.findMany({
+      where: {
+        purchase_invoiceId: id,
+      },
+      include: {
+        Products: true,
+        Purchase_invoice: true,
+      },
+    });
+    return {
+      success: true,
+      data: res,
+    };
+  } catch (error) {
+    return {
+      message: "هەڵەیەک هەیە",
+      success: false,
+    };
+  }
+};
+
+// ----------------------POST------------------------------
+
+export const addProductPurchaseAction = async (
+  invoice_id: number,
+  product_id: number,
+  quantity: number
+) => {
+  try {
+    // Check if the purchase invoice exists
+    const purchaseInvoice = await db.purchase_invoice.findUnique({
+      where: { id: invoice_id },
+    });
+
+    if (!purchaseInvoice) {
+      return {
+        message: "ئەم وەسڵە بوونی نییە",
+        success: false,
+      };
+    }
+
+    await db.$transaction(async (tx) => {
+      const existItem = await tx.purchase_invoice_items.findFirst({
+        where: {
+          purchase_invoiceId: invoice_id,
+          product_id: product_id,
+        },
+      });
+
+      if (existItem) {
+        await tx.purchase_invoice_items.update({
+          where: { id: existItem.id },
+          data: { quantity: { increment: quantity } },
+        });
+      } else {
+        await tx.purchase_invoice_items.create({
+          data: {
+            purchase_invoiceId: invoice_id,
+            product_id,
+            quantity,
+          },
+        });
+      }
+    });
+
+    return {
+      success: true,
+      message: "بە سەرکەوتویی زیاد کرا",
+    };
+  } catch (error: any) {
+    console.error("Error: ", error);
+    return {
+      message: "هەڵەیەک هەیە",
+      success: false,
+    };
+  }
+};
+
 export const addInvoiceAction = async (values: addInvoiceType) => {
   try {
     const parasedData = addInvoice.safeParse(values);
@@ -154,6 +276,8 @@ export const addInvoiceAction = async (values: addInvoiceType) => {
     };
   }
 };
+
+// ----------------------Delete------------------------------
 
 export const deletePurchaseInvoiceAction = async (id: number) => {
   try {
@@ -196,115 +320,6 @@ export const deletePurchaseInvoiceAction = async (id: number) => {
   }
 };
 
-export const addProductPurchaseAction = async (
-  invoice_id: number,
-  product_id: number,
-  quantity: number
-) => {
-  try {
-    // Check if the product purchase invoice exists
-    const purchaseInvoice = await db.purchase_invoice.findUnique({
-      where: { id: invoice_id },
-    });
-
-    if (!purchaseInvoice) {
-      return {
-        message: "ئەم وەسڵە بوونی نییە",
-        success: false,
-      };
-    }
-    db.$transaction(async (tx) => {
-      // if product exist in the invoice update the quantity
-      const existItem = await tx.purchase_invoice_items.findFirst({
-        where: {
-          purchase_invoiceId: invoice_id,
-          product_id: product_id,
-        },
-      });
-      if (existItem) {
-        await tx.purchase_invoice_items.update({
-          where: { id: existItem.id },
-          data: { quantity: { increment: quantity } },
-        });
-        return;
-      }
-      // if product not exist in the invoice create new item
-      await db.purchase_invoice_items.create({
-        data: {
-          purchase_invoiceId: invoice_id,
-          product_id: product_id,
-          quantity: quantity,
-        },
-      });
-    });
-
-    return {
-      success: true,
-      message: "بە سەرکەوتویی زیاد کرا",
-    };
-  } catch (error: any) {
-    return {
-      message: "هەڵەیەک هەیە",
-      success: false,
-    };
-  }
-};
-
-export const getUnFinishPurchaseProducts = async (id: number) => {
-  try {
-    const res = await db.purchase_invoice_items.findMany({
-      where: {
-        purchase_invoiceId: id,
-      },
-      include: {
-        Products: true,
-        Purchase_invoice: true,
-      },
-    });
-    return {
-      success: true,
-      data: res,
-    };
-  } catch (error) {
-    return {
-      message: "هەڵەیەک هەیە",
-      success: false,
-    };
-  }
-};
-
-export const getPurchasePorudcts = async (id: number) => {
-  try {
-    const res = await db.purchase_invoice_items.findMany({
-      where: {
-        purchase_invoiceId: id,
-      },
-      include: {
-        Products: true,
-      },
-    });
-    const products = res.map((item) => {
-      return {
-        id: item?.id,
-        name: item.Products?.name,
-        barcode: item.Products?.barcode,
-        quantity: item.quantity,
-        purchase_price: item.Products?.purchase_price,
-      };
-    });
-
-    return {
-      success: true,
-      data: products,
-    };
-  } catch (error) {
-    return {
-      message: "هەڵەیەک هەیە",
-      success: false,
-    };
-  }
-};
-
 export const deletePurchaseItemProdcut = async (id: number) => {
   try {
     const existItem = await db.purchase_invoice_items.findUnique({
@@ -334,6 +349,8 @@ export const deletePurchaseItemProdcut = async (id: number) => {
     };
   }
 };
+
+// ----------------------PUT------------------------------
 
 export const completeInvoiceAction = async (id: number) => {
   try {
@@ -367,15 +384,30 @@ export const completeInvoiceAction = async (id: number) => {
 
     // Use a transaction for atomic updates
     await db.$transaction(async (tx) => {
+      let total = 0;
       for (const { product_id, quantity } of productUpdates) {
         if (product_id) {
+          const product = await tx.products.findUnique({
+            where: { id: product_id },
+          });
+          if (!product) {
+            continue;
+          }
+          total += product.purchase_price * quantity;
           await tx.products.update({
             where: { id: product_id },
             data: { quantity: { increment: quantity } },
           });
         }
       }
-
+      await tx.mainCash.update({
+        where: { id: 1 },
+        data: {
+          amount: { decrement: total },
+          type_action: "withdraw",
+          last_amount: total,
+        },
+      });
       // Mark the purchase invoice as done
       await tx.purchase_invoice.update({
         where: { id },
@@ -389,27 +421,6 @@ export const completeInvoiceAction = async (id: number) => {
     };
   } catch (error) {
     console.error(error);
-    return {
-      message: "هەڵەیەک هەیە",
-      success: false,
-    };
-  }
-};
-
-export const getProductByBarcode = async (barcode: string) => {
-  try {
-    const res = await db.products.findMany({
-      where: {
-        barcode: {
-          contains: barcode,
-        },
-      },
-    });
-    return {
-      success: true,
-      data: res,
-    };
-  } catch (error) {
     return {
       message: "هەڵەیەک هەیە",
       success: false,
