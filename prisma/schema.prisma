@@ -124,6 +124,11 @@ enum ActionType {
   deposit
 }
 
+enum AddedBy {
+  system
+  person
+}
+
 model Users {
   id        Int      @id @default(autoincrement())
   name      String
@@ -140,6 +145,7 @@ model MainCash {
   amount      Float
   last_amount Int
   type_action ActionType
+  added_by    AddedBy    @default(system)
   created_at  DateTime   @default(now())
   updated_at  DateTime   @updatedAt
 }
@@ -150,6 +156,7 @@ model SubCash {
   amount      Float
   last_amount Int
   type_action ActionType
+  added_by    AddedBy    @default(system)
   created_at  DateTime   @default(now())
   updated_at  DateTime   @updatedAt
 }
@@ -160,6 +167,7 @@ model HistoryMainCash {
   name        String
   amount      Float
   type_action ActionType
+  added_by    AddedBy    @default(system)
   created_at  DateTime   @default(now())
   updated_at  DateTime   @updatedAt
 }
@@ -170,6 +178,7 @@ model HistorySubCash {
   name        String
   amount      Float
   type_action ActionType
+  added_by    AddedBy    @default(system)
   created_at  DateTime   @default(now())
   updated_at  DateTime   @updatedAt
 }

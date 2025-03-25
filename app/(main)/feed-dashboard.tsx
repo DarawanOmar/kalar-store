@@ -208,11 +208,29 @@ const StatCard = memo(({ data }: { data: CardData }) => (
       )}{" "}
     </CardHeader>
     <CardContent>
-      <div className="flex gap-1 items-center text-2xl font-bold">
-        <span className="text-xl">IQD </span>
-        <span>{data.count}</span>
-      </div>
-      <p className="text-xs text-muted-foreground">{data.description}</p>
+      {data.isCash ? (
+        <Link
+          href={
+            data.isMain
+              ? "/history-transaction?type=main-cash"
+              : "/history-transaction"
+          }
+        >
+          <div className="flex gap-1 items-center text-2xl font-bold">
+            <span className="text-xl">IQD </span>
+            <span>{data.count}</span>
+          </div>
+          <p className="text-xs text-muted-foreground">{data.description}</p>
+        </Link>
+      ) : (
+        <>
+          <div className="flex gap-1 items-center text-2xl font-bold">
+            <span className="text-xl">IQD </span>
+            <span>{data.count}</span>
+          </div>
+          <p className="text-xs text-muted-foreground">{data.description}</p>
+        </>
+      )}
     </CardContent>
   </Card>
 ));

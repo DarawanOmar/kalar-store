@@ -88,6 +88,65 @@ export const getSubCash = async () => {
     };
   }
 };
+export const getHistoryMainCash = async () => {
+  try {
+    const cashData = await db.historyMainCash.findMany();
+    const user = await db.users.findUnique({
+      where: {
+        email: cashData?.[0].user_email,
+      },
+      select: {
+        name: true,
+      },
+    });
+    const dataSend = cashData.map((item) => {
+      return {
+        ...item,
+        user: user?.name,
+      };
+    });
+    return {
+      message: "بە سەرکەوتویی گەڕایەوە",
+      success: true,
+      data: dataSend,
+    };
+  } catch (error) {
+    return {
+      message: "هەڵەیەک هەیە",
+      success: false,
+    };
+  }
+};
+export const getHistorySubCash = async () => {
+  try {
+    const cashData = await db.historySubCash.findMany();
+    const user = await db.users.findUnique({
+      where: {
+        email: cashData?.[0]?.user_email,
+      },
+      select: {
+        name: true,
+      },
+    });
+    const dataSend = cashData.map((item) => {
+      return {
+        ...item,
+        user: user?.name,
+      };
+    });
+
+    return {
+      message: "بە سەرکەوتویی گەڕایەوە",
+      success: true,
+      data: dataSend,
+    };
+  } catch (error) {
+    return {
+      message: "هەڵەیەک هەیە",
+      success: false,
+    };
+  }
+};
 
 // ----------------------PUT-------------------------
 
@@ -145,6 +204,7 @@ export const addMainCashAction = async (values: addCashType) => {
         },
         last_amount: values.amount,
         type_action: values.type_action as ActionType,
+        // added_by: "person",
       },
       where: {
         id: 1,
@@ -156,6 +216,7 @@ export const addMainCashAction = async (values: addCashType) => {
         name: `History-${values.type_action}`,
         amount: values.amount,
         type_action: values.type_action as ActionType,
+        // added_by: "person",
       },
     });
     return {
@@ -178,33 +239,30 @@ export const addSubCashAction = async (values: addCashType) => {
         success: false,
       };
     }
-
     const email = user.token.split(",between,")[1];
-
-    await db.$transaction([
-      db.subCash.update({
-        data: {
-          amount: {
-            [values.type_action === "deposit" ? "increment" : "decrement"]:
-              values.amount,
-          },
-          last_amount: values.amount,
-          type_action: values.type_action,
+    await db.subCash.update({
+      data: {
+        amount: {
+          [values.type_action === "deposit" ? "increment" : "decrement"]:
+            values.amount,
         },
-        where: {
-          id: 1,
-        },
-      }),
-      db.historySubCash.create({
-        data: {
-          amount: values.amount,
-          name: `History-${values.type_action}`,
-          type_action: values.type_action as ActionType,
-          user_email: email,
-        },
-      }),
-    ]);
-
+        last_amount: values.amount,
+        type_action: values.type_action as ActionType,
+        // added_by: "person",
+      },
+      where: {
+        id: 1,
+      },
+    });
+    await db.historySubCash.create({
+      data: {
+        user_email: email,
+        name: `History-${values.type_action}`,
+        amount: values.amount,
+        type_action: values.type_action as ActionType,
+        // added_by: "person",
+      },
+    });
     return {
       message: "بە سەرکەوتویی زیاد کرا",
       success: true,
