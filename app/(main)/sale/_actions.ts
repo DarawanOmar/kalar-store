@@ -3,6 +3,7 @@
 import db from "@/lib/prisma";
 import { addSale, addSaleType } from "./_type";
 import { Type_Sale_Purchase } from "@prisma/client";
+import { getSession } from "@/lib/utils/cookies";
 
 // ------------------------DELETE---------------------------
 export const deleteEmptySaleInvoice = async (id: number) => {
@@ -318,7 +319,15 @@ export const completeSaleInvoiceAction = async (
   amount_payment: number
 ) => {
   try {
-    // Fetch the sale invoice and its items in a single query
+    const user = await getSession();
+    if (!user) {
+      return {
+        message: "تکایە تۆکەنەکە دووبارە بکەوە",
+        success: false,
+      };
+    }
+    const email = user.token.split(",between,")[1];
+
     const saleInvoice = await db.sale_invoice.findUnique({
       where: { id },
       include: { Sale_invoice_items: true },
@@ -372,6 +381,12 @@ export const completeSaleInvoiceAction = async (
         saleInvoice.type === "cash" ||
         (saleInvoice.type === "loan" && amount_payment)
       ) {
+        console.log(
+          "value =>",
+          saleInvoice.type === "cash"
+            ? (saleInvoice.total_amount as number)
+            : amount_payment
+        );
         await tx.mainCash.update({
           where: { id: 1 },
           data: {
@@ -381,13 +396,26 @@ export const completeSaleInvoiceAction = async (
                   ? (saleInvoice.total_amount as number)
                   : amount_payment,
             },
-            last_amount: {
-              increment:
-                saleInvoice.type === "cash"
-                  ? (saleInvoice.total_amount as number)
-                  : amount_payment,
-            },
+            last_amount:
+              saleInvoice.type === "cash"
+                ? (saleInvoice.total_amount as number)
+                : amount_payment,
+
             type_action: "deposit",
+          },
+        });
+        await tx.historyMainCash.create({
+          data: {
+            amount:
+              saleInvoice.type === "cash"
+                ? (saleInvoice.total_amount as number)
+                : amount_payment,
+            type_action: "deposit",
+            added_by: "system",
+            name: ` فرۆشتنی کاڵا بە ${
+              saleInvoice.type === "loan" ? "قەرز" : "کاش"
+            } `,
+            user_email: email,
           },
         });
       }

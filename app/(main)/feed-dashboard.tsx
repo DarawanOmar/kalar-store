@@ -28,26 +28,35 @@ import Link from "next/link";
 import { getAllCompleteSaleInvoice } from "./sale-invoice/_lib";
 import { getAllCompleteInvoice } from "./purchase-invoice/_lib";
 import { format } from "date-fns";
-import { CardData, DashboardData, getTotalRevenue, Invoice } from "./_lib";
+import { CardData, DashboardData, getTotalRevenue, Invoice } from "./_action";
 import ModalAddCash from "@/components/modal-add-cash";
+import { cn, parseDateRange } from "@/lib/utils";
+import { DatePickerWithRange } from "@/components/layout/date-picker-with-range";
 
-export default async function FeedDashboard() {
-  const { now, sevenDaysAgo } = getDateRange();
+type Props = {
+  searchParams: searchParamsType;
+};
+
+export default async function FeedDashboard({ searchParams }: Props) {
+  const range = ((await searchParams).range as string) || ""; //range=03-03-2025to03-25-2025
+  const { startDate, endDate } = parseDateRange(range);
 
   const [totals, completeSaleInvoices, completeInvoices] = await Promise.all([
-    getTotalRevenue(sevenDaysAgo, now),
-    getAllCompleteSaleInvoice(sevenDaysAgo, now, 1),
-    getAllCompleteInvoice(sevenDaysAgo, now, 1),
+    getTotalRevenue(startDate, endDate),
+    getAllCompleteSaleInvoice(startDate, endDate, 1),
+    getAllCompleteInvoice(startDate, endDate, 1),
   ]);
 
   return (
-    <div className="flex flex-1 flex-col gap-4 my-10 md:gap-8 md:p-8">
+    <div className="flex flex-1 flex-col gap-4 mt-5">
+      <div className="ms-auto">
+        <DatePickerWithRange />
+      </div>{" "}
       <div className="grid gap-4 md:grid-cols-2 md:gap-8 lg:grid-cols-3 xl:grid-cols-4">
         {DASHBOARD_CARDS(totals).map((card, index) => (
           <StatCard key={index} data={card} />
         ))}
       </div>
-
       <div className="grid gap-4 md:gap-8 lg:grid-cols-2 2xl:grid-cols-2">
         <Card className="2xl:col-span-1 max-h-max">
           <CardHeader className="flex flex-col gap-5 sm:flex-row items-center">
@@ -136,14 +145,6 @@ export default async function FeedDashboard() {
   );
 }
 
-// Utility function to get date range
-const getDateRange = () => {
-  const now = new Date();
-  const sevenDaysAgo = new Date(now);
-  sevenDaysAgo.setDate(now.getDate() - 7);
-  return { now, sevenDaysAgo };
-};
-
 // Dashboard cards data
 const DASHBOARD_CARDS = (totals: DashboardData): CardData[] => [
   {
@@ -155,6 +156,7 @@ const DASHBOARD_CARDS = (totals: DashboardData): CardData[] => [
     description: `کۆتا جار ${
       totals.mainCashData?.last_amount?.toLocaleString() || 0
     } ${typeAction(totals.mainCashData?.type || "deposit")}`,
+    type: totals.mainCashData?.type as "deposit" | "withdraw",
   },
   {
     isMain: false,
@@ -165,6 +167,7 @@ const DASHBOARD_CARDS = (totals: DashboardData): CardData[] => [
     description: `کۆتا جار ${
       totals.subCashData?.last_amount?.toLocaleString() || 0
     } ${typeAction(totals.subCashData?.type || "deposit")}`,
+    type: totals.subCashData?.type as "deposit" | "withdraw",
   },
   {
     isMain: false,
@@ -173,6 +176,7 @@ const DASHBOARD_CARDS = (totals: DashboardData): CardData[] => [
     icon: CreditCard,
     count: totals?.totalSalePrice?.toLocaleString(),
     description: " لە هەفتەی ڕابردوو",
+    type: "none",
   },
   {
     isMain: false,
@@ -181,6 +185,7 @@ const DASHBOARD_CARDS = (totals: DashboardData): CardData[] => [
     icon: Activity,
     count: totals?.totalPurchasePrice?.toLocaleString(),
     description: " لە هەفتەی ڕابردوو",
+    type: "none",
   },
   {
     isMain: false,
@@ -189,6 +194,7 @@ const DASHBOARD_CARDS = (totals: DashboardData): CardData[] => [
     icon: Activity,
     count: totals?.totalExpenses?.toLocaleString(),
     description: " لە هەفتەی ڕابردوو",
+    type: "none",
   },
 ];
 
@@ -220,7 +226,14 @@ const StatCard = memo(({ data }: { data: CardData }) => (
             <span className="text-xl">IQD </span>
             <span>{data.count}</span>
           </div>
-          <p className="text-xs text-muted-foreground">{data.description}</p>
+          <p
+            className={cn("text-xs text-muted-foreground", {
+              "text-green-500": data.type === "deposit",
+              "text-red-500": data.type === "withdraw",
+            })}
+          >
+            {data.description}
+          </p>
         </Link>
       ) : (
         <>
@@ -228,7 +241,9 @@ const StatCard = memo(({ data }: { data: CardData }) => (
             <span className="text-xl">IQD </span>
             <span>{data.count}</span>
           </div>
-          <p className="text-xs text-muted-foreground">{data.description}</p>
+          <p className={cn("text-xs text-muted-foreground")}>
+            {data.description}
+          </p>
         </>
       )}
     </CardContent>

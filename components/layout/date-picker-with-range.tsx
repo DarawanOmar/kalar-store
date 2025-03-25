@@ -1,7 +1,7 @@
 "use client";
 
-import { useCallback, useState } from "react";
-import { addDays, format } from "date-fns";
+import { useCallback, useEffect, useState } from "react";
+import { format, parse } from "date-fns";
 import { Calendar as CalendarIcon } from "lucide-react";
 import { DateRange } from "react-day-picker";
 
@@ -19,31 +19,60 @@ export function DatePickerWithRange({
   name = "range",
   className,
   triggerClassName,
+  defaultRange,
 }: React.HTMLAttributes<HTMLDivElement> & {
   triggerClassName?: string;
   name?: string;
+  defaultRange?: { startDate: Date; endDate: Date };
 }) {
   const [dataQuery, setDataQuery] = useQueryState(name, {
     clearOnDefault: true,
     defaultValue: "",
     shallow: false,
   });
-  const now = new Date();
-  const [date, setDate] = useState<DateRange | undefined>({
-    // seven days ago
-    from: addDays(now, -7),
-    to: new Date(),
-  });
+
+  // Parse searchParam value if available
+  const parseRangeFromSearchParams = (
+    range: string | undefined
+  ): DateRange | undefined => {
+    if (!range) return undefined;
+    const [start, end] = range.split("to");
+    return {
+      from: parse(start.trim(), "MM-dd-yyyy", new Date()),
+      to: parse(end.trim(), "MM-dd-yyyy", new Date()),
+    };
+  };
+
+  // Initialize date state
+  const [date, setDate] = useState<DateRange | undefined>(
+    parseRangeFromSearchParams(dataQuery) || {
+      from: defaultRange?.startDate,
+      to: defaultRange?.endDate,
+    }
+  );
+
+  // Update the state when searchParams change (on refresh)
+  useEffect(() => {
+    setDate(
+      parseRangeFromSearchParams(dataQuery) || {
+        from: defaultRange?.startDate,
+        to: defaultRange?.endDate,
+      }
+    );
+  }, [dataQuery, defaultRange]);
 
   const handleChangeDate = useCallback(
-    (date: DateRange | undefined) => {
-      setDate(date);
-      if (!date?.from || !date?.to) return;
+    (selectedDate: DateRange | undefined) => {
+      setDate(selectedDate);
+      if (!selectedDate?.from || !selectedDate?.to) return;
       setDataQuery(
-        `${format(date.from, "MM-dd-yyyy")}to${format(date.to, "MM-dd-yyyy")}`
+        `${format(selectedDate.from, "MM-dd-yyyy")}to${format(
+          selectedDate.to,
+          "MM-dd-yyyy"
+        )}`
       );
     },
-    [name]
+    [setDataQuery]
   );
 
   return (
@@ -62,7 +91,7 @@ export function DatePickerWithRange({
             {date?.from ? (
               date.to ? (
                 <>
-                  {format(date.from, "LLL dd, y")} -
+                  {format(date.from, "LLL dd, y")} -{" "}
                   {format(date.to, "LLL dd, y")}
                 </>
               ) : (
@@ -70,8 +99,8 @@ export function DatePickerWithRange({
               )
             ) : (
               <span>
-                {format(new Date(), "LLL dd, y")} -
-                {format(new Date(), "LLL dd, y")}
+                {format(defaultRange?.startDate || new Date(), "LLL dd, y")} -{" "}
+                {format(defaultRange?.endDate || new Date(), "LLL dd, y")}
               </span>
             )}
           </Button>
@@ -93,7 +122,10 @@ export function DatePickerWithRange({
                 className="w-full font-sirwan_reguler font-thin my-3 px-3"
                 onClick={() => {
                   setDataQuery("");
-                  setDate(undefined);
+                  setDate({
+                    from: defaultRange?.startDate,
+                    to: defaultRange?.endDate,
+                  });
                 }}
               >
                 سڕینەوەی گەڕان

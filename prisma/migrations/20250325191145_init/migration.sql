@@ -120,7 +120,6 @@ CREATE TABLE `MainCash` (
     `amount` DOUBLE NOT NULL,
     `last_amount` INTEGER NOT NULL,
     `type_action` ENUM('withdraw', 'deposit') NOT NULL,
-    `added_by` ENUM('system', 'person') NOT NULL DEFAULT 'system',
     `created_at` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
     `updated_at` DATETIME(3) NOT NULL,
 
@@ -134,7 +133,6 @@ CREATE TABLE `SubCash` (
     `amount` DOUBLE NOT NULL,
     `last_amount` INTEGER NOT NULL,
     `type_action` ENUM('withdraw', 'deposit') NOT NULL,
-    `added_by` ENUM('system', 'person') NOT NULL DEFAULT 'system',
     `created_at` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
     `updated_at` DATETIME(3) NOT NULL,
 
@@ -148,7 +146,7 @@ CREATE TABLE `HistoryMainCash` (
     `name` VARCHAR(191) NOT NULL,
     `amount` DOUBLE NOT NULL,
     `type_action` ENUM('withdraw', 'deposit') NOT NULL,
-    `added_by` ENUM('system', 'person') NOT NULL DEFAULT 'system',
+    `added_by` ENUM('system', 'person') NOT NULL,
     `created_at` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
     `updated_at` DATETIME(3) NOT NULL,
 
@@ -162,7 +160,7 @@ CREATE TABLE `HistorySubCash` (
     `name` VARCHAR(191) NOT NULL,
     `amount` DOUBLE NOT NULL,
     `type_action` ENUM('withdraw', 'deposit') NOT NULL,
-    `added_by` ENUM('system', 'person') NOT NULL DEFAULT 'system',
+    `added_by` ENUM('system', 'person') NOT NULL,
     `created_at` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
     `updated_at` DATETIME(3) NOT NULL,
 

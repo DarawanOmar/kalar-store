@@ -17,6 +17,12 @@ const column: ColumnDef<any>[] = [
     },
   },
   {
+    accessorKey: "name",
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title="بابەت" />
+    ),
+  },
+  {
     accessorKey: "user",
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title="کێ" />
@@ -25,9 +31,15 @@ const column: ColumnDef<any>[] = [
   {
     accessorKey: "added_by",
     header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="لە لایەن" />
+      <DataTableColumnHeader column={column} title="لەلایەن" />
     ),
+    cell: function CellComponent({ row }) {
+      return (
+        <div>{row.original.added_by === "person" ? "کەسەکەوە" : "سیستەم"}</div>
+      );
+    },
   },
+
   {
     accessorKey: "amount",
     header: ({ column }) => (
@@ -40,7 +52,7 @@ const column: ColumnDef<any>[] = [
   {
     accessorKey: "type_action",
     header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="بڕ" />
+      <DataTableColumnHeader column={column} title="جۆر" />
     ),
     cell: function CellComponent({ row }) {
       return (

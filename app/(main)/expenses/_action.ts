@@ -90,7 +90,11 @@ export const getSubCash = async () => {
 };
 export const getHistoryMainCash = async () => {
   try {
-    const cashData = await db.historyMainCash.findMany();
+    const cashData = await db.historyMainCash.findMany({
+      orderBy: {
+        created_at: "desc",
+      },
+    });
     const user = await db.users.findUnique({
       where: {
         email: cashData?.[0].user_email,
@@ -119,7 +123,11 @@ export const getHistoryMainCash = async () => {
 };
 export const getHistorySubCash = async () => {
   try {
-    const cashData = await db.historySubCash.findMany();
+    const cashData = await db.historySubCash.findMany({
+      orderBy: {
+        created_at: "desc",
+      },
+    });
     const user = await db.users.findUnique({
       where: {
         email: cashData?.[0]?.user_email,
@@ -204,7 +212,6 @@ export const addMainCashAction = async (values: addCashType) => {
         },
         last_amount: values.amount,
         type_action: values.type_action as ActionType,
-        // added_by: "person",
       },
       where: {
         id: 1,
@@ -213,10 +220,13 @@ export const addMainCashAction = async (values: addCashType) => {
     await db.historyMainCash.create({
       data: {
         user_email: email,
-        name: `History-${values.type_action}`,
+        name:
+          values.type_action === "deposit"
+            ? `زیادکردنی پارە بۆ قاسە`
+            : `کەمکردنی  پارە لە قاسە`,
         amount: values.amount,
         type_action: values.type_action as ActionType,
-        // added_by: "person",
+        added_by: "person",
       },
     });
     return {
@@ -248,7 +258,6 @@ export const addSubCashAction = async (values: addCashType) => {
         },
         last_amount: values.amount,
         type_action: values.type_action as ActionType,
-        // added_by: "person",
       },
       where: {
         id: 1,
@@ -257,10 +266,13 @@ export const addSubCashAction = async (values: addCashType) => {
     await db.historySubCash.create({
       data: {
         user_email: email,
-        name: `History-${values.type_action}`,
+        name:
+          values.type_action === "deposit"
+            ? `زیادکردنی پارە بۆ قاسە`
+            : `کەمکردنی  پارە لە قاسە`,
         amount: values.amount,
         type_action: values.type_action as ActionType,
-        // added_by: "person",
+        added_by: "person",
       },
     });
     return {

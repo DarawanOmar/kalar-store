@@ -2,6 +2,7 @@
 
 import db from "@/lib/prisma";
 import { addInvoice, addInvoiceType } from "./_type";
+import { getSession } from "@/lib/utils/cookies";
 
 // ----------------------Get------------------------------
 
@@ -408,6 +409,24 @@ export const completeInvoiceAction = async (id: number) => {
           last_amount: total,
         },
       });
+      const user = await getSession();
+      if (!user) {
+        return {
+          message: "تکایە تۆکەنەکە دووبارە بکەوە",
+          success: false,
+        };
+      }
+      const email = user.token.split(",between,")[1];
+      await tx.historyMainCash.create({
+        data: {
+          amount: total,
+          type_action: "withdraw",
+          added_by: "system",
+          name: "کڕینی کاڵا",
+          user_email: email,
+        },
+      });
+
       // Mark the purchase invoice as done
       await tx.purchase_invoice.update({
         where: { id },

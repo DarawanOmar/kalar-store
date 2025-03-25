@@ -3,56 +3,60 @@
 import db from "@/lib/prisma";
 import { Prisma } from "@prisma/client";
 import { payLoanType } from "./_type";
+import { getSession } from "@/lib/utils/cookies";
 
 // ----------------------GET------------------------------
-export const getAllLoans = async (search: string, page: number) => {
+export const getAllLoans = async (
+  search: string,
+  page: number,
+  startDate?: Date,
+  endDate?: Date
+) => {
   try {
-    let where: Prisma.Sale_invoiceWhereInput | undefined = {};
-    if (search) {
-      where = {
-        type: "loan",
-        is_done: true,
-        OR: [
-          {
-            name: {
-              contains: search,
-            },
+    // Date filter condition
+    const dateFilter =
+      startDate && endDate
+        ? { createdAt: { gte: startDate, lte: endDate } }
+        : {};
+
+    // Name search filter
+    const nameFilter = search
+      ? {
+          name: {
+            contains: search,
+            mode: "insensitive", // Case-insensitive search
           },
-          {
-            note: {
-              contains: search,
-            },
-          },
-        ],
-      };
-    }
+        }
+      : {};
+
+    const where: Prisma.Sale_invoiceWhereInput = {
+      type: "loan",
+      is_done: true,
+      remaining_amount: { gt: 0 },
+      ...dateFilter,
+      ...nameFilter,
+    };
+
+    // Fetch filtered data
     const res = await db.sale_invoice.findMany({
-      where: {
-        type: "loan",
-        is_done: true,
-        remaining_amount: {
-          gt: 0,
-        },
-      },
-      orderBy: {
-        createdAt: "desc",
-      },
+      where,
+      orderBy: { createdAt: "desc" },
       take: 10,
       skip: (page - 1) * 10,
     });
-    const pageSize = 10;
-    const total_amount = res.reduce(
+
+    // Calculate total loan amount
+    const totalAmount = res.reduce(
       (acc, item) => acc + (item.total_amount || 0),
       0
     );
-    const data = {
-      data: res,
-      totalAmount: total_amount,
-    };
 
     return {
       success: true,
-      data,
+      data: {
+        data: res,
+        totalAmount,
+      },
     };
   } catch (error) {
     return {
@@ -141,7 +145,23 @@ export const payLoanAction = async (id: number, data: payLoanType) => {
         type_action: "deposit",
       },
     });
-
+    const user = await getSession();
+    if (!user) {
+      return {
+        message: "تکایە تۆکەنەکە دووبارە بکەوە",
+        success: false,
+      };
+    }
+    const email = user.token.split(",between,")[1];
+    await db.historyMainCash.create({
+      data: {
+        amount: data.amount,
+        type_action: "deposit",
+        added_by: "system",
+        name: "دانەوەی پارەی قەرز",
+        user_email: email,
+      },
+    });
     return {
       message: "بە سەرکەوتوی پارەدان کرا",
       success: true,

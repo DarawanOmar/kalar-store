@@ -72,7 +72,7 @@ export function DataTable<TData, TValue>({
       rowSelection,
       pagination: {
         pageIndex: 0,
-        pageSize: pageSize || 10,
+        pageSize: pageSize || 50,
       },
     },
   });

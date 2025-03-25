@@ -38,6 +38,9 @@ export const getAllCompleteSaleInvoice = async (
           },
         },
       },
+      orderBy: {
+        createdAt: "desc",
+      },
       skip: (page - 1) * 10,
       take: 10,
     });
@@ -84,6 +87,7 @@ export const getOneSaleInvoice = async (id: number) => {
         place: true,
         discount: true,
         phone: true,
+        type: true,
         createdAt: true,
         Sale_invoice_items: {
           select: {
@@ -128,6 +132,7 @@ export const getOneSaleInvoice = async (id: number) => {
     // Format response
     const formattedInvoice = {
       name: invoice.name,
+      type: invoice.type,
       place: invoice.place,
       phone: invoice.phone,
       note: invoice.note,

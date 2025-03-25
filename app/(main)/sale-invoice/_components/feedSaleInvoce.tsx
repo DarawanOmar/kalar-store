@@ -2,24 +2,16 @@ import React from "react";
 import CardSale from "./card-sale";
 import { getAllCompleteSaleInvoice } from "../_lib";
 import EmptyImage from "@/components/reuseable/empty-image";
+import { parseDateRange } from "@/lib/utils";
 
 async function FeedSaleInvoice({
   searchParams,
 }: {
   searchParams: searchParamsType;
 }) {
-  let startDate: Date | undefined;
-  let endDate: Date | undefined;
   const page = Number((await searchParams).page) || 1;
-  const range = (await searchParams).range || "";
-  if (range) {
-    const changeToString = range.toString();
-    const [start, end] = changeToString.split("to");
-    startDate = new Date(start);
-    // add 1 day to the end date
-    endDate = new Date(end);
-    endDate.setDate(endDate.getDate() + 1);
-  }
+  const range = ((await searchParams).range as string) || "";
+  const { startDate, endDate } = parseDateRange(range);
 
   const allSaleInvoice = await getAllCompleteSaleInvoice(
     startDate,

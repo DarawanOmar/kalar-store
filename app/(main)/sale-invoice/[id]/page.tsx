@@ -25,6 +25,10 @@ async function OneSaleInvoice({ params }: Props) {
       <div className="flex justify-between sm:items-center ">
         <div className="flex flex-wrap gap-3 sm:items-center">
           <TotalShown text="ناو" total={OneSaleInvoice.data?.name || ""} />
+          <TotalShown
+            text="جۆری پسوڵە"
+            total={OneSaleInvoice.data?.type === "cash" ? "کاش" : "قەرز"}
+          />
           <TotalShown text="تێبینی" total={OneSaleInvoice.data?.note || ""} />
           <TotalShown
             text="بەروار"

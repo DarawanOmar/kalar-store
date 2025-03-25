@@ -34,6 +34,9 @@ export const getAllCompleteInvoice = async (
           },
         },
       },
+      orderBy: {
+        createdAt: "desc",
+      },
       take: 10,
       skip: (page - 1) * 10,
     });

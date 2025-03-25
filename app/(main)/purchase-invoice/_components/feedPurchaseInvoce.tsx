@@ -6,24 +6,16 @@ import EmptyImage from "@/components/reuseable/empty-image";
 import PaginatedComponent from "@/components/ui/pagination";
 import { redirect } from "next/navigation";
 import { format } from "date-fns";
+import { parseDateRange } from "@/lib/utils";
 
 async function FeedPurchaseInvoice({
   searchParams,
 }: {
   searchParams: searchParamsType;
 }) {
-  let startDate: Date | undefined;
-  let endDate: Date | undefined;
-  const range = (await searchParams).range || "";
   const page = Number((await searchParams).page) || 1;
-  if (range) {
-    const changeToString = range.toString();
-    const [start, end] = changeToString.split("to");
-    startDate = new Date(start);
-    // add 1 day to the end date
-    endDate = new Date(end);
-    endDate.setDate(endDate.getDate() + 1);
-  }
+  const range = ((await searchParams).range as string) || "";
+  const { startDate, endDate } = parseDateRange(range);
 
   const allPurchaseInvoice = await getAllCompleteInvoice(
     startDate,

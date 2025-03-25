@@ -1,5 +1,5 @@
 "use server";
-import bcrypt from "bcrypt";
+import bcrypt from "bcryptjs";
 import db from "@/lib/prisma";
 import { addUser, addUserType } from "./_type";
 import { deleteIamge } from "../products/_action";

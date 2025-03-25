@@ -5,11 +5,19 @@ import React from "react";
 import column from "./_components/columns";
 import { getAllLoans } from "./_actions";
 import { DatePickerWithRange } from "@/components/layout/date-picker-with-range";
+import { parseDateRange } from "@/lib/utils";
 
 async function LoansPage({ searchParams }: { searchParams: searchParamsType }) {
+  const range = ((await searchParams).range as string) || ""; //range=03-03-2025to03-25-2025
+  const { startDate, endDate } = parseDateRange(range);
   const page = Number((await searchParams).page || 1);
   const search = (await searchParams).search || "";
-  const allLaons = await getAllLoans(search as string, page);
+  const allLaons = await getAllLoans(
+    search as string,
+    page,
+    startDate,
+    endDate
+  );
   return (
     <div className="my-10">
       <div className="flex flex-col gap-5 sm:hidden my-10">
