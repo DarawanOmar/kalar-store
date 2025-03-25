@@ -13,16 +13,13 @@ export const getAllProducts = async (search: string, page: number) => {
     };
   }
 
-  const produts = await db.products
-    .findMany({
-      where,
-      take: 10,
-      skip: (page - 1) * pageSize,
-      orderBy: { id: "desc" },
-      cacheStrategy: { ttl: 60, swr: 10, tags: ["products"] },
-    })
-    .withAccelerateInfo();
-  return produts.data;
+  const produts = await db.products.findMany({
+    where,
+    take: 10,
+    skip: (page - 1) * pageSize,
+    orderBy: { id: "desc" },
+  });
+  return produts;
 };
 export const addProducts = async (values: addProductType) => {
   try {
@@ -40,7 +37,7 @@ export const addProducts = async (values: addProductType) => {
     await db.products.create({
       data: { ...parasedData.data, quantity: 0 },
     });
-    await db.$accelerate.invalidate({ tags: ["products"] });
+
     return {
       message: "بە سەرکەوتویی زیاد کرا",
       success: true,
@@ -70,7 +67,6 @@ export const updateProducts = async (id: number, values: addProductType) => {
       },
       where: { id },
     });
-    await db.$accelerate.invalidate({ tags: ["products"] });
 
     return {
       message: "بە سەرکەوتویی نوێکرایەوە",

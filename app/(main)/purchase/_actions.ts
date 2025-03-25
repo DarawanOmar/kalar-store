@@ -263,13 +263,16 @@ export const addInvoiceAction = async (values: addInvoiceType) => {
       data: {
         ...parasedData.data,
         is_done: false,
+        Status: "Remain",
+        type: parasedData.data.type as "Cash" | "Loan",
       },
     });
     return {
       success: true,
       message: "بە سەرکەوتویی زیاد کرا",
     };
-  } catch (error) {
+  } catch (error: any) {
+    console.log("object", error);
     return {
       message: "هەڵەیەک هەیە",
       success: false,

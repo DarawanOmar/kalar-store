@@ -78,6 +78,7 @@ const getDefaultValues = (values: Partial<addInvoiceType> = {}) => {
     invoice_number: "",
     name: "",
     place: "",
+    type: "Cash",
     note: "",
   };
 
@@ -94,6 +95,8 @@ function labelTranslate(name: string) {
       return "ژمارەی پسووڵە";
     case "place":
       return "شوێن";
+    case "type":
+      return "پارەدان";
     case "type":
       return "پارەدان";
     default:

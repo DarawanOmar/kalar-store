@@ -1,4 +1,5 @@
 import { memo } from "react";
+import { memo } from "react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import {
@@ -34,21 +35,32 @@ import ModalAddCash from "@/components/modal-add-cash";
 export default async function FeedDashboard() {
   const { now, sevenDaysAgo } = getDateRange();
 
+  const { now, sevenDaysAgo } = getDateRange();
+
   const [totals, completeSaleInvoices, completeInvoices] = await Promise.all([
     getTotalRevenue(sevenDaysAgo, now),
     getAllCompleteSaleInvoice(sevenDaysAgo, now, 1),
     getAllCompleteInvoice(sevenDaysAgo, now, 1),
   ]);
 
+
   return (
-    <div className="flex flex-1 flex-col gap-4 my-10 md:gap-8 md:p-8">
+    <div className="flex flex-1 flex-col gap-4  md:gap-8 md:p-4">
+      <div className="flex justify-between items-center">
+        <h1>ڕاپۆرت</h1>
+        <DatePickerWithRange />
+      </div>
       <div className="grid gap-4 md:grid-cols-2 md:gap-8 lg:grid-cols-3 xl:grid-cols-4">
+        {DASHBOARD_CARDS(totals).map((card, index) => (
+          <StatCard key={index} data={card} />
         {DASHBOARD_CARDS(totals).map((card, index) => (
           <StatCard key={index} data={card} />
         ))}
       </div>
 
+
       <div className="grid gap-4 md:gap-8 lg:grid-cols-2 2xl:grid-cols-2">
+        <Card className="2xl:col-span-1 max-h-max">
         <Card className="2xl:col-span-1 max-h-max">
           <CardHeader className="flex flex-col gap-5 sm:flex-row items-center">
             <div className="grid gap-2">
@@ -61,6 +73,7 @@ export default async function FeedDashboard() {
               asChild
               size="sm"
               className="ms-auto gap-1 gradient-blue-left"
+              variant="gooeyRight"
               variant="gooeyRight"
             >
               <Link href="/purchase-invoice">
@@ -79,6 +92,8 @@ export default async function FeedDashboard() {
                 </TableRow>
               </TableHeader>
               <TableBody>
+                {!completeInvoices.data?.formattedInvoices.length ? (
+                  <EmptyState message="هیچ کڕینێک تۆمار نەکراوە" />
                 {!completeInvoices.data?.formattedInvoices.length ? (
                   <EmptyState message="هیچ کڕینێک تۆمار نەکراوە" />
                 ) : (
@@ -100,6 +115,8 @@ export default async function FeedDashboard() {
         </Card>
 
         <Card className="max-h-max">
+
+        <Card className="max-h-max">
           <CardHeader className="flex flex-col gap-5 sm:flex-row items-center">
             <div className="grid gap-2">
               <CardTitle>فرۆشتن لەم دواییانەدا</CardTitle>
@@ -112,6 +129,7 @@ export default async function FeedDashboard() {
               size="sm"
               className="ms-auto gap-1 gradient-blue-left"
               variant="gooeyRight"
+              variant="gooeyRight"
             >
               <Link href="/sale-invoice">
                 <ArrowUpRight className="h-4 w-4" />
@@ -123,9 +141,13 @@ export default async function FeedDashboard() {
             {!completeSaleInvoices.data?.formattedInvoices.length ? (
               <div className="text-center my-[77px] text-primary">
                 هیچ فرۆشتنێک تۆمار نەکراوە
+            {!completeSaleInvoices.data?.formattedInvoices.length ? (
+              <div className="text-center my-[77px] text-primary">
+                هیچ فرۆشتنێک تۆمار نەکراوە
               </div>
             ) : (
               completeSaleInvoices.data?.formattedInvoices.map(
+                (sale, index) => <SaleItem key={index} sale={sale} />
                 (sale, index) => <SaleItem key={index} sale={sale} />
               )
             )}

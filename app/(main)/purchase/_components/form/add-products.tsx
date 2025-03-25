@@ -24,6 +24,7 @@ export default function AddPurchaseProduct() {
     defaultValues: {
       id: 0,
       name: "",
+      sale_price: 0,
       quantity: 0,
       purchase_price: 0,
     },

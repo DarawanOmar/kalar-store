@@ -3,10 +3,12 @@
 import * as React from "react";
 import {
   Banknote,
+  Banknote,
   Bot,
   CreditCard,
   Frame,
   GalleryVerticalEnd,
+  HandCoins,
   LayoutDashboard,
   PieChart,
   ShoppingBag,

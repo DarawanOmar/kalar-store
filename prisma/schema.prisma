@@ -26,15 +26,28 @@ model Products {
   Sale_invoice_items     Sale_invoice_items[]
 }
 
+enum Type_Sale_Purchase {
+  Loan
+  Cash
+}
+
+enum Status {
+  Done
+  Remain
+}
+
 model Purchase_invoice {
-  id             Int      @id @default(autoincrement())
+  id             Int                @id @default(autoincrement())
   invoice_number String
   name           String
+  Status         Status
+  type           Type_Sale_Purchase
+  paid_amount    Float?
   place          String
   note           String?
   is_done        Boolean
-  createdAt      DateTime @default(now())
-  updatedAt      DateTime @updatedAt
+  createdAt      DateTime           @default(now())
+  updatedAt      DateTime           @updatedAt
 
   Purchase_invoice_items Purchase_invoice_items[]
 }
@@ -93,6 +106,7 @@ model Sale_invoice_items {
 
   Products   Products? @relation(fields: [product_id], references: [id])
   product_id Int?
+  loss       Boolean   @default(false)
   loss       Boolean   @default(false)
   quantity   Int
   createdAt  DateTime  @default(now())
