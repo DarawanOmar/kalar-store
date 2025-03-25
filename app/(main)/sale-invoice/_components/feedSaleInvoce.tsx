@@ -3,6 +3,7 @@ import CardSale from "./card-sale";
 import { getAllCompleteSaleInvoice } from "../_lib";
 import EmptyImage from "@/components/reuseable/empty-image";
 import { parseDateRange } from "@/lib/utils";
+import PaginatedComponent from "@/components/ui/pagination";
 
 async function FeedSaleInvoice({
   searchParams,
@@ -18,15 +19,23 @@ async function FeedSaleInvoice({
     endDate,
     page
   );
-  if (allSaleInvoice.data?.formattedInvoices.length === 0) {
+  if (allSaleInvoice?.data?.data?.length === 0) {
     return <EmptyImage />;
   }
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-10">
-      {allSaleInvoice.data?.formattedInvoices.map((product, index) => (
-        <CardSale key={index} product={product} />
-      ))}
-    </div>
+    <>
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-10">
+        {allSaleInvoice?.data?.data?.map((product, index) => (
+          <CardSale key={index} product={product} />
+        ))}
+      </div>
+      <div className="my-5">
+        <PaginatedComponent
+          currentPage={page}
+          totalPages={allSaleInvoice?.data?.totalPage || 1}
+        />
+      </div>
+    </>
   );
 }
 export default FeedSaleInvoice;

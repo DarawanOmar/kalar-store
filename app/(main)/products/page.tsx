@@ -3,7 +3,6 @@ import Search from "@/components/reuseable/search";
 import ModalAddProcut from "./_components/form/modal-add-product";
 import FeedProducts from "./_components/feed-products";
 import SkelotonCard from "@/components/reuseable/skeloton-card";
-import PaginatedComponent from "@/components/ui/pagination";
 
 async function Products({ searchParams }: { searchParams: searchParamsType }) {
   return (
@@ -23,9 +22,6 @@ async function Products({ searchParams }: { searchParams: searchParamsType }) {
         >
           <FeedProducts searchParams={searchParams} />
         </Suspense>
-        <div className="my-5">
-          <PaginatedComponent currentPage={1} totalPages={1} />
-        </div>
       </div>
     </div>
   );

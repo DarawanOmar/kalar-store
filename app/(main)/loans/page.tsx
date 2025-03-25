@@ -39,7 +39,7 @@ async function LoansPage({ searchParams }: { searchParams: searchParamsType }) {
           data={allLaons?.data?.data || []}
           columns={column}
           isSearch={false}
-          totalPage={1}
+          totalPage={allLaons.data?.totalPage || 1}
           currentPage={page}
         />
       </div>

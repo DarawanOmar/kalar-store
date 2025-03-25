@@ -16,7 +16,7 @@ export const getAllCompleteSaleInvoice = async (
         },
       };
     }
-
+    const pageSize = 10;
     const invoices = await db.sale_invoice.findMany({
       where,
       select: {
@@ -41,8 +41,8 @@ export const getAllCompleteSaleInvoice = async (
       orderBy: {
         createdAt: "desc",
       },
-      skip: (page - 1) * 10,
-      take: 10,
+      skip: (page - 1) * pageSize,
+      take: pageSize,
     });
 
     const formattedInvoices = invoices.map((invoice) => {
@@ -64,7 +64,12 @@ export const getAllCompleteSaleInvoice = async (
     });
 
     return {
-      data: { formattedInvoices },
+      data: {
+        data: formattedInvoices,
+        totalPage: Math.ceil(
+          (await db.sale_invoice.count({ where })) / pageSize
+        ),
+      },
       success: true,
     };
   } catch (error) {

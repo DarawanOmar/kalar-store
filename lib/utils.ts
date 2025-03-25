@@ -19,3 +19,34 @@ export const parseDateRange = (range: string) => {
     endDate: new Date(end.trim()),
   };
 };
+
+import { differenceInMonths, differenceInWeeks } from "date-fns";
+
+// Function to get the relative time description (last month, last 2 months, last week, etc.)
+export const getTimeDescription = (startDate: Date): string => {
+  const now = new Date();
+
+  // Calculate the number of months and weeks between startDate and now
+  const monthsDifference = differenceInMonths(now, startDate);
+  const weeksDifference = differenceInWeeks(now, startDate);
+
+  // If the range is in months
+  if (monthsDifference >= 1) {
+    if (monthsDifference === 1) {
+      return "لە مانگی ڕابردوو"; // "Last month"
+    } else {
+      return `لە ${monthsDifference} مانگ ڕابردوو`; // "Last X months"
+    }
+  }
+
+  // If the range is in weeks
+  if (weeksDifference >= 1) {
+    if (weeksDifference === 1) {
+      return "لە هەفتەی ڕابردوو"; // "Last week"
+    } else {
+      return `لە ${weeksDifference} هەفتە ڕابردوو`; // "Last X weeks"
+    }
+  }
+
+  return ""; // Return empty if the range is less than a week
+};

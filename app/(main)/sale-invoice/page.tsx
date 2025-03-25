@@ -4,7 +4,6 @@ import Title from "@/components/reuseable/title";
 import { SquarePercent } from "lucide-react";
 import React, { Suspense } from "react";
 import FeedSaleInvoice from "./_components/feedSaleInvoce";
-import PaginatedComponent from "@/components/ui/pagination";
 
 function SaleInvoice({ searchParams }: { searchParams: searchParamsType }) {
   return (
@@ -24,9 +23,6 @@ function SaleInvoice({ searchParams }: { searchParams: searchParamsType }) {
         >
           <FeedSaleInvoice searchParams={searchParams} />
         </Suspense>
-      </div>
-      <div className="">
-        <PaginatedComponent currentPage={1} totalPages={1} />
       </div>
     </div>
   );

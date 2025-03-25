@@ -12,15 +12,30 @@ export const getAllProducts = async (search: string, page: number) => {
       OR: [{ name: { contains: search } }, { barcode: { contains: search } }],
     };
   }
-  const produts = await db.products.findMany({
+
+  // Fetch products
+  const products = await db.products.findMany({
     where,
-    take: 10,
+    take: pageSize,
     skip: (page - 1) * pageSize,
     orderBy: { id: "desc" },
   });
 
-  return produts;
+  // Get the total count of products matching the search criteria
+  const totalCount = await db.products.count({
+    where,
+  });
+
+  // Calculate the total pages
+  const totalPages = Math.ceil(totalCount / pageSize);
+
+  // Return products along with total pages
+  return {
+    products,
+    totalPages,
+  };
 };
+
 export const addProducts = async (values: addProductType) => {
   try {
     const parasedData = addProduct.safeParse(values);

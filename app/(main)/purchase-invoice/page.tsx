@@ -3,7 +3,6 @@ import SkelotonCard from "@/components/reuseable/skeloton-card";
 import Title from "@/components/reuseable/title";
 import { SquarePercent } from "lucide-react";
 import React, { Suspense } from "react";
-import PaginatedComponent from "@/components/ui/pagination";
 import FeedPurchaseInvoice from "./_components/feedPurchaseInvoce";
 
 async function PurchaseInvoice({

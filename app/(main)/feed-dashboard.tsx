@@ -30,7 +30,7 @@ import { getAllCompleteInvoice } from "./purchase-invoice/_lib";
 import { format } from "date-fns";
 import { CardData, DashboardData, getTotalRevenue, Invoice } from "./_action";
 import ModalAddCash from "@/components/modal-add-cash";
-import { cn, parseDateRange } from "@/lib/utils";
+import { cn, getTimeDescription, parseDateRange } from "@/lib/utils";
 import { DatePickerWithRange } from "@/components/layout/date-picker-with-range";
 
 type Props = {
@@ -53,7 +53,7 @@ export default async function FeedDashboard({ searchParams }: Props) {
         <DatePickerWithRange />
       </div>{" "}
       <div className="grid gap-4 md:grid-cols-2 md:gap-8 lg:grid-cols-3 xl:grid-cols-4">
-        {DASHBOARD_CARDS(totals).map((card, index) => (
+        {DASHBOARD_CARDS(totals, startDate).map((card, index) => (
           <StatCard key={index} data={card} />
         ))}
       </div>
@@ -129,14 +129,14 @@ export default async function FeedDashboard({ searchParams }: Props) {
             </Button>
           </CardHeader>
           <CardContent className="grid gap-8">
-            {!completeSaleInvoices.data?.formattedInvoices.length ? (
+            {!completeSaleInvoices?.data?.data?.length ? (
               <div className="text-center my-[77px] text-primary">
                 هیچ فرۆشتنێک تۆمار نەکراوە
               </div>
             ) : (
-              completeSaleInvoices.data?.formattedInvoices.map(
-                (sale, index) => <SaleItem key={index} sale={sale} />
-              )
+              completeSaleInvoices?.data?.data?.map((sale, index) => (
+                <SaleItem key={index} sale={sale} />
+              ))
             )}
           </CardContent>
         </Card>
@@ -146,7 +146,10 @@ export default async function FeedDashboard({ searchParams }: Props) {
 }
 
 // Dashboard cards data
-const DASHBOARD_CARDS = (totals: DashboardData): CardData[] => [
+const DASHBOARD_CARDS = (
+  totals: DashboardData,
+  startDate: Date
+): CardData[] => [
   {
     isMain: true,
     isCash: true,
@@ -175,7 +178,7 @@ const DASHBOARD_CARDS = (totals: DashboardData): CardData[] => [
     title: "کۆی فرۆشراوەکان",
     icon: CreditCard,
     count: totals?.totalSalePrice?.toLocaleString(),
-    description: " لە هەفتەی ڕابردوو",
+    description: getTimeDescription(startDate),
     type: "none",
   },
   {
@@ -184,7 +187,7 @@ const DASHBOARD_CARDS = (totals: DashboardData): CardData[] => [
     title: "کۆی کڕدراوەکان",
     icon: Activity,
     count: totals?.totalPurchasePrice?.toLocaleString(),
-    description: " لە هەفتەی ڕابردوو",
+    description: getTimeDescription(startDate),
     type: "none",
   },
   {
@@ -193,7 +196,7 @@ const DASHBOARD_CARDS = (totals: DashboardData): CardData[] => [
     title: "کۆی خەرجی",
     icon: Activity,
     count: totals?.totalExpenses?.toLocaleString(),
-    description: " لە هەفتەی ڕابردوو",
+    description: getTimeDescription(startDate),
     type: "none",
   },
 ];

@@ -13,6 +13,7 @@ export const getAllLoans = async (
   endDate?: Date
 ) => {
   try {
+    const pageSize = 30;
     // Date filter condition
     const dateFilter =
       startDate && endDate
@@ -41,8 +42,8 @@ export const getAllLoans = async (
     const res = await db.sale_invoice.findMany({
       where,
       orderBy: { createdAt: "desc" },
-      take: 10,
-      skip: (page - 1) * 10,
+      take: pageSize,
+      skip: (page - 1) * pageSize,
     });
 
     // Calculate total loan amount
@@ -56,6 +57,9 @@ export const getAllLoans = async (
       data: {
         data: res,
         totalAmount,
+        totalPage: Math.ceil(
+          (await db.sale_invoice.count({ where })) / pageSize
+        ),
       },
     };
   } catch (error) {

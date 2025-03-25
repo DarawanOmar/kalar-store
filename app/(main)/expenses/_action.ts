@@ -33,7 +33,7 @@ export const getAllExpenses = async (search: string, page: number) => {
       take: 10,
       skip: (page - 1) * 10,
     });
-    const pageSize = 10;
+    const pageSize = 30;
     const data = {
       data: res.map((item) => {
         return {
