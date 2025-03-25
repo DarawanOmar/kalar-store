@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 import Search from "@/components/reuseable/search";
 import { DataTable } from "@/components/reuseable/table";
 import TotalShown from "@/components/reuseable/total-shown";
@@ -38,12 +37,6 @@ async function LoansPage({ searchParams }: { searchParams: searchParamsType }) {
       </div>
     </div>
   );
-=======
-import React from "react";
-
-function LoansPage() {
-  return <div>LoansPage</div>;
->>>>>>> 30ac0a7a4be69a854df94344c503056b89d66d2f
 }
 
 export default LoansPage;

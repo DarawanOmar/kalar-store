@@ -135,18 +135,6 @@ export const cardData = [
     description: "+20.1% لە مانگی ڕابردوو",
   },
   {
-    title: "قاسەی دووکان",
-    icon: DollarSign,
-    count: "$45,231.89",
-    description: "+20.1% لە مانگی ڕابردوو",
-  },
-  {
-    title: "قاسەی حیسابات",
-    icon: DollarSign,
-    count: "$45,231.89",
-    description: "+20.1% لە مانگی ڕابردوو",
-  },
-  {
     title: "کۆی فرۆشراوەکان",
     icon: CreditCard,
     count: "+12,234",

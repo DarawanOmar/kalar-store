@@ -87,7 +87,6 @@ const getDefaultValues = (values: Partial<addSaleType> = {}) => {
     name: "",
     place: "",
     type: "cash",
-    type: "cash",
     phone: "",
     note: "",
   };
@@ -105,8 +104,6 @@ function labelTranslate(name: string) {
       return "ژمارەی مۆبایل";
     case "place":
       return "شوێن";
-    case "type":
-      return "جۆری پارەدان";
     case "type":
       return "جۆری پارەدان";
     case "invoice_number":
