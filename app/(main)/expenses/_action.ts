@@ -160,10 +160,63 @@ export const getHistorySubCash = async () => {
 
 export const updateExpenses = async (id: number, data: addExpensesType) => {
   try {
-    await db.expenses.update({
-      data,
+    const existingExpense = await db.expenses.findUnique({
       where: { id },
+      select: { price: true, quantity: true, name: true },
     });
+
+    if (!existingExpense) {
+      return {
+        message: "ئەم خەرجیە بەردەست نییە",
+        success: false,
+      };
+    }
+
+    // Calculate the current and new total amount
+    const currentTotal = existingExpense.price * existingExpense.quantity;
+    const newTotal = data.price * data.quantity;
+    const difference = newTotal - currentTotal;
+
+    // Update the expense entry
+    await db.expenses.update({
+      where: { id },
+      data,
+    });
+
+    // Update mainCash based on whether the amount increased or decreased
+    await db.mainCash.update({
+      where: { id: 1 },
+      data: {
+        amount:
+          difference < 0
+            ? { increment: Math.abs(difference) }
+            : { decrement: difference },
+        type_action: difference < 0 ? "deposit" : "withdraw",
+        last_amount: Math.abs(difference),
+      },
+    });
+
+    // Get user session
+    const user = await getSession();
+    if (!user) {
+      return {
+        message: "تکایە تۆکەنەکە دووبارە بکەوە",
+        success: false,
+      };
+    }
+
+    // Log transaction in historyMainCash
+    const email = user.token.split(",between,")[1];
+    await db.historyMainCash.create({
+      data: {
+        amount: Math.abs(difference),
+        type_action: difference < 0 ? "deposit" : "withdraw",
+        added_by: "system",
+        name: `نوێکردنەوەی خەرجی ${data.name}`,
+        user_email: email,
+      },
+    });
+
     return {
       message: "بە سەرکەوتویی نوێکرایەوە",
       success: true,
@@ -182,6 +235,31 @@ export const addExpensesAction = async (data: addExpensesType) => {
   try {
     await db.expenses.create({
       data,
+    });
+    await db.mainCash.update({
+      where: { id: 1 },
+      data: {
+        amount: { decrement: data.price * data.quantity },
+        type_action: "withdraw",
+        last_amount: data.price * data.quantity,
+      },
+    });
+    const user = await getSession();
+    if (!user) {
+      return {
+        message: "تکایە تۆکەنەکە دووبارە بکەوە",
+        success: false,
+      };
+    }
+    const email = user.token.split(",between,")[1];
+    await db.historyMainCash.create({
+      data: {
+        amount: data.price * data.quantity,
+        type_action: "withdraw",
+        added_by: "system",
+        name: `خەرجی بۆ ${data.name}`,
+        user_email: email,
+      },
     });
     return {
       message: "بە سەرکەوتویی زیاد کرا",
@@ -291,8 +369,43 @@ export const addSubCashAction = async (values: addCashType) => {
 // ----------------------DELETE-------------------------
 export const deleteExpenses = async (id: number) => {
   try {
+    const data = await db.expenses.findUnique({
+      where: { id },
+      select: { price: true, quantity: true, name: true },
+    });
+    if (!data) {
+      return {
+        message: "ئەم خەرجیە بەردەست نییە",
+        success: false,
+      };
+    }
     await db.expenses.delete({
       where: { id },
+    });
+    await db.mainCash.update({
+      where: { id: 1 },
+      data: {
+        amount: { increment: data.price * data.quantity },
+        type_action: "deposit",
+        last_amount: data.price * data.quantity,
+      },
+    });
+    const user = await getSession();
+    if (!user) {
+      return {
+        message: "تکایە تۆکەنەکە دووبارە بکەوە",
+        success: false,
+      };
+    }
+    const email = user.token.split(",between,")[1];
+    await db.historyMainCash.create({
+      data: {
+        amount: data.price * data.quantity,
+        type_action: "deposit",
+        added_by: "system",
+        name: `گەڕانەوەی خەرجی ${data.name}`,
+        user_email: email,
+      },
     });
     return {
       message: "بە سەرکەوتویی سڕایەوە",

@@ -69,51 +69,51 @@ const column: ColumnDef<{
       return <div>{row?.original?.sale_price?.toLocaleString()}</div>;
     },
   },
-  {
-    id: "actions",
-    cell: function CellComponent({ row }) {
-      const [open, setOpen] = React.useState(false);
-      const handleClose = () => setOpen((prev) => !prev);
-      const { product_id, sale_invoice_item_id } = row.original;
-      return (
-        <div className="">
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="ghost" className="h-8 w-8 p-0">
-                <span className="sr-only">Open menu</span>
-                <MoreVertical className="h-4 w-4" />
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent className="space-y-1" align="end">
-              <DropdownMenuLabel className="text-center">
-                کردارەکان
-              </DropdownMenuLabel>
-              <DropdownMenuSeparator />
-              <CustomDialog
-                open={open}
-                onOpenChange={setOpen}
-                isFreshButtonPass
-                title="گەڕاندنەوەی کاڵا"
-                classContent="max-w-md"
-                button={
-                  <button className="flex gap-2 items-center font-sirwan_reguler  hover:bg-primary hover:text-white transition-all duration-500 p-2 rounded-lg w-full">
-                    <EditIcon height={18} width={18} />
-                    <span className="text-sm">گەڕاندنەوەی کاڵا</span>
-                  </button>
-                }
-              >
-                <ReturnItemForm
-                  product_id={product_id as number}
-                  sale_invoice_item_id={sale_invoice_item_id as number}
-                  handleClose={handleClose}
-                />
-              </CustomDialog>
-            </DropdownMenuContent>
-          </DropdownMenu>
-        </div>
-      );
-    },
-  },
+  // {
+  //   id: "actions",
+  //   cell: function CellComponent({ row }) {
+  //     const [open, setOpen] = React.useState(false);
+  //     const handleClose = () => setOpen((prev) => !prev);
+  //     const { product_id, sale_invoice_item_id } = row.original;
+  //     return (
+  //       <div className="">
+  //         <DropdownMenu>
+  //           <DropdownMenuTrigger asChild>
+  //             <Button variant="ghost" className="h-8 w-8 p-0">
+  //               <span className="sr-only">Open menu</span>
+  //               <MoreVertical className="h-4 w-4" />
+  //             </Button>
+  //           </DropdownMenuTrigger>
+  //           <DropdownMenuContent className="space-y-1" align="end">
+  //             <DropdownMenuLabel className="text-center">
+  //               کردارەکان
+  //             </DropdownMenuLabel>
+  //             <DropdownMenuSeparator />
+  //             <CustomDialog
+  //               open={open}
+  //               onOpenChange={setOpen}
+  //               isFreshButtonPass
+  //               title="گەڕاندنەوەی کاڵا"
+  //               classContent="max-w-md"
+  //               button={
+  //                 <button className="flex gap-2 items-center font-sirwan_reguler  hover:bg-primary hover:text-white transition-all duration-500 p-2 rounded-lg w-full">
+  //                   <EditIcon height={18} width={18} />
+  //                   <span className="text-sm">گەڕاندنەوەی کاڵا</span>
+  //                 </button>
+  //               }
+  //             >
+  //               <ReturnItemForm
+  //                 product_id={product_id as number}
+  //                 sale_invoice_item_id={sale_invoice_item_id as number}
+  //                 handleClose={handleClose}
+  //               />
+  //             </CustomDialog>
+  //           </DropdownMenuContent>
+  //         </DropdownMenu>
+  //       </div>
+  //     );
+  //   },
+  // },
 ];
 
 export default column;

@@ -54,7 +54,7 @@ export function SelectField({
             defaultValue={field.value}
           >
             <FormControl>
-              <SelectTrigger className="border-muted-foreground/10">
+              <SelectTrigger className="border-muted-foreground/30">
                 <SelectValue placeholder={placeholder} />
               </SelectTrigger>
             </FormControl>

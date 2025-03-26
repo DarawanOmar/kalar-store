@@ -62,7 +62,11 @@ const column: ColumnDef<Expenses>[] = [
       <DataTableColumnHeader column={column} title="کۆی گشتی" />
     ),
     cell: function CellComponent({ row }) {
-      return <div>{row.original.price.toLocaleString()}</div>;
+      return (
+        <div>
+          {(row.original.price * row.original.quantity).toLocaleString()}
+        </div>
+      );
     },
   },
   {

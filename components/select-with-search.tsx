@@ -105,7 +105,7 @@ export function SelectWithSearch({
             role="combobox"
             aria-expanded={open}
             className={cn(
-              "w-full justify-between bg-background hover:bg-background  px-3  outline-none border-muted-foreground/10",
+              "w-full justify-between bg-background hover:bg-background  px-3  outline-none border-muted-foreground/30",
               !field.value && "text-muted-foreground"
             )}
           >

@@ -49,7 +49,7 @@ export const TextField: React.FC<TextFieldProps> = ({
           <FormControl>
             <Input
               placeholder={placeholder}
-              className={cn("border-muted-foreground/10", className)}
+              className={cn("border-muted-foreground/30", className)}
               {...field}
               type={type}
             />

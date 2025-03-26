@@ -1,3 +1,4 @@
+export const dynamic = "force-dynamic"; // Add this at the top of your Server Component
 import React from "react";
 import AddsaleProduct from "./_components/form/add-products";
 import { DataTable } from "@/components/reuseable/table";
