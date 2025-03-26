@@ -32,6 +32,7 @@ import { CardData, DashboardData, getTotalRevenue, Invoice } from "./_action";
 import ModalAddCash from "@/components/modal-add-cash";
 import { cn, getTimeDescription, parseDateRange } from "@/lib/utils";
 import { DatePickerWithRange } from "@/components/layout/date-picker-with-range";
+import { Badge } from "@/components/ui/badge";
 
 type Props = {
   searchParams: searchParamsType;
@@ -193,6 +194,24 @@ const DASHBOARD_CARDS = (
   {
     isMain: false,
     isCash: false,
+    title: "کۆی فرۆشتن بە قەزر",
+    icon: Activity,
+    count: totals?.totalLoanSales?.toLocaleString(),
+    description: getTimeDescription(startDate),
+    type: "none",
+  },
+  {
+    isMain: false,
+    isCash: false,
+    title: "کۆی فرۆشتن بە کاش",
+    icon: Activity,
+    count: totals?.totalCashSales?.toLocaleString(),
+    description: getTimeDescription(startDate),
+    type: "none",
+  },
+  {
+    isMain: false,
+    isCash: false,
     title: "کۆی خەرجی",
     icon: Activity,
     count: totals?.totalExpenses?.toLocaleString(),
@@ -264,13 +283,18 @@ const SaleItem = memo(({ sale }: { sale: Invoice }) => (
       <p className="text-sm text-muted-foreground">{sale.place}</p>
     </div>
     <div className="flex flex-col ms-auto font-medium">
-      <span>{sale.total.toLocaleString()}+</span>
-      {sale.discount && (
+      <div className="flex items-center gap-1">
+        <Badge className="font-normal">
+          {sale.type === "loan" ? "قەرز" : "کاش"}
+        </Badge>
+        <span>{sale.total.toLocaleString()}+</span>
+      </div>
+      {sale.discount ? (
         <div className="flex items-center">
           <span className="text-xs">{sale.discount.toLocaleString()}</span>
           <Percent size={12} />
         </div>
-      )}
+      ) : null}
     </div>
   </div>
 ));

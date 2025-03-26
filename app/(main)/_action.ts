@@ -8,22 +8,37 @@ export const getTotalRevenue = async (startDate?: Date, endDate?: Date) => {
         ? { createdAt: { gte: startDate, lte: endDate } }
         : {};
 
-    const [saleItems, purchaseItems, expenses, subCash, mainCash] =
-      await Promise.all([
-        db.sale_invoice_items.findMany({
-          include: { Products: true },
-          where: dateFilter,
-        }),
-        db.purchase_invoice_items.findMany({
-          include: { Products: true },
-          where: dateFilter,
-        }),
-        db.expenses.findMany({
-          where: dateFilter,
-        }),
-        db.subCash.findFirst(),
-        db.mainCash.findFirst(),
-      ]);
+    const [
+      cashSalesTotal,
+      loanSalesTotal,
+      saleItems,
+      purchaseItems,
+      expenses,
+      subCash,
+      mainCash,
+    ] = await Promise.all([
+      db.sale_invoice.aggregate({
+        _sum: { total_amount: true },
+        where: { type: "cash", ...dateFilter },
+      }),
+      db.sale_invoice.aggregate({
+        _sum: { total_amount: true },
+        where: { type: "loan", ...dateFilter },
+      }),
+      db.sale_invoice_items.findMany({
+        include: { Products: true },
+        where: dateFilter,
+      }),
+      db.purchase_invoice_items.findMany({
+        include: { Products: true },
+        where: dateFilter,
+      }),
+      db.expenses.findMany({
+        where: dateFilter,
+      }),
+      db.subCash.findFirst(),
+      db.mainCash.findFirst(),
+    ]);
 
     const calculateTotalSalePrice = () =>
       saleItems.reduce((total, item) => {
@@ -36,18 +51,23 @@ export const getTotalRevenue = async (startDate?: Date, endDate?: Date) => {
         const productPrice = item.Products?.purchase_price || 0;
         return total + productPrice * item.quantity;
       }, 0);
+
     const calculateTotalExpenses = () =>
       expenses.reduce((total, item) => {
         const productPrice = item.price || 0;
         return total + productPrice * item.quantity;
       }, 0);
+
     const totalSalePrice = calculateTotalSalePrice();
     const totalPurchasePrice = calculateTotalPurchasePrice();
     const totalExpenses = calculateTotalExpenses();
+
     return {
       totalSalePrice,
       totalPurchasePrice,
       totalExpenses,
+      totalCashSales: cashSalesTotal._sum.total_amount || 0,
+      totalLoanSales: loanSalesTotal._sum.total_amount || 0,
       subCashData: {
         value: subCash?.amount || 0,
         last_amount: subCash?.last_amount || 0,
@@ -78,6 +98,7 @@ export interface CardData {
 export interface Invoice {
   id: number;
   name: string;
+  type: string;
   invoice_number: string;
   is_discount: boolean;
   place: string;
@@ -91,6 +112,8 @@ export interface DashboardData {
   totalSalePrice?: number;
   totalPurchasePrice?: number;
   totalExpenses?: number;
+  totalLoanSales?: number;
+  totalCashSales?: number;
   subCashData?: CashType;
   mainCashData?: CashType;
 }
