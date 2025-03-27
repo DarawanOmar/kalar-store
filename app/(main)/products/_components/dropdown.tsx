@@ -27,16 +27,16 @@ function DropdownMenuProduct({ product }: Props) {
         <PopoverTrigger>
           <EllipsisVertical size={16} />
         </PopoverTrigger>
-        <PopoverContent className="max-w-max  bg-soft_primary text-white rounded-lg border-none p-0 ">
+        <PopoverContent className="max-w-max  bg-soft_primary text-white rounded-lg border-none p-2 ">
           <div className="">
             <CustomDialog
               open={open}
               onOpenChange={setOpen}
               isFreshButtonPass
-              classContent="max-w-5xl"
+              classContent="max-w-3xl"
               title="گۆرانکاری"
               button={
-                <button className="flex gap-2 items-center font-sirwan_reguler  hover:bg-primary p-2 rounded-t-lg ">
+                <button className="flex gap-2 items-center font-sirwan_reguler  hover:bg-primary p-2 rounded-lg ">
                   <EditIcon height={18} width={18} />
                   <span className="text-sm">گۆرانکاری</span>
                 </button>
@@ -57,8 +57,8 @@ function DropdownMenuProduct({ product }: Props) {
                 handleClose={handleClose}
               />
             </CustomDialog>
-            <hr className="border-gray" />
-            <ReusableDeleteDailog
+            {/* <hr className="border-gray" /> */}
+            {/* <ReusableDeleteDailog
               title="دڵنیایت لە سڕینەوەی کاڵا"
               isFreshButtonPass
               button={
@@ -69,7 +69,7 @@ function DropdownMenuProduct({ product }: Props) {
               }
               actionDelete={deleteProducts}
               id={product?.id}
-            />
+            /> */}
           </div>
         </PopoverContent>
       </Popover>

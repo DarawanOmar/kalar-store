@@ -315,7 +315,7 @@ export const createSaleInvoice = async (values: addSaleType) => {
 
 export const completeSaleInvoiceAction = async (
   id: number,
-  diccount: number | undefined,
+  discount: number | undefined,
   amount_payment: number
 ) => {
   try {
@@ -341,7 +341,6 @@ export const completeSaleInvoiceAction = async (
     }
 
     const items = saleInvoice.Sale_invoice_items;
-
     if (items.length === 0) {
       return {
         message: "ئەم وەسڵە هیچ کاڵایەکی تێدا تۆمارنەکراوە",
@@ -349,17 +348,14 @@ export const completeSaleInvoiceAction = async (
       };
     }
 
-    // Fetch all product IDs and quantities in a single query
     const productUpdates = items.map((item) => ({
       product_id: item.product_id,
       quantity: item.quantity,
     }));
 
-    // Use a transaction for atomic updates
     await db.$transaction(async (tx) => {
       for (const { product_id } of productUpdates) {
         if (product_id) {
-          // Decrement the quantity of the product
           const product = await tx.products.findUnique({
             where: { id: product_id },
           });
@@ -369,46 +365,44 @@ export const completeSaleInvoiceAction = async (
           }
         }
       }
-      let is_discount;
-      if (diccount) {
-        is_discount = true;
-      } else {
-        is_discount = false;
+      if (!saleInvoice.total_amount) {
+        return {
+          message: "ئەم وەسڵە بوونی نییە",
+          success: false,
+        };
       }
-
-      // decrease amount in main-cash
       if (
         saleInvoice.type === "cash" ||
         (saleInvoice.type === "loan" && amount_payment)
       ) {
-        console.log(
-          "value =>",
-          saleInvoice.type === "cash"
-            ? (saleInvoice.total_amount as number)
-            : amount_payment
-        );
         await tx.mainCash.update({
           where: { id: 1 },
           data: {
             amount: {
               increment:
                 saleInvoice.type === "cash"
-                  ? (saleInvoice.total_amount as number)
+                  ? discount
+                    ? saleInvoice.total_amount - discount
+                    : saleInvoice.total_amount
                   : amount_payment,
             },
             last_amount:
               saleInvoice.type === "cash"
-                ? (saleInvoice.total_amount as number)
+                ? discount
+                  ? saleInvoice.total_amount - discount
+                  : saleInvoice.total_amount
                 : amount_payment,
-
             type_action: "deposit",
           },
         });
+
         await tx.historyMainCash.create({
           data: {
             amount:
               saleInvoice.type === "cash"
-                ? (saleInvoice.total_amount as number)
+                ? discount
+                  ? saleInvoice.total_amount - discount
+                  : saleInvoice.total_amount
                 : amount_payment,
             type_action: "deposit",
             added_by: "system",
@@ -420,17 +414,22 @@ export const completeSaleInvoiceAction = async (
         });
       }
 
-      // Mark the sale invoice as done
       await tx.sale_invoice.update({
         where: { id },
         data: {
           is_done: true,
-          discount: diccount,
-          is_discount: is_discount,
-          paid_amount: amount_payment || 0,
-          remaining_amount: amount_payment
-            ? (saleInvoice.total_amount as number) - amount_payment
-            : (saleInvoice.total_amount as number),
+          discount: discount || 0,
+          total_amount: discount
+            ? saleInvoice.total_amount - discount
+            : saleInvoice.total_amount,
+          is_discount: discount ? true : false,
+          paid_amount: amount_payment,
+          remaining_amount:
+            amount_payment && discount
+              ? saleInvoice.total_amount - discount - amount_payment
+              : amount_payment
+              ? saleInvoice.total_amount - amount_payment
+              : saleInvoice.total_amount,
         },
       });
     });
@@ -447,3 +446,135 @@ export const completeSaleInvoiceAction = async (
     };
   }
 };
+
+// export const completeSaleInvoiceAction = async (
+//   id: number,
+//   diccount: number | undefined,
+//   amount_payment: number
+// ) => {
+//   try {
+//     const user = await getSession();
+//     if (!user) {
+//       return {
+//         message: "تکایە تۆکەنەکە دووبارە بکەوە",
+//         success: false,
+//       };
+//     }
+//     const email = user.token.split(",between,")[1];
+
+//     const saleInvoice = await db.sale_invoice.findUnique({
+//       where: { id },
+//       include: { Sale_invoice_items: true },
+//     });
+
+//     if (!saleInvoice) {
+//       return {
+//         message: "ئەم وەسڵە بوونی نییە",
+//         success: false,
+//       };
+//     }
+
+//     const items = saleInvoice.Sale_invoice_items;
+
+//     if (items.length === 0) {
+//       return {
+//         message: "ئەم وەسڵە هیچ کاڵایەکی تێدا تۆمارنەکراوە",
+//         success: false,
+//       };
+//     }
+
+//     // Fetch all product IDs and quantities in a single query
+//     const productUpdates = items.map((item) => ({
+//       product_id: item.product_id,
+//       quantity: item.quantity,
+//     }));
+
+//     // Use a transaction for atomic updates
+//     await db.$transaction(async (tx) => {
+//       for (const { product_id } of productUpdates) {
+//         if (product_id) {
+//           // Decrement the quantity of the product
+//           const product = await tx.products.findUnique({
+//             where: { id: product_id },
+//           });
+
+//           if (!product) {
+//             throw new Error(`کاڵایەک بوونی نییە `);
+//           }
+//         }
+//       }
+//       let is_discount;
+//       if (diccount) {
+//         is_discount = true;
+//       } else {
+//         is_discount = false;
+//       }
+
+//       // decrease amount in main-cash
+//       if (
+//         saleInvoice.type === "cash" ||
+//         (saleInvoice.type === "loan" && amount_payment)
+//       ) {
+//         await tx.mainCash.update({
+//           where: { id: 1 },
+//           data: {
+//             amount: {
+//               increment:
+//                 saleInvoice.type === "cash"
+//                   ? (saleInvoice.total_amount as number)
+//                   : amount_payment,
+//             },
+//             last_amount:
+//               saleInvoice.type === "cash"
+//                 ? (saleInvoice.total_amount as number)
+//                 : amount_payment,
+
+//             type_action: "deposit",
+//           },
+//         });
+//         await tx.historyMainCash.create({
+//           data: {
+//             amount:
+//               saleInvoice.type === "cash"
+//                 ? (saleInvoice.total_amount as number)
+//                 : amount_payment,
+//             type_action: "deposit",
+//             added_by: "system",
+//             name: ` فرۆشتنی کاڵا بە ${
+//               saleInvoice.type === "loan" ? "قەرز" : "کاش"
+//             } `,
+//             user_email: email,
+//           },
+//         });
+//       }
+
+//       // Mark the sale invoice as done
+//       await tx.sale_invoice.update({
+//         where: { id },
+//         data: {
+//           is_done: true,
+//           discount: diccount,
+//           total_amount: diccount
+//             ? (saleInvoice?.total_amount as number) - diccount
+//             : saleInvoice?.total_amount,
+//           is_discount: is_discount,
+//           paid_amount: amount_payment || 0,
+//           remaining_amount: amount_payment
+//             ? (saleInvoice.total_amount as number) - amount_payment
+//             : (saleInvoice.total_amount as number),
+//         },
+//       });
+//     });
+
+//     return {
+//       success: true,
+//       message: "بە سەرکەوتویی تەواوکرایەوە",
+//     };
+//   } catch (error: any) {
+//     console.log("Error => ", error.message);
+//     return {
+//       message: `هەڵەیەک هەیە : ${error.message}`,
+//       success: false,
+//     };
+//   }
+// };

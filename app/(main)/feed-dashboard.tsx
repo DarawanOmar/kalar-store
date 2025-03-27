@@ -222,7 +222,7 @@ const DASHBOARD_CARDS = (
 
 // Memoized components for better performance
 const StatCard = memo(({ data }: { data: CardData }) => (
-  <Card>
+  <Card className="hover:scale-105 transition-all duration-300 cursor-pointer">
     <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
       <CardTitle className="text-sm font-medium">{data.title}</CardTitle>
       {data.isCash ? (
@@ -273,7 +273,7 @@ const StatCard = memo(({ data }: { data: CardData }) => (
 ));
 
 const SaleItem = memo(({ sale }: { sale: Invoice }) => (
-  <div className="flex items-center gap-4">
+  <div className="flex items-center gap-4 ">
     <Avatar className="hidden h-9 w-9 sm:flex">
       <AvatarImage src="/empty-product.jpg" alt="Avatar" />
       <AvatarFallback />

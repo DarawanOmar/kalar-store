@@ -108,7 +108,7 @@ export const deleteProducts = async (id: number) => {
 
     if (product.quantity !== 0) {
       return {
-        message: "ببورە، ئەم کاڵایە بەرز نییە",
+        message: "ببورە، ئەم کاڵایە کڕدراوە و حەدەدی ماوە",
         success: false,
       };
     }
