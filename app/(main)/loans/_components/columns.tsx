@@ -58,6 +58,15 @@ const column: ColumnDef<any>[] = [
     },
   },
   {
+    accessorKey: "discount",
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title="داشکاندن" />
+    ),
+    cell: function CellComponent({ row }) {
+      return <div>{row.original.discount?.toLocaleString()}</div>;
+    },
+  },
+  {
     accessorKey: "remaining_amount",
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title="بڕی پارەی ماوە" />

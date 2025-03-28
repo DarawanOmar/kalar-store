@@ -20,6 +20,7 @@ CREATE TABLE `Purchase_invoice` (
     `invoice_number` VARCHAR(191) NOT NULL,
     `name` VARCHAR(191) NOT NULL,
     `place` VARCHAR(191) NOT NULL,
+    `total_amount` DOUBLE NULL,
     `note` VARCHAR(191) NULL,
     `is_done` BOOLEAN NOT NULL,
     `createdAt` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),

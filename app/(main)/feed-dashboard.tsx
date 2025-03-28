@@ -156,7 +156,7 @@ const DASHBOARD_CARDS = (
     isCash: true,
     title: "قاسەی سەرەکی",
     icon: DollarSign,
-    count: totals?.mainCashData?.value?.toLocaleString(),
+    count: totals?.mainCashData?.value || 0,
     description: `کۆتا جار ${
       totals.mainCashData?.last_amount?.toLocaleString() || 0
     } ${typeAction(totals.mainCashData?.type || "deposit")}`,
@@ -167,7 +167,7 @@ const DASHBOARD_CARDS = (
     isCash: true,
     title: "قاسەی لاوەکی",
     icon: Edit,
-    count: totals?.subCashData?.value?.toLocaleString(),
+    count: totals?.subCashData?.value || 0,
     description: `کۆتا جار ${
       totals.subCashData?.last_amount?.toLocaleString() || 0
     } ${typeAction(totals.subCashData?.type || "deposit")}`,
@@ -178,7 +178,7 @@ const DASHBOARD_CARDS = (
     isCash: false,
     title: "کۆی فرۆشراوەکان",
     icon: CreditCard,
-    count: totals?.totalSalePrice?.toLocaleString(),
+    count: totals?.totalSalePrice || 0,
     description: getTimeDescription(startDate),
     type: "none",
   },
@@ -187,7 +187,7 @@ const DASHBOARD_CARDS = (
     isCash: false,
     title: "کۆی کڕدراوەکان",
     icon: Activity,
-    count: totals?.totalPurchasePrice?.toLocaleString(),
+    count: totals?.totalPurchasePrice || 0,
     description: getTimeDescription(startDate),
     type: "none",
   },
@@ -196,7 +196,7 @@ const DASHBOARD_CARDS = (
     isCash: false,
     title: "کۆی فرۆشتن بە قەزر",
     icon: Activity,
-    count: totals?.totalLoanSales?.toLocaleString(),
+    count: totals?.totalLoanSales || 0,
     description: getTimeDescription(startDate),
     type: "none",
   },
@@ -205,7 +205,7 @@ const DASHBOARD_CARDS = (
     isCash: false,
     title: "کۆی فرۆشتن بە کاش",
     icon: Activity,
-    count: totals?.totalCashSales?.toLocaleString(),
+    count: totals?.totalCashSales || 0,
     description: getTimeDescription(startDate),
     type: "none",
   },
@@ -214,7 +214,7 @@ const DASHBOARD_CARDS = (
     isCash: false,
     title: "کۆی خەرجی",
     icon: Activity,
-    count: totals?.totalExpenses?.toLocaleString(),
+    count: totals?.totalExpenses || 0,
     description: getTimeDescription(startDate),
     type: "none",
   },
@@ -222,7 +222,7 @@ const DASHBOARD_CARDS = (
 
 // Memoized components for better performance
 const StatCard = memo(({ data }: { data: CardData }) => (
-  <Card className="hover:scale-105 transition-all duration-300 cursor-pointer">
+  <Card className="hover:scale-105 transition-all duration-300 cursor-pointer hover:bg-muted">
     <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
       <CardTitle className="text-sm font-medium">{data.title}</CardTitle>
       {data.isCash ? (
@@ -244,9 +244,13 @@ const StatCard = memo(({ data }: { data: CardData }) => (
               : "/history-transaction"
           }
         >
-          <div className="flex gap-1 items-center text-2xl font-bold">
+          <div
+            className={cn("flex gap-1 items-center text-2xl font-bold", {
+              "text-red-400": data.count < 0,
+            })}
+          >
             <span className="text-xl">IQD </span>
-            <span>{data.count}</span>
+            <span className={cn("")}>{data.count?.toLocaleString() || 0}</span>
           </div>
           <p
             className={cn("text-xs text-muted-foreground", {
@@ -261,7 +265,7 @@ const StatCard = memo(({ data }: { data: CardData }) => (
         <>
           <div className="flex gap-1 items-center text-2xl font-bold">
             <span className="text-xl">IQD </span>
-            <span>{data.count}</span>
+            <span>{data.count?.toLocaleString() || 0}</span>
           </div>
           <p className={cn("text-xs text-muted-foreground")}>
             {data.description}

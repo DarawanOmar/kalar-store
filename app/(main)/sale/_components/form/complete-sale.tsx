@@ -58,7 +58,7 @@ function CompleteSale({
       }
     });
   }
-
+  const discount = Number(form.watch("discount"));
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="sm:px-6">
@@ -87,7 +87,7 @@ function CompleteSale({
               placeholder="پارە بۆ دانەوە"
             />
           ) : null}
-          <TotalShown text="کۆی گشتی" total={total || 0} />
+          <TotalShown text="کۆی گشتی" total={total - discount || 0} />
           <Button type="submit" variant={"gooeyRight"} className="flex gap-1">
             {pendding ? (
               <LuLoaderCircle className="animate-spin transition-all duration-500" />

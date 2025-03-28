@@ -11,7 +11,7 @@ export const getTotalRevenue = async (startDate?: Date, endDate?: Date) => {
     const [
       cashSalesTotal,
       loanSalesTotal,
-      saleItems,
+      totalSale,
       purchaseItems,
       expenses,
       subCash,
@@ -25,9 +25,9 @@ export const getTotalRevenue = async (startDate?: Date, endDate?: Date) => {
         _sum: { total_amount: true },
         where: { type: "loan", ...dateFilter },
       }),
-      db.sale_invoice_items.findMany({
-        include: { Products: true },
-        where: dateFilter,
+      db.sale_invoice.aggregate({
+        _sum: { total_amount: true },
+        where: { ...dateFilter },
       }),
       db.purchase_invoice_items.findMany({
         include: { Products: true },
@@ -39,12 +39,6 @@ export const getTotalRevenue = async (startDate?: Date, endDate?: Date) => {
       db.subCash.findFirst(),
       db.mainCash.findFirst(),
     ]);
-
-    const calculateTotalSalePrice = () =>
-      saleItems.reduce((total, item) => {
-        const productPrice = item.Products?.sale_price || 0;
-        return total + productPrice * item.quantity;
-      }, 0);
 
     const calculateTotalPurchasePrice = () =>
       purchaseItems.reduce((total, item) => {
@@ -58,7 +52,7 @@ export const getTotalRevenue = async (startDate?: Date, endDate?: Date) => {
         return total + productPrice * item.quantity;
       }, 0);
 
-    const totalSalePrice = calculateTotalSalePrice();
+    const totalSalePrice = totalSale._sum.total_amount || 0;
     const totalPurchasePrice = calculateTotalPurchasePrice();
     const totalExpenses = calculateTotalExpenses();
 
@@ -88,7 +82,7 @@ export const getTotalRevenue = async (startDate?: Date, endDate?: Date) => {
 export interface CardData {
   title: string;
   icon: React.ComponentType<{ className?: string }>;
-  count?: string;
+  count: number;
   description: string;
   isCash?: boolean;
   isMain?: boolean;
