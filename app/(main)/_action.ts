@@ -22,7 +22,7 @@ export const getTotalRevenue = async (startDate?: Date, endDate?: Date) => {
         where: { type: "cash", ...dateFilter },
       }),
       db.sale_invoice.aggregate({
-        _sum: { total_amount: true },
+        _sum: { total_amount: true, remaining_amount: true, paid_amount: true },
         where: { type: "loan", ...dateFilter },
       }),
       db.sale_invoice.aggregate({
@@ -62,6 +62,8 @@ export const getTotalRevenue = async (startDate?: Date, endDate?: Date) => {
       totalExpenses,
       totalCashSales: cashSalesTotal._sum.total_amount || 0,
       totalLoanSales: loanSalesTotal._sum.total_amount || 0,
+      totalPaidLoan: loanSalesTotal._sum.paid_amount || 0, // ✅ Total Paid Loan Amount
+      totalRemainingLoan: loanSalesTotal._sum.remaining_amount || 0,
       subCashData: {
         value: subCash?.amount || 0,
         last_amount: subCash?.last_amount || 0,
@@ -108,6 +110,8 @@ export interface DashboardData {
   totalExpenses?: number;
   totalLoanSales?: number;
   totalCashSales?: number;
+  totalRemainingLoan?: number;
+  totalPaidLoan?: number;
   subCashData?: CashType;
   mainCashData?: CashType;
 }

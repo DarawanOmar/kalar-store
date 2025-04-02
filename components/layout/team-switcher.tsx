@@ -1,7 +1,7 @@
 "use client";
 
 import * as React from "react";
-import { ChevronsUpDown, MonitorCog } from "lucide-react";
+import { ChevronsUpDown, MonitorCog, UsersRound } from "lucide-react";
 import dara from "@/public/dara.jpg";
 import { SidebarMenuButton, useSidebar } from "@/components/ui/sidebar";
 import Image from "next/image";
@@ -88,7 +88,11 @@ export function TeamSwitcher({ isName }: { isName: boolean }) {
             </span>
           )}
         </div>
-        <MonitorCog className="mr-auto " />
+        {isName ? (
+          <UsersRound className="mr-auto " />
+        ) : (
+          <MonitorCog className="mr-auto " />
+        )}
       </SidebarMenuButton>
       <CustomDialog
         classContent="max-w-2xl bg-gradient-to-tr from-[#6e2c2a]/20 via-[#6e2c2a]/50 to-[#6e2c2a]/20 dark:bg-gradient-to-tr from-[#6e2c2a]/5 via-[#6e2c2a]/50 to-[#6e2c2a]/5"

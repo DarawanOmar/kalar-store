@@ -39,7 +39,7 @@ type Props = {
 };
 
 export default async function FeedDashboard({ searchParams }: Props) {
-  const range = ((await searchParams).range as string) || ""; //range=03-03-2025to03-25-2025
+  const range = ((await searchParams).range as string) || "";
   const { startDate, endDate } = parseDateRange(range);
 
   const [totals, completeSaleInvoices, completeInvoices] = await Promise.all([
@@ -206,6 +206,24 @@ const DASHBOARD_CARDS = (
     title: "کۆی فرۆشتن بە کاش",
     icon: Activity,
     count: totals?.totalCashSales || 0,
+    description: getTimeDescription(startDate),
+    type: "none",
+  },
+  {
+    isMain: false,
+    isCash: false,
+    title: "کۆی قەرزی دراوە",
+    icon: Activity,
+    count: totals?.totalPaidLoan || 0,
+    description: getTimeDescription(startDate),
+    type: "none",
+  },
+  {
+    isMain: false,
+    isCash: false,
+    title: "کۆی قەرزی ماوە",
+    icon: Activity,
+    count: totals?.totalRemainingLoan || 0,
     description: getTimeDescription(startDate),
     type: "none",
   },
