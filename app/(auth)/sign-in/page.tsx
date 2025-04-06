@@ -20,7 +20,9 @@ export default function SignIn() {
       </section>
       <div className=" bg-muted  w-full">
         <Image
-          src={login}
+          src={"/logo.jpg"}
+          width={500}
+          height={500}
           alt="Login"
           className=" max-md:max-h-[300px] md:h-full w-full max-sm:object-top object-cover"
           priority

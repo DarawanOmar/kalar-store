@@ -1,7 +1,7 @@
 import { cn } from "@/lib/utils";
 import Image from "next/image";
 import React from "react";
-import Empty from "@/public/empty-data.svg";
+import Empty from "@/public/empty-data.png";
 
 function EmptyImage({
   height = 300,
@@ -14,7 +14,8 @@ function EmptyImage({
 }) {
   return (
     <Image
-      src={Empty}
+      // src={Empty}
+      src={"/empty-data.png"}
       alt="Empty"
       width={width}
       height={height}
