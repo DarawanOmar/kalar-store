@@ -1,5 +1,9 @@
 import { clsx, type ClassValue } from "clsx";
 import { twMerge } from "tailwind-merge";
+import { differenceInMonths, differenceInWeeks } from "date-fns";
+import path from "path";
+import { unlink } from "fs";
+import { unlinkImage } from "./helper";
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
@@ -19,8 +23,6 @@ export const parseDateRange = (range: string) => {
     endDate: new Date(end.trim()),
   };
 };
-
-import { differenceInMonths, differenceInWeeks } from "date-fns";
 
 // Function to get the relative time description (last month, last 2 months, last week, etc.)
 export const getTimeDescription = (startDate: Date): string => {
@@ -50,3 +52,49 @@ export const getTimeDescription = (startDate: Date): string => {
 
   return ""; // Return empty if the range is less than a week
 };
+
+export function getImageData(event: any) {
+  const data = event as FileList | null;
+  if (!data || !data[0]?.name) return { files: null, displayUrl: null };
+
+  var binaryData = [];
+  binaryData.push(data[0]);
+
+  const dataTransfer = new DataTransfer();
+  Array.from(data!).forEach((image) => dataTransfer.items.add(image));
+
+  const displayUrl = URL.createObjectURL(
+    new Blob(binaryData, { type: "application/zip" })
+  );
+
+  return { files: dataTransfer.files, displayUrl };
+}
+
+export async function uploadImageUsingHandler(
+  file: File,
+  updatePath?: string | null
+) {
+  const formData = new FormData();
+  formData.append("image", file);
+
+  if (updatePath) {
+    await unlinkImage(updatePath);
+  }
+
+  const response = await fetch("/api/upload", {
+    method: "POST",
+    body: formData,
+  });
+
+  if (!response.ok) {
+    return {
+      success: false,
+      message: (await response?.json())?.error || "ڕەسمەکە خەزن نەبوو",
+    };
+  }
+
+  return {
+    success: true,
+    path: (await response.json()).filePath,
+  };
+}

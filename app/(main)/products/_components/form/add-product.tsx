@@ -13,13 +13,22 @@ import {
 } from "@/components/ui/form";
 import { DialogClose } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
-import { cn } from "@/lib/utils";
+import { cn, uploadImageUsingHandler } from "@/lib/utils";
 import { useTransition } from "react";
 import { LuLoaderCircle } from "react-icons/lu";
 import { addProduct, addProductType } from "../../_type";
 import { addProducts, deleteIamge, updateProducts } from "../../_action";
 import { UploadDropzone } from "@/utils/uploadthing";
 import { UploadCloud } from "lucide-react";
+import {
+  FileInput,
+  FileSvgDraw,
+  FileUploader,
+  FileUploaderItem,
+} from "@/components/ui/file-upload";
+import { sizeImage } from "@/lib/globals";
+import { AspectRatio } from "@radix-ui/react-aspect-ratio";
+import Image from "next/image";
 
 type filmFormProps = {
   isEdit?: boolean;
@@ -42,14 +51,35 @@ export default function AddProduct({
 
   function onSubmit(values: addProductType) {
     setPendding(async () => {
-      const result = isEdit
-        ? await updateProducts(id as number, values)
-        : await addProducts(values);
-      if (result.success) {
-        toast.success(result.message);
+      let productValues;
+      let path;
+      if (values.image) {
+        const {
+          success,
+          message,
+          path: imagePath,
+        } = await uploadImageUsingHandler(values.image, info?.image);
+        if (!success) {
+          toast.error(message);
+          return;
+        }
+        values.image = imagePath;
+        path = imagePath;
+      } else {
+        values.image = null;
+      }
+
+      if (isEdit && id) {
+        productValues = await updateProducts(id as number, values);
+      } else {
+        productValues = await addProducts(values, path);
+      }
+
+      if (productValues.success) {
+        toast.success(productValues.message);
         handleClose && handleClose();
       } else {
-        toast.error(result.message);
+        toast.error(productValues.message);
       }
     });
   }
@@ -121,7 +151,7 @@ export default function AddProduct({
               }}
             />
           </div> */}
-          {/* <FormField
+          <FormField
             control={form.control}
             name="image"
             render={({ field }) => (
@@ -142,7 +172,7 @@ export default function AddProduct({
                   className="relative bg-background rounded-lg p-2"
                 >
                   <FileInput className="outline-dashed outline-1 outline-white">
-                    <div className="flex items-center justify-center flex-col pt-3 pb-4 w-full ">
+                    <div className="flex items-center justify-center flex-col pt-3 pb-4 w-full  ">
                       {field.value && (
                         <FileUploaderItem
                           index={0}
@@ -151,8 +181,8 @@ export default function AddProduct({
                         >
                           <AspectRatio className="size-full">
                             <Image
-                              src={URL.createObjectURL(field.value)} // Convert File to Object URL
-                              alt={field.value.name} // Use file name as alt
+                              src={URL.createObjectURL(field.value)}
+                              alt={field.value.name}
                               className="object-cover rounded-md"
                               fill
                             />
@@ -165,7 +195,7 @@ export default function AddProduct({
                 </FileUploader>
               </>
             )}
-          /> */}
+          />
         </div>
 
         <div className=" max-w-lg mx-auto gap-16 w-full mt-10 flex  justify-between items-center ">

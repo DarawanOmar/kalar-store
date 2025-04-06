@@ -12,7 +12,7 @@ async function FeedProducts({
 }) {
   const page = Number((await searchParams).page || 1);
   const search = (await searchParams).search || "";
-  const allProducts = await getAllProducts(search as string, page);
+  const allProducts = await getAllProducts(search as string, page, true);
   if (allProducts.products.length === 0) return <EmptyImage />;
   return (
     <>

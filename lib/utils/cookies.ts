@@ -31,24 +31,27 @@ export async function login(token: string, redirectValues: string) {
   const session = await encrypt({ token, expires });
 
   // Save the session in a cookie
-  (await cookies()).set("session", session, { expires, httpOnly: true });
+  (await cookies()).set("sessionKalarStore", session, {
+    expires,
+    httpOnly: true,
+  });
   redirect(redirectValues);
 }
 
 export async function logout() {
   // Destroy the session
-  (await cookies()).set("session", "", { expires: new Date(-1) });
+  (await cookies()).set("sessionKalarStore", "", { expires: new Date(-1) });
   redirect("/sign-in");
 }
 
 export async function getSession() {
-  const session = (await cookies()).get("session")?.value;
+  const session = (await cookies()).get("sessionKalarStore")?.value;
   if (!session) return null;
   return await decrypt(session);
 }
 
 export async function updateSession(request: NextRequest) {
-  const session = request.cookies.get("session")?.value;
+  const session = request.cookies.get("sessionKalarStore")?.value;
 
   if (!session) return;
 
@@ -59,7 +62,7 @@ export async function updateSession(request: NextRequest) {
 
   const res = NextResponse.next();
   res.cookies.set({
-    name: "session",
+    name: "sessionKalarStore",
     value: await encrypt(parsed),
     httpOnly: true,
     expires: parsed.expires,

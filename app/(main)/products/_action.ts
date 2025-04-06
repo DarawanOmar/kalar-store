@@ -4,7 +4,11 @@ import db from "@/lib/prisma";
 import { addProduct, addProductType } from "./_type";
 import { utapi } from "@/server/uploadthing";
 
-export const getAllProducts = async (search: string, page: number) => {
+export const getAllProducts = async (
+  search: string,
+  page: number,
+  isActive: boolean = true
+) => {
   const pageSize = 10;
   let where = {};
   if (search) {
@@ -12,23 +16,22 @@ export const getAllProducts = async (search: string, page: number) => {
       OR: [{ name: { contains: search } }, { barcode: { contains: search } }],
     };
   }
-
   // Fetch products
   const products = await db.products.findMany({
-    where,
+    where: {
+      is_active: isActive,
+      ...where,
+    },
     take: pageSize,
     skip: (page - 1) * pageSize,
     orderBy: { id: "desc" },
   });
-
   // Get the total count of products matching the search criteria
   const totalCount = await db.products.count({
     where,
   });
-
   // Calculate the total pages
   const totalPages = Math.ceil(totalCount / pageSize);
-
   // Return products along with total pages
   return {
     products,
@@ -36,7 +39,7 @@ export const getAllProducts = async (search: string, page: number) => {
   };
 };
 
-export const addProducts = async (values: addProductType) => {
+export const addProducts = async (values: addProductType, path: string) => {
   try {
     const parasedData = addProduct.safeParse(values);
     if (parasedData.success === false) {
@@ -48,11 +51,9 @@ export const addProducts = async (values: addProductType) => {
         success: false,
       };
     }
-
     await db.products.create({
-      data: { ...parasedData.data, quantity: 0 },
+      data: { ...parasedData.data, image: path, quantity: 0 },
     });
-
     return {
       message: "بە سەرکەوتویی زیاد کرا",
       success: true,
@@ -119,15 +120,19 @@ export const deleteProducts = async (id: number) => {
       await deleteIamge(key as string);
     }
 
-    await db.products.delete({
+    await db.products.update({
       where: { id },
+      data: {
+        is_active: !product.is_active,
+      },
     });
 
     return {
-      message: "بە سەرکەوتویی سڕایەوە",
+      message: "بە سەرکەوتویی جێبەجێ کرا",
       success: true,
     };
-  } catch (error) {
+  } catch (error: any) {
+    console.log(error.message);
     return {
       message: "هەڵەیەک هەیە",
       success: false,

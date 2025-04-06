@@ -1,5 +1,4 @@
 "use client";
-
 import * as React from "react";
 import {
   Banknote,
@@ -10,6 +9,7 @@ import {
   LayoutDashboard,
   PieChart,
   ShoppingBag,
+  ShoppingBasket,
   ShoppingCart,
   SquarePercent,
 } from "lucide-react";
@@ -74,6 +74,12 @@ const data = {
     {
       title: "بەرهەماکانمان",
       url: "/products",
+      icon: ShoppingBasket,
+      isActive: true,
+    },
+    {
+      title: "بەرهەمە سڕاوەکان",
+      url: "/trash-products",
       icon: Frame,
       isActive: true,
     },
