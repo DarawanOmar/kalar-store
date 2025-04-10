@@ -17,9 +17,7 @@ import { cn, uploadImageUsingHandler } from "@/lib/utils";
 import { useTransition } from "react";
 import { LuLoaderCircle } from "react-icons/lu";
 import { addProduct, addProductType } from "../../_type";
-import { addProducts, deleteIamge, updateProducts } from "../../_action";
-import { UploadDropzone } from "@/utils/uploadthing";
-import { UploadCloud } from "lucide-react";
+import { addProducts, updateProducts } from "../../_action";
 import {
   FileInput,
   FileSvgDraw,
@@ -51,9 +49,8 @@ export default function AddProduct({
 
   function onSubmit(values: addProductType) {
     setPendding(async () => {
-      let productValues;
-      let path;
-      if (values.image) {
+      let path = info?.image || null;
+      if (values.image instanceof File) {
         const {
           success,
           message,
@@ -63,17 +60,13 @@ export default function AddProduct({
           toast.error(message);
           return;
         }
-        values.image = imagePath;
         path = imagePath;
-      } else {
-        values.image = null;
       }
 
-      if (isEdit && id) {
-        productValues = await updateProducts(id as number, values);
-      } else {
-        productValues = await addProducts(values, path);
-      }
+      const productValues =
+        isEdit && id
+          ? await updateProducts(id, { ...values, image: path })
+          : await addProducts(values, path);
 
       if (productValues.success) {
         toast.success(productValues.message);

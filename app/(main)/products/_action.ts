@@ -77,9 +77,14 @@ export const updateProducts = async (id: number, values: addProductType) => {
         success: false,
       };
     }
+    const existingProduct = await db.products.findUnique({
+      where: { id },
+    });
+
     await db.products.update({
       data: {
         ...parasedData.data,
+        image: parasedData.data.image || existingProduct?.image || null,
       },
       where: { id },
     });

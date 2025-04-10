@@ -1,7 +1,14 @@
 "use server";
 
-import { unlink } from "fs";
+import fs, { unlink } from "fs";
 import path from "path";
+
+export const ensureDirectoryExists = async (dirPath: string) => {
+  if (!fs.existsSync(dirPath)) {
+    fs.mkdirSync(dirPath, { recursive: true });
+    console.log(`Directory created: ${dirPath}`);
+  }
+};
 
 export async function unlinkImage(
   filePath: string

@@ -1,8 +1,6 @@
 import { clsx, type ClassValue } from "clsx";
 import { twMerge } from "tailwind-merge";
 import { differenceInMonths, differenceInWeeks } from "date-fns";
-import path from "path";
-import { unlink } from "fs";
 import { unlinkImage } from "./helper";
 
 export function cn(...inputs: ClassValue[]) {
