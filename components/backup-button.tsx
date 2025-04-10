@@ -15,34 +15,56 @@ export default function BackupButton({ isLocal }: Props) {
     try {
       setIsLoading(true);
       const formData = new FormData();
-      formData.append("uploadToDrive", isLocal ? "local" : "telegram");
+      formData.append("uploadOption", isLocal ? "local" : "google-drive");
 
       const response = await fetch("/api/backup", {
         method: "POST",
         body: formData,
       });
+
       const data = await response.json();
+
       if (response.ok) {
-        isLocal
-          ? toast.success("بەسەرکەوتووی کۆپیەک هەڵگیرا لە کۆمپتەرەکەوە")
-          : toast.success("بە سەرکەوتووی کۆپیەک نێردرا بۆ تلیگرام");
+        if (isLocal) {
+          toast.success("بەسەرکەوتووی کۆپیەک هەڵگیرا لە کۆمپتەرەکەوە");
+        } else {
+          toast.success("بەسەرکەوتووی کۆپیەک نێردرا بۆ گۆگڵ درایڤ");
+
+          // If you want to show the Google Drive link
+          if (data.fileUrl) {
+            toast.info("لینکی فایل لە گۆگڵ درایڤ", {
+              action: {
+                label: "کردنەوەی لینک",
+                onClick: () => window.open(data.fileUrl, "_blank"),
+              },
+            });
+          }
+        }
       } else {
-        toast.error(`Error: ${data.error || "Failed to backup database"}`);
+        toast.error(
+          `هەڵە: ${
+            data.description || "هەڵەیەک هەیە لە کاتی باکئەپ کردنی داتابەیس"
+          }`
+        );
       }
     } catch (error: any) {
-      toast.error(`Error: ${error.message}`);
+      toast.error(`هەڵە: ${error.message}`);
     } finally {
       setIsLoading(false);
     }
   };
 
   return (
-    <div className="backup-container">
-      <Button onClick={handleBackup} disabled={isLoading} className="gap-2">
+    <div>
+      <Button
+        onClick={handleBackup}
+        disabled={isLoading}
+        className="gap-2 w-full"
+      >
         {isLoading ? (
           <LuLoaderCircle className="animate-spin transition-all duration-500" />
         ) : null}
-        {isLocal ? "باکئەپ بۆ کۆمپیتەر" : "باکئەپ بۆ تێلیگرام"}
+        {isLocal ? "باکئەپ بۆ کۆمپیتەر" : "باکئەپ گۆگڵ درایڤ"}
       </Button>
     </div>
   );

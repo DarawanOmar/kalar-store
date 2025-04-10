@@ -19,17 +19,6 @@ export const metadata: Metadata = {
   },
   description:
     "Kalar Store is a place where you can find all the products you need.",
-  // twitter: {
-  //   card: "summary_large_image",
-  // },
-  // openGraph: {
-  //   type: "website",
-  //   locale: "en_US",
-  //   url: "https://kalar-store.vercel.app",
-  //   siteName: "Dr-Kurdistan",
-  // },
-  // metadataBase: new URL("https://kalar-store.vercel.app"),
-  // manifest: "/manifest.json",
 };
 
 import { connection } from "next/server";
@@ -60,7 +49,7 @@ export default function MainLayout({
               <UTSSR />
             </Suspense>
             {children}
-            <Toaster dir="rtl" className="font-sirwan_meduim" />
+            <Toaster dir="rtl" className="font-sirwan_meduim" richColors />
           </main>
         </ThemeProvider>
       </body>

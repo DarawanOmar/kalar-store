@@ -34,7 +34,6 @@ import { cn, getTimeDescription, parseDateRange } from "@/lib/utils";
 import { DatePickerWithRange } from "@/components/layout/date-picker-with-range";
 import { Badge } from "@/components/ui/badge";
 import BackupButton from "@/components/backup-button";
-import UploadPage from "@/components/backup-goole-drive-button";
 
 type Props = {
   searchParams: searchParamsType;
@@ -52,11 +51,13 @@ export default async function FeedDashboard({ searchParams }: Props) {
 
   return (
     <div className="flex flex-1 flex-col gap-4 mt-5">
-      <div className="flex flex-wrap gap-5 ms-auto">
-        <DatePickerWithRange />
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5 ms-auto w-full lg:max-w-3xl ">
+        <DatePickerWithRange
+          className="w-full max-w-full xl:col-span-2"
+          triggerClassName="w-full max-w-full xl:col-span-2"
+        />
         <BackupButton />
         <BackupButton isLocal />
-        <UploadPage />
       </div>{" "}
       <div className="grid gap-4 md:grid-cols-2 md:gap-8 lg:grid-cols-3 xl:grid-cols-4">
         {DASHBOARD_CARDS(totals, startDate).map((card, index) => (
