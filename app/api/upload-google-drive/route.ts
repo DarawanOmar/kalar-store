@@ -1,13 +1,10 @@
-// app/api/upload/route.ts
 import { NextResponse } from "next/server";
 import { uploadToDrive } from "@/lib/google-drive";
 
-// Must match the runtime of the imported module
-export const runtime = "nodejs"; // Critical - must be Node.js to use googleapis
+export const runtime = "nodejs";
 
 export async function POST(request: Request) {
   try {
-    // Verify environment variables
     if (!process.env.GOOGLE_CLIENT_EMAIL || !process.env.GOOGLE_PRIVATE_KEY) {
       throw new Error("Google Drive credentials not configured");
     }
@@ -20,11 +17,19 @@ export async function POST(request: Request) {
     }
 
     const buffer = Buffer.from(await file.arrayBuffer());
-    const fileUrl = await uploadToDrive(buffer, file.name, file.type);
+    const { fileUrl, isUpdated } = await uploadToDrive(
+      buffer,
+      file.name,
+      file.type
+    );
 
     return NextResponse.json({
       success: true,
       fileUrl,
+      isUpdated,
+      message: isUpdated
+        ? "File updated successfully"
+        : "File uploaded successfully",
     });
   } catch (error) {
     console.error("Upload error:", error);

@@ -1,10 +1,10 @@
-// app/upload/page.tsx
 "use client";
 import { useState } from "react";
 
 export default function UploadPage() {
   const [file, setFile] = useState<File | null>(null);
   const [isUploading, setIsUploading] = useState(false);
+  const [uploadProgress, setUploadProgress] = useState(0);
   const [uploadResult, setUploadResult] = useState<{
     success: boolean;
     fileUrl?: string;
@@ -15,17 +15,43 @@ export default function UploadPage() {
     if (!file) return;
 
     setIsUploading(true);
+    setUploadProgress(0);
+    setUploadResult(null);
+
     try {
       const formData = new FormData();
       formData.append("file", file);
 
-      const response = await fetch("/api/upload-google-drive", {
-        method: "POST",
-        body: formData,
+      const xhr = new XMLHttpRequest();
+      xhr.open("POST", "/api/upload-google-drive", true);
+
+      // Progress event handler
+      xhr.upload.onprogress = (event) => {
+        if (event.lengthComputable) {
+          const percentComplete = Math.round(
+            (event.loaded / event.total) * 100
+          );
+          setUploadProgress(percentComplete);
+        }
+      };
+
+      // Create promise to handle completion
+      const uploadPromise = new Promise((resolve, reject) => {
+        xhr.onload = () => {
+          if (xhr.status >= 200 && xhr.status < 300) {
+            resolve(JSON.parse(xhr.responseText));
+          } else {
+            reject(new Error(xhr.statusText));
+          }
+        };
+        xhr.onerror = () => reject(new Error("Network error"));
       });
 
-      const result = await response.json();
-      setUploadResult(result);
+      xhr.send(formData);
+
+      const result = await uploadPromise;
+      setUploadResult(result as any);
+      setUploadProgress(100);
     } catch (error) {
       console.error("Upload failed:", error);
       setUploadResult({ success: false });
@@ -53,13 +79,34 @@ export default function UploadPage() {
           />
         </div>
 
+        {/* Progress bar */}
+        {isUploading && (
+          <div className="w-full bg-gray-200 rounded-full h-2.5">
+            <div
+              className="bg-blue-600 h-2.5 rounded-full transition-all duration-300"
+              style={{ width: `${uploadProgress}%` }}
+            ></div>
+            <div className="text-right text-xs text-gray-500 mt-1">
+              {uploadProgress}%
+            </div>
+          </div>
+        )}
+
         <button
           type="submit"
           disabled={!file || isUploading}
           className="px-4 py-2 bg-blue-600 text-white rounded-md
-            hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed"
+            hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed
+            transition-colors duration-200 w-full"
         >
-          {isUploading ? "Uploading..." : "Upload"}
+          {isUploading ? (
+            <span className="flex items-center justify-center gap-2">
+              <span className="animate-spin">↻</span>
+              Uploading... ({uploadProgress}%)
+            </span>
+          ) : (
+            "Upload"
+          )}
         </button>
       </form>
 
