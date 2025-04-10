@@ -80,7 +80,7 @@ export default function AddProduct({
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="  px-6">
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 gap-10">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 gap-10 ">
           {Object.entries(form.getValues())
             .slice(0, 6)
             .map(([key, value]) => (
@@ -148,7 +148,7 @@ export default function AddProduct({
             control={form.control}
             name="image"
             render={({ field }) => (
-              <>
+              <div className="max-w-max mx-auto ">
                 <FormLabel className="text-base">وێنە(مۆبایل)</FormLabel>
                 <FileUploader
                   value={field.value ? [field.value] : null}
@@ -164,8 +164,8 @@ export default function AddProduct({
                   reSelect={true}
                   className="relative bg-background rounded-lg p-2"
                 >
-                  <FileInput className="outline-dashed outline-1 outline-white">
-                    <div className="flex items-center justify-center flex-col pt-3 pb-4 w-full  ">
+                  <FileInput className="outline-dashed outline-1 outline-white mx-auto w-full">
+                    <div className="flex items-center justify-center flex-col pt-3 pb-4 w-full mx-auto ">
                       {field.value && (
                         <FileUploaderItem
                           index={0}
@@ -186,7 +186,7 @@ export default function AddProduct({
                     </div>
                   </FileInput>
                 </FileUploader>
-              </>
+              </div>
             )}
           />
         </div>
