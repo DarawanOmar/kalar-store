@@ -19,6 +19,8 @@ function titleName(path: string) {
   switch (path) {
     case "/":
       return "داشبۆرد";
+    case "/report":
+      return "ڕاپۆرتەکان";
     case "/products":
       return "بەرهەمەکان";
     case "/purchase":

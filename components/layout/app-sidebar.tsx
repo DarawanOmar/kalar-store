@@ -3,6 +3,7 @@ import * as React from "react";
 import {
   Banknote,
   Bot,
+  ChartBar,
   CreditCard,
   Frame,
   GalleryVerticalEnd,
@@ -13,7 +14,6 @@ import {
   ShoppingCart,
   SquarePercent,
 } from "lucide-react";
-
 import { NavMain } from "@/components/layout/nav-main";
 import { TeamSwitcher } from "@/components/layout/team-switcher";
 import {
@@ -94,6 +94,11 @@ const data = {
       icon: Banknote,
     },
 
+    {
+      title: "ڕاپۆرتەکان",
+      url: "/report",
+      icon: ChartBar,
+    },
     {
       title: "پسووڵە فرۆشراوەکان",
       url: "/sale-invoice",

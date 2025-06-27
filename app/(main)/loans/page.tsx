@@ -1,14 +1,14 @@
+import React from "react";
 import Search from "@/components/reuseable/search";
 import { DataTable } from "@/components/reuseable/table";
 import TotalShown from "@/components/reuseable/total-shown";
-import React from "react";
 import column from "./_components/columns";
 import { getAllLoans } from "./_actions";
 import { DatePickerWithRange } from "@/components/layout/date-picker-with-range";
 import { parseDateRange } from "@/lib/utils";
 
 async function LoansPage({ searchParams }: { searchParams: searchParamsType }) {
-  const range = ((await searchParams).range as string) || ""; //range=03-03-2025to03-25-2025
+  const range = ((await searchParams).range as string) || "";
   const { startDate, endDate } = parseDateRange(range);
   const page = Number((await searchParams).page || 1);
   const search = (await searchParams).search || "";

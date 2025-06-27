@@ -25,7 +25,7 @@ export const getAllLoans = async (
       ? {
           name: {
             contains: search,
-            mode: "insensitive", // Case-insensitive search
+            mode: "insensitive",
           },
         }
       : {};

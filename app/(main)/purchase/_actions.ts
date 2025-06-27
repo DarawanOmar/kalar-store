@@ -1,8 +1,9 @@
 "use server";
 
 import db from "@/lib/prisma";
-import { addInvoice, addInvoiceType } from "./_type";
+import { addInvoice, addInvoiceType, addProductPurchaseType } from "./_type";
 import { getSession } from "@/lib/utils/cookies";
+import { handlePrismaError } from "@/lib/utils";
 
 // ----------------------Get------------------------------
 
@@ -22,10 +23,7 @@ export const getunFinishedInvoice = async () => {
       data: res,
     };
   } catch (error: any) {
-    return {
-      message: "هەڵەیەک هەیە", // Kurdish: "An error occurred"
-      success: false,
-    };
+    return handlePrismaError(error);
   }
 };
 
@@ -51,13 +49,9 @@ export const getOneInvoice = async (id: number) => {
             id: true,
             product_id: true,
             quantity: true,
-            Products: {
-              select: {
-                name: true,
-                barcode: true,
-                purchase_price: true,
-              },
-            },
+            unit_price: true,
+            product_barcode: true,
+            product_name: true,
           },
         },
       },
@@ -74,9 +68,9 @@ export const getOneInvoice = async (id: number) => {
       id: item.id,
       product_id: item.product_id,
       quantity: item.quantity,
-      name: item.Products?.name || "",
-      barcode: item.Products?.barcode || "",
-      sale_price: item.Products?.purchase_price || 0,
+      name: item.product_name || "",
+      barcode: item.product_barcode || "",
+      sale_price: item.unit_price || 0,
     }));
 
     const total = Products.reduce(
@@ -98,11 +92,7 @@ export const getOneInvoice = async (id: number) => {
       data: resultFormatted,
     };
   } catch (error: any) {
-    console.error("Error fetching invoice:", error.stack);
-    return {
-      message: "هەڵەیەک هەیە",
-      success: false,
-    };
+    return handlePrismaError(error);
   }
 };
 
@@ -131,10 +121,7 @@ export const getPurchasePorudcts = async (id: number) => {
       data: products,
     };
   } catch (error) {
-    return {
-      message: "هەڵەیەک هەیە",
-      success: false,
-    };
+    return handlePrismaError(error);
   }
 };
 
@@ -184,10 +171,7 @@ export const getUnFinishPurchaseProducts = async (id: number) => {
       data: res,
     };
   } catch (error) {
-    return {
-      message: "هەڵەیەک هەیە",
-      success: false,
-    };
+    return handlePrismaError(error);
   }
 };
 
@@ -195,15 +179,12 @@ export const getUnFinishPurchaseProducts = async (id: number) => {
 
 export const addProductPurchaseAction = async (
   invoice_id: number,
-  product_id: number,
-  quantity: number
+  values: addProductPurchaseType
 ) => {
   try {
-    // Check if the purchase invoice exists
     const purchaseInvoice = await db.purchase_invoice.findUnique({
       where: { id: invoice_id },
     });
-
     if (!purchaseInvoice) {
       return {
         message: "ئەم وەسڵە بوونی نییە",
@@ -212,24 +193,36 @@ export const addProductPurchaseAction = async (
     }
 
     await db.$transaction(async (tx) => {
+      const product = await tx.products.findUnique({
+        where: { id: values.id },
+      });
+      if (values.purchase_price) {
+        await tx.products.update({
+          where: { id: values.id },
+          data: { purchase_price: values.purchase_price },
+        });
+      }
       const existItem = await tx.purchase_invoice_items.findFirst({
         where: {
           purchase_invoiceId: invoice_id,
-          product_id: product_id,
+          product_id: values.id,
         },
       });
 
       if (existItem) {
         await tx.purchase_invoice_items.update({
           where: { id: existItem.id },
-          data: { quantity: { increment: quantity } },
+          data: { quantity: { increment: values.quantity } },
         });
       } else {
         await tx.purchase_invoice_items.create({
           data: {
             purchase_invoiceId: invoice_id,
-            product_id,
-            quantity,
+            product_id: values.id,
+            quantity: values.quantity,
+            unit_price: values.purchase_price,
+            product_name: product?.name || "",
+            product_barcode: product?.barcode || "",
           },
         });
       }
@@ -240,11 +233,7 @@ export const addProductPurchaseAction = async (
       message: "بە سەرکەوتویی زیاد کرا",
     };
   } catch (error: any) {
-    console.error("Error: ", error);
-    return {
-      message: "هەڵەیەک هەیە",
-      success: false,
-    };
+    return handlePrismaError(error);
   }
 };
 
@@ -271,10 +260,7 @@ export const addInvoiceAction = async (values: addInvoiceType) => {
       message: "بە سەرکەوتویی زیاد کرا",
     };
   } catch (error) {
-    return {
-      message: "هەڵەیەک هەیە",
-      success: false,
-    };
+    return handlePrismaError(error);
   }
 };
 
@@ -314,10 +300,7 @@ export const deletePurchaseInvoiceAction = async (id: number) => {
       message: "بە سەرکەوتویی سڕایەوە",
     };
   } catch (error) {
-    return {
-      message: "هەڵەیەک هەیە",
-      success: false,
-    };
+    return handlePrismaError(error);
   }
 };
 
@@ -344,10 +327,7 @@ export const deletePurchaseItemProdcut = async (id: number) => {
       message: "بە سەرکەوتویی سڕایەوە",
     };
   } catch (error) {
-    return {
-      message: "هەڵەیەک هەیە",
-      success: false,
-    };
+    return handlePrismaError(error);
   }
 };
 
@@ -381,25 +361,18 @@ export const completeInvoiceAction = async (id: number) => {
     const productUpdates = items.map((item) => ({
       product_id: item.product_id,
       quantity: item.quantity,
+      purchase_price: item.unit_price,
     }));
 
     // Use a transaction for atomic updates
     await db.$transaction(async (tx) => {
       let total = 0;
-      for (const { product_id, quantity } of productUpdates) {
-        if (product_id) {
-          const product = await tx.products.findUnique({
-            where: { id: product_id },
-          });
-          if (!product) {
-            continue;
-          }
-          total += product.purchase_price * quantity;
-          await tx.products.update({
-            where: { id: product_id },
-            data: { quantity: { increment: quantity } },
-          });
-        }
+      for (const { product_id, quantity, purchase_price } of productUpdates) {
+        total += purchase_price * quantity;
+        await tx.products.update({
+          where: { id: product_id as number },
+          data: { quantity: { increment: quantity } },
+        });
       }
       await tx.mainCash.update({
         where: { id: 1 },
@@ -439,10 +412,6 @@ export const completeInvoiceAction = async (id: number) => {
       message: "بە سەرکەوتویی تەواوکرایەوە",
     };
   } catch (error) {
-    console.error(error);
-    return {
-      message: "هەڵەیەک هەیە",
-      success: false,
-    };
+    return handlePrismaError(error);
   }
 };

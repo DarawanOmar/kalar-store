@@ -16,11 +16,11 @@ import ReturnPurchaseItemForm from "./form/modal-add-user";
 
 const column: ColumnDef<{
   purchase_invoice_item_id: number;
-  product_id: number | undefined;
-  name: string | undefined;
-  barcode: string | undefined;
+  product_id: number | null;
+  name: string;
+  barcode: string;
   quantity: number;
-  purchase_price: number | undefined;
+  purchase_price: number;
 }>[] = [
   {
     accessorKey: "id",
@@ -33,16 +33,6 @@ const column: ColumnDef<{
   },
 
   {
-    accessorKey: "name",
-    header: ({ column }) => (
-      <DataTableColumnHeader
-        column={column}
-        title="ناو"
-        className="text-right"
-      />
-    ),
-  },
-  {
     accessorKey: "barcode",
     header: ({ column }) => (
       <DataTableColumnHeader
@@ -53,6 +43,16 @@ const column: ColumnDef<{
     ),
   },
 
+  {
+    accessorKey: "name",
+    header: ({ column }) => (
+      <DataTableColumnHeader
+        column={column}
+        title="ناو"
+        className="text-right"
+      />
+    ),
+  },
   {
     accessorKey: "quantity",
     header: ({ column }) => (
@@ -73,51 +73,62 @@ const column: ColumnDef<{
       );
     },
   },
-  // {
-  //   id: "actions",
-  //   cell: function CellComponent({ row }) {
-  //     const [open, setOpen] = React.useState(false);
-  //     const handleClose = () => setOpen((prev) => !prev);
-  //     const { product_id, purchase_invoice_item_id } = row.original;
-  //     return (
-  //       <div className="">
-  //         <DropdownMenu>
-  //           <DropdownMenuTrigger asChild>
-  //             <Button variant="ghost" className="h-8 w-8 p-0">
-  //               <span className="sr-only">Open menu</span>
-  //               <MoreVertical className="h-4 w-4" />
-  //             </Button>
-  //           </DropdownMenuTrigger>
-  //           <DropdownMenuContent className="space-y-1" align="end">
-  //             <DropdownMenuLabel className="text-center">
-  //               کردارەکان
-  //             </DropdownMenuLabel>
-  //             <DropdownMenuSeparator />
-  //             <CustomDialog
-  //               open={open}
-  //               onOpenChange={setOpen}
-  //               isFreshButtonPass
-  //               title="گەڕاندنەوەی کاڵا"
-  //               classContent="max-w-md"
-  //               button={
-  //                 <button className="flex gap-2 items-center font-sirwan_reguler  hover:bg-primary hover:text-white transition-all duration-500 p-2 rounded-lg w-full">
-  //                   <EditIcon height={18} width={18} />
-  //                   <span className="text-sm">گەڕاندنەوەی کاڵا</span>
-  //                 </button>
-  //               }
-  //             >
-  //               <ReturnPurchaseItemForm
-  //                 product_id={product_id as number}
-  //                 sale_invoice_item_id={purchase_invoice_item_id as number}
-  //                 handleClose={handleClose}
-  //               />
-  //             </CustomDialog>
-  //           </DropdownMenuContent>
-  //         </DropdownMenu>
-  //       </div>
-  //     );
-  //   },
-  // },
+  {
+    accessorKey: "total_amount",
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title="کۆی گشتی" />
+    ),
+    cell: function CellComponent({ row }) {
+      const quantity = row?.original?.quantity || 0;
+      const salePrice = row?.original?.purchase_price || 0;
+      return <div>{(quantity * salePrice).toLocaleString()}</div>;
+    },
+  },
+  {
+    id: "actions",
+    cell: function CellComponent({ row }) {
+      const [open, setOpen] = React.useState(false);
+      const handleClose = () => setOpen((prev) => !prev);
+      const { product_id, purchase_invoice_item_id } = row.original;
+      return (
+        <div className="">
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="ghost" className="h-8 w-8 p-0">
+                <span className="sr-only">Open menu</span>
+                <MoreVertical className="h-4 w-4" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent className="space-y-1" align="end">
+              <DropdownMenuLabel className="text-center">
+                کردارەکان
+              </DropdownMenuLabel>
+              <DropdownMenuSeparator />
+              <CustomDialog
+                open={open}
+                onOpenChange={setOpen}
+                isFreshButtonPass
+                title="گەڕاندنەوەی کاڵا"
+                classContent="max-w-md"
+                button={
+                  <button className="flex gap-2 items-center font-sirwan_reguler  hover:bg-primary hover:text-white transition-all duration-500 p-2 rounded-lg w-full">
+                    <EditIcon height={18} width={18} />
+                    <span className="text-sm">گەڕاندنەوەی کاڵا</span>
+                  </button>
+                }
+              >
+                <ReturnPurchaseItemForm
+                  product_id={product_id as number}
+                  sale_invoice_item_id={purchase_invoice_item_id as number}
+                  handleClose={handleClose}
+                />
+              </CustomDialog>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        </div>
+      );
+    },
+  },
 ];
 
 export default column;

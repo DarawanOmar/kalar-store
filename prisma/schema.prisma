@@ -9,11 +9,12 @@ datasource db {
 
 model Products {
   id             Int      @id @default(autoincrement())
-  name           String
+  name           String   @db.VarChar(255)
   barcode        String
   sale_price     Int
   purchase_price Int
   quantity       Int
+  min_quantity   Int      @default(0)
   note           String?
   image          String?
   is_active      Boolean  @default(true)
@@ -25,14 +26,15 @@ model Products {
 }
 
 model Purchase_invoice {
-  id             Int      @id @default(autoincrement())
+  id             Int     @id @default(autoincrement())
   invoice_number String
   name           String
   place          String
   note           String?
   is_done        Boolean
-  createdAt      DateTime @default(now())
-  updatedAt      DateTime @updatedAt
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   Purchase_invoice_items Purchase_invoice_items[]
 }
@@ -46,9 +48,12 @@ model Purchase_invoice_items {
   Products   Products? @relation(fields: [product_id], references: [id])
   product_id Int?
 
-  quantity  Int
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  product_name    String
+  product_barcode String
+  unit_price      Int
+  quantity        Int
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
 }
 
 enum Type_Sale_Purchase {
@@ -89,12 +94,15 @@ model Sale_invoice_items {
   Sale_invoice   Sale_invoice? @relation(fields: [sale_invoiceId], references: [id])
   sale_invoiceId Int?
 
-  Products   Products? @relation(fields: [product_id], references: [id])
-  product_id Int?
-  loss       Boolean   @default(false)
-  quantity   Int
-  createdAt  DateTime  @default(now())
-  updatedAt  DateTime  @updatedAt
+  Products        Products? @relation(fields: [product_id], references: [id])
+  product_id      Int?
+  loss            Boolean   @default(false)
+  product_name    String
+  product_barcode String
+  unit_price      Int
+  quantity        Int
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
 }
 
 model LoanPayment {

@@ -46,7 +46,7 @@ export default function AddSaleProduct() {
         id: nameMatch.id || 0,
         sale_price: nameMatch?.sale_price || 0,
         name: nameMatch?.name || "",
-        quantity: 0,
+        quantity: 1,
       });
     }
   }, [name, products]);
@@ -56,11 +56,7 @@ export default function AddSaleProduct() {
       return toast.error("تکایە پسوڵەکە دیاری بکە یان دانەیەک دروست بکە");
 
     setPendding(async () => {
-      const result = await addProductSaleAction(
-        Number(invoice_id),
-        values.id as number,
-        values.quantity
-      );
+      const result = await addProductSaleAction(Number(invoice_id), values);
       if (result.success) {
         toast.success(result.message);
         form.reset({
@@ -104,7 +100,12 @@ export default function AddSaleProduct() {
           />
           <TextField control={form.control} name="quantity" placeholder="بڕ" />
           {/* Submit Button */}
-          <Button type="submit" variant="gooeyRight" className="flex gap-1">
+          <Button
+            type="submit"
+            disabled={pendding}
+            variant="gooeyRight"
+            className="flex gap-1"
+          >
             {pendding ? (
               <LuLoaderCircle className="animate-spin transition-all duration-500" />
             ) : (

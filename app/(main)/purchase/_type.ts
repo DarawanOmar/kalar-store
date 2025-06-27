@@ -10,14 +10,14 @@ export const addInvoice = z.object({
 export type addInvoiceType = z.infer<typeof addInvoice>;
 
 export const addProductPurchase = z.object({
-  id: z.coerce.number().optional(),
-  name: z.string().optional(),
+  id: z.coerce.number(),
+  name: z.string(),
 
   quantity: z.coerce
     .number({ message: "ژمارە داخڵ بکە" })
     .positive({ message: "ژمارەی نرخ بەرزترە لە سفر بێت" })
     .min(1, { message: "بڕ داخڵ بکە" }),
-  purchase_price: z.coerce.number().optional(),
+  purchase_price: z.coerce.number(),
 });
 
 export type addProductPurchaseType = z.infer<typeof addProductPurchase>;

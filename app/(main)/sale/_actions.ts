@@ -1,7 +1,7 @@
 "use server";
 
 import db from "@/lib/prisma";
-import { addSale, addSaleType } from "./_type";
+import { addProductSaleType, addSale, addSaleType } from "./_type";
 import { Type_Sale_Purchase } from "@prisma/client";
 import { getSession } from "@/lib/utils/cookies";
 
@@ -135,13 +135,9 @@ export const getOneSaleInvoice = async (id: number) => {
             id: true,
             product_id: true,
             quantity: true,
-            Products: {
-              select: {
-                name: true,
-                barcode: true,
-                sale_price: true,
-              },
-            },
+            product_barcode: true,
+            product_name: true,
+            unit_price: true,
           },
         },
       },
@@ -160,9 +156,9 @@ export const getOneSaleInvoice = async (id: number) => {
         id: item.id,
         product_id: item.product_id,
         quantity: item.quantity,
-        name: item.Products?.name || "",
-        barcode: item.Products?.barcode || "",
-        sale_price: item.Products?.sale_price || 0,
+        name: item.product_name || "",
+        barcode: item.product_barcode || "",
+        sale_price: item.unit_price || 0,
       }))
     );
     const total = Products.reduce(
@@ -197,12 +193,11 @@ export const getOneSaleInvoice = async (id: number) => {
 
 export const addProductSaleAction = async (
   invoice_id: number,
-  product_id: number,
-  quantity: number
+  values: addProductSaleType
 ) => {
   try {
     const product = await db.products.findUnique({
-      where: { id: product_id },
+      where: { id: values.id },
     });
 
     if (!product) {
@@ -219,7 +214,7 @@ export const addProductSaleAction = async (
       };
     }
 
-    if (product.quantity < quantity) {
+    if (product.quantity < values.quantity) {
       return {
         message: `${product.quantity}بڕی کاڵای بەردەست  `,
         success: false,
@@ -233,28 +228,31 @@ export const addProductSaleAction = async (
       await tx.sale_invoice.update({
         where: { id: invoice_id },
         data: {
-          total_amount: { increment: product.sale_price * quantity },
+          total_amount: { increment: values.sale_price * values.quantity },
           remaining_amount:
             sale_invoice?.type === "cash"
               ? 0
-              : { increment: product.sale_price * quantity },
+              : { increment: values.sale_price * values.quantity },
         },
       });
       await tx.products.update({
-        where: { id: product_id },
-        data: { quantity: { decrement: quantity } },
+        where: { id: values.id },
+        data: {
+          quantity: { decrement: values.quantity },
+          sale_price: values.sale_price,
+        },
       });
       // if product exist in the invoice update the quantity
       const existItem = await tx.sale_invoice_items.findFirst({
         where: {
           sale_invoiceId: invoice_id,
-          product_id: product_id,
+          product_id: values.id,
         },
       });
       if (existItem) {
         await tx.sale_invoice_items.update({
           where: { id: existItem.id },
-          data: { quantity: { increment: quantity } },
+          data: { quantity: { increment: values.quantity } },
         });
         return;
       }
@@ -262,8 +260,11 @@ export const addProductSaleAction = async (
       await tx.sale_invoice_items.create({
         data: {
           sale_invoiceId: invoice_id,
-          product_id: product_id,
-          quantity: quantity,
+          product_id: values.id,
+          quantity: values.quantity,
+          product_name: product.name,
+          product_barcode: product.barcode,
+          unit_price: values.sale_price,
         },
       });
     });
@@ -350,7 +351,6 @@ export const completeSaleInvoiceAction = async (
 
     const productUpdates = items.map((item) => ({
       product_id: item.product_id,
-      quantity: item.quantity,
     }));
 
     await db.$transaction(async (tx) => {
@@ -429,7 +429,7 @@ export const completeSaleInvoiceAction = async (
               ? saleInvoice.total_amount - discount - amount_payment
               : amount_payment
               ? saleInvoice.total_amount - amount_payment
-              : 0,
+              : saleInvoice.total_amount,
         },
       });
     });

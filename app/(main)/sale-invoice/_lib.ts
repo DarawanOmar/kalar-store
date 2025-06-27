@@ -1,4 +1,5 @@
 import db from "@/lib/prisma";
+import { handlePrismaError } from "@/lib/utils";
 
 export const getAllCompleteSaleInvoice = async (
   startDate: Date | undefined,
@@ -6,7 +7,7 @@ export const getAllCompleteSaleInvoice = async (
   page: number
 ) => {
   try {
-    let where: any = { is_done: true };
+    let where: any = { is_done: true, total_amount: { gt: 0 } };
     if (startDate && endDate) {
       where = {
         ...where,
@@ -31,11 +32,7 @@ export const getAllCompleteSaleInvoice = async (
         Sale_invoice_items: {
           select: {
             quantity: true,
-            Products: {
-              select: {
-                sale_price: true,
-              },
-            },
+            unit_price: true,
           },
         },
       },
@@ -48,7 +45,7 @@ export const getAllCompleteSaleInvoice = async (
 
     const formattedInvoices = invoices.map((invoice) => {
       const total = invoice.Sale_invoice_items.reduce(
-        (sum, item) => sum + (item.Products?.sale_price || 0) * item.quantity,
+        (sum, item) => sum + (item.unit_price || 0) * item.quantity,
         0
       );
 
@@ -75,11 +72,7 @@ export const getAllCompleteSaleInvoice = async (
       success: true,
     };
   } catch (error) {
-    console.error("Error fetching invoices:", error);
-    return {
-      message: "هەڵەیەک هەیە",
-      success: false,
-    };
+    return handlePrismaError(error);
   }
 };
 
@@ -98,16 +91,12 @@ export const getOneSaleInvoice = async (id: number) => {
         createdAt: true,
         Sale_invoice_items: {
           select: {
-            quantity: true,
             id: true,
-            Products: {
-              select: {
-                id: true,
-                name: true,
-                barcode: true,
-                sale_price: true,
-              },
-            },
+            quantity: true,
+            product_barcode: true,
+            product_name: true,
+            unit_price: true,
+            product_id: true,
           },
         },
       },
@@ -123,11 +112,11 @@ export const getOneSaleInvoice = async (id: number) => {
     // Consolidate products into a single array
     const products = invoice.Sale_invoice_items.map((item) => ({
       sale_invoice_item_id: item.id,
-      product_id: item.Products?.id,
-      name: item.Products?.name,
-      barcode: item.Products?.barcode,
+      product_id: item.product_id,
+      name: item.product_name,
+      barcode: item.product_barcode,
       quantity: item.quantity,
-      sale_price: item.Products?.sale_price,
+      sale_price: item.unit_price,
     }));
 
     // Calculate total
@@ -154,9 +143,8 @@ export const getOneSaleInvoice = async (id: number) => {
       success: true,
     };
   } catch (error: any) {
-    console.error("Error fetching invoice:", error?.message);
     return {
-      message: "هەڵەیەک هەیە",
+      message: error.message || "An error occurred while fetching the invoice",
       success: false,
     };
   }

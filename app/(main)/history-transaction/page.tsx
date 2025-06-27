@@ -34,14 +34,12 @@ async function HistoryTransaction({ searchParams }: Props) {
     <div className="w-full">
       <div className="flex justify-between items-center w-full  my-10">
         <Link
-          href={`/`}
+          href={`/report`}
           className="p-1 rounded-full text-soft_primary hover:bg-primary hover:text-white cursor-pointer transition-all duration-500  max-w-max me-auto"
         >
           <ChevronRight size={25} strokeWidth={2.5} />
         </Link>
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-5">
-          <TotalShown total={totalIncrease} text="کۆی زیادکردن" />
-          <TotalShown total={totalDecrease} text="کۆی کەمکردن" />
+        <div className="grid grid-cols-1 ">
           <TotalShown total={total} text="کۆی گشتی ئێستا" />
         </div>
       </div>

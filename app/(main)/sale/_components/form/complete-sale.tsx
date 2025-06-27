@@ -88,7 +88,12 @@ function CompleteSale({
             />
           ) : null}
           <TotalShown text="کۆی گشتی" total={total - discount || 0} />
-          <Button type="submit" variant={"gooeyRight"} className="flex gap-1">
+          <Button
+            type="submit"
+            variant={"gooeyRight"}
+            disabled={pendding}
+            className="flex gap-1"
+          >
             {pendding ? (
               <LuLoaderCircle className="animate-spin transition-all duration-500" />
             ) : (

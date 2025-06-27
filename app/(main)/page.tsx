@@ -8,11 +8,9 @@ type Props = {
 
 async function DashboardPage({ searchParams }: Props) {
   return (
-    <div>
-      <Suspense fallback={<SkeletonDashboard />}>
-        <FeedDashboard searchParams={searchParams} />
-      </Suspense>
-    </div>
+    <Suspense fallback={<SkeletonDashboard />}>
+      <FeedDashboard />
+    </Suspense>
   );
 }
 

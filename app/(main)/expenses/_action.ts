@@ -4,6 +4,7 @@ import db from "@/lib/prisma";
 import { addCashType, addExpensesType } from "./_type";
 import { ActionType } from "@prisma/client";
 import { getSession } from "@/lib/utils/cookies";
+import { handlePrismaError } from "@/lib/utils";
 
 // ----------------------GET-------------------------
 export const getAllExpenses = async (search: string, page: number) => {
@@ -52,10 +53,7 @@ export const getAllExpenses = async (search: string, page: number) => {
       data,
     };
   } catch (error) {
-    return {
-      message: "هەڵەیەک هەیە",
-      success: false,
-    };
+    return handlePrismaError(error);
   }
 };
 export const getMainCash = async () => {
@@ -115,10 +113,7 @@ export const getHistoryMainCash = async () => {
       data: dataSend,
     };
   } catch (error) {
-    return {
-      message: "هەڵەیەک هەیە",
-      success: false,
-    };
+    return handlePrismaError(error);
   }
 };
 export const getHistorySubCash = async () => {
@@ -149,10 +144,7 @@ export const getHistorySubCash = async () => {
       data: dataSend,
     };
   } catch (error) {
-    return {
-      message: "هەڵەیەک هەیە",
-      success: false,
-    };
+    return handlePrismaError(error);
   }
 };
 
@@ -222,10 +214,7 @@ export const updateExpenses = async (id: number, data: addExpensesType) => {
       success: true,
     };
   } catch (error) {
-    return {
-      message: "هەڵەیەک هەیە",
-      success: false,
-    };
+    return handlePrismaError(error);
   }
 };
 
@@ -266,10 +255,7 @@ export const addExpensesAction = async (data: addExpensesType) => {
       success: true,
     };
   } catch (error) {
-    return {
-      message: "هەڵەیەک هەیە",
-      success: false,
-    };
+    return handlePrismaError(error);
   }
 };
 export const addMainCashAction = async (values: addCashType) => {
@@ -312,10 +298,7 @@ export const addMainCashAction = async (values: addCashType) => {
       success: true,
     };
   } catch (error) {
-    return {
-      message: "هەڵەیەک هەیە",
-      success: false,
-    };
+    return handlePrismaError(error);
   }
 };
 export const addSubCashAction = async (values: addCashType) => {
@@ -358,11 +341,7 @@ export const addSubCashAction = async (values: addCashType) => {
       success: true,
     };
   } catch (error) {
-    console.error("Error in addSubCashAction:", error);
-    return {
-      message: "هەڵەیەک هەیە",
-      success: false,
-    };
+    return handlePrismaError(error);
   }
 };
 
@@ -412,9 +391,6 @@ export const deleteExpenses = async (id: number) => {
       success: true,
     };
   } catch (error) {
-    return {
-      message: "هەڵەیەک هەیە",
-      success: false,
-    };
+    return handlePrismaError(error);
   }
 };

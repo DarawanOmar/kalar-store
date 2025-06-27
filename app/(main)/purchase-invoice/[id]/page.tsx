@@ -7,6 +7,7 @@ import { getOnePurchaseInvoice } from "../_lib";
 import TotalShown from "@/components/reuseable/total-shown";
 import { format } from "date-fns";
 import EmptyImage from "@/components/reuseable/empty-image";
+import { redirect } from "next/navigation";
 
 type Props = {
   params: Promise<{
@@ -18,7 +19,7 @@ async function OneSaleInvoice({ params }: Props) {
   const id = (await params).id;
   const oneInvoice = await getOnePurchaseInvoice(Number(id));
   if (oneInvoice.message === "Invoice not found") {
-    return <EmptyImage />;
+    redirect("/purchase-invoice");
   }
   if (oneInvoice.data)
     return (
@@ -32,7 +33,6 @@ async function OneSaleInvoice({ params }: Props) {
               total={format(oneInvoice?.data?.createdAt, "P") || ""}
             />
             <TotalShown text="شوێن" total={oneInvoice.data?.place || ""} />
-            <TotalShown text="کۆی گشتی" total={oneInvoice.data?.total || 0} />
           </div>
           <Link
             href={`/purchase-invoice`}

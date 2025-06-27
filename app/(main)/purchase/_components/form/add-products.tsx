@@ -43,7 +43,7 @@ export default function AddPurchaseProduct() {
         id: nameMatch.id || 0,
         purchase_price: nameMatch?.purchase_price || 0,
         name: nameMatch?.name || "",
-        quantity: 0,
+        quantity: 1,
       });
     }
   }, [name, products]);
@@ -52,18 +52,14 @@ export default function AddPurchaseProduct() {
     if (!invoice_id)
       return toast.error(" تکایە پسوڵەکە دیاری بکە یان دانەیەک دروست بکە");
     setPendding(async () => {
-      const result = await addProductPurchaseAction(
-        Number(invoice_id),
-        values.id as number,
-        values.quantity
-      );
+      const result = await addProductPurchaseAction(Number(invoice_id), values);
       if (result.success) {
         toast.success(result.message);
         form.reset({
           id: 0,
+          purchase_price: 0,
           name: "",
           quantity: 0,
-          purchase_price: 0,
         });
       } else {
         toast.error(result.message);
@@ -98,7 +94,12 @@ export default function AddPurchaseProduct() {
             placeholder="نرخی کڕین"
           />
           <TextField control={form.control} name="quantity" placeholder="بڕ" />
-          <Button type="submit" variant={"gooeyRight"} className="flex gap-1">
+          <Button
+            type="submit"
+            disabled={pendding}
+            variant={"gooeyRight"}
+            className="flex gap-1"
+          >
             {pendding ? (
               <LuLoaderCircle className="animate-spin transition-all duration-500" />
             ) : (

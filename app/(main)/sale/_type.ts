@@ -12,13 +12,13 @@ export const addSale = z.object({
 export type addSaleType = z.infer<typeof addSale>;
 
 export const addProductSale = z.object({
-  id: z.coerce.number().optional(),
-  name: z.string().optional(),
+  id: z.coerce.number(),
+  name: z.string(),
   quantity: z.coerce
     .number({ message: "ژمارە داخڵ بکە" })
     .positive({ message: "ژمارەی نرخ بەرزترە لە سفر بێت" })
     .min(1, { message: "بڕ داخڵ بکە" }),
-  sale_price: z.coerce.number().optional(),
+  sale_price: z.coerce.number(),
 });
 
 export type addProductSaleType = z.infer<typeof addProductSale>;

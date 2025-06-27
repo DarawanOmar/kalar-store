@@ -109,6 +109,7 @@ export default function AddExpenses({
         <div className=" max-w-lg mx-auto gap-16 w-full mt-10 flex  justify-between items-center ">
           <Button
             type="submit"
+            disabled={pendding}
             variant={"gooeyRight"}
             className="w-full py-[23px]"
           >

@@ -14,7 +14,11 @@ const column: ColumnDef<any>[] = [
       <DataTableColumnHeader column={column} title="#" className="text-right" />
     ),
     cell: function CellComponent({ row }) {
-      return <div>{row.index + 1}</div>;
+      return (
+        <div className="hover:underline">
+          <Link href={`/loans/${row.original.id}`}>{row.index + 1}</Link>
+        </div>
+      );
     },
   },
 
@@ -29,7 +33,7 @@ const column: ColumnDef<any>[] = [
     ),
     cell: function CellComponent({ row }) {
       return (
-        <div className="">
+        <div className="hover:underline">
           <Link href={`/loans/${row.original.id}`}>{row.original?.name}</Link>
         </div>
       );
@@ -37,16 +41,17 @@ const column: ColumnDef<any>[] = [
   },
 
   {
-    accessorKey: "invoice_number",
-    header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="ژمارەی پسوڵە" />
-    ),
-  },
-  {
     accessorKey: "phone",
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title="ژمارەی مۆبایل" />
     ),
+    cell: function CellComponent({ row }) {
+      return (
+        <div className="hover:underline">
+          <Link href={`/loans/${row.original.id}`}>{row.original?.phone}</Link>
+        </div>
+      );
+    },
   },
   {
     accessorKey: "paid_amount",

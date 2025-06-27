@@ -1,4 +1,5 @@
 import db from "@/lib/prisma";
+import { handlePrismaError } from "@/lib/utils";
 
 export const getAllCompleteInvoice = async (
   startDate: Date | undefined,
@@ -26,11 +27,7 @@ export const getAllCompleteInvoice = async (
         Purchase_invoice_items: {
           select: {
             quantity: true,
-            Products: {
-              select: {
-                purchase_price: true,
-              },
-            },
+            unit_price: true,
           },
         },
       },
@@ -43,8 +40,7 @@ export const getAllCompleteInvoice = async (
 
     const formattedInvoices = invoices.map((invoice) => {
       const total = invoice.Purchase_invoice_items.reduce(
-        (sum, item) =>
-          sum + (item.Products?.purchase_price || 0) * item.quantity,
+        (sum, item) => sum + (item.unit_price || 0) * item.quantity,
         0
       );
 
@@ -65,11 +61,7 @@ export const getAllCompleteInvoice = async (
       success: true,
     };
   } catch (error) {
-    console.error("Error fetching invoices:", error);
-    return {
-      message: "هەڵەیەک هەیە",
-      success: false,
-    };
+    return handlePrismaError(error);
   }
 };
 
@@ -86,14 +78,10 @@ export const getOnePurchaseInvoice = async (id: number) => {
           select: {
             id: true,
             quantity: true,
-            Products: {
-              select: {
-                id: true,
-                name: true,
-                barcode: true,
-                purchase_price: true,
-              },
-            },
+            unit_price: true,
+            product_barcode: true,
+            product_name: true,
+            product_id: true,
           },
         },
       },
@@ -109,11 +97,11 @@ export const getOnePurchaseInvoice = async (id: number) => {
     // Consolidate products into a single array
     const products = invoice.Purchase_invoice_items.map((item) => ({
       purchase_invoice_item_id: item.id,
-      product_id: item.Products?.id,
-      name: item.Products?.name,
-      barcode: item.Products?.barcode,
+      product_id: item.product_id,
+      name: item.product_name,
+      barcode: item.product_barcode,
       quantity: item.quantity,
-      purchase_price: item.Products?.purchase_price,
+      purchase_price: item.unit_price,
     }));
 
     // Calculate total
@@ -137,7 +125,7 @@ export const getOnePurchaseInvoice = async (id: number) => {
       success: true,
     };
   } catch (error: any) {
-    console.error("Error fetching invoice:", error?.message);
+    // return handlePrismaError(error);
     return {
       message: "هەڵەیەک هەیە",
       success: false,

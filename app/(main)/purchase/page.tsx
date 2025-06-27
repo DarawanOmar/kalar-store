@@ -33,7 +33,9 @@ async function Purchase({ searchParams }: { searchParams: searchParamsType }) {
         <AddPurchaseProduct />
       </div>
       <CompletePurchase total={getActiveInvoice.data?.total || 0} />
-      <ShownPurchaseProducts invoice_id={invoice_id} />
+      <ShownPurchaseProducts
+        products_purchase={getActiveInvoice.data?.Products || []}
+      />
     </div>
   );
 }

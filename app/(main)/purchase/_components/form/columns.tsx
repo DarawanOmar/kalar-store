@@ -8,11 +8,12 @@ import { deletePurchaseItemProdcut } from "../../_actions";
 import { toast, Toaster } from "sonner";
 
 const column: ColumnDef<{
-  id: number | undefined;
-  name: string | undefined;
-  barcode: string | undefined;
+  id: number;
+  product_id: number | null;
   quantity: number;
-  purchase_price: number | undefined;
+  name: string;
+  barcode: string;
+  sale_price: number;
 }>[] = [
   {
     accessorKey: "id",
@@ -25,21 +26,21 @@ const column: ColumnDef<{
   },
 
   {
-    accessorKey: "name",
-    header: ({ column }) => (
-      <DataTableColumnHeader
-        column={column}
-        title="ناو"
-        className="text-right"
-      />
-    ),
-  },
-  {
     accessorKey: "barcode",
     header: ({ column }) => (
       <DataTableColumnHeader
         column={column}
         title="باڕکۆد"
+        className="text-right"
+      />
+    ),
+  },
+  {
+    accessorKey: "name",
+    header: ({ column }) => (
+      <DataTableColumnHeader
+        column={column}
+        title="ناو"
         className="text-right"
       />
     ),
@@ -57,7 +58,7 @@ const column: ColumnDef<{
       <DataTableColumnHeader column={column} title="نرخی کڕین" />
     ),
     cell: function CellComponent({ row }) {
-      return <div>{row.original.purchase_price?.toLocaleString()}</div>;
+      return <div>{row.original.sale_price?.toLocaleString()}</div>;
     },
   },
 

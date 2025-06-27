@@ -16,51 +16,28 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import {
-  Activity,
-  ArrowUpRight,
-  CreditCard,
-  DollarSign,
-  Edit,
-  Percent,
-} from "lucide-react";
+import { Activity, ArrowUpRight, CreditCard, Percent } from "lucide-react";
 import Link from "next/link";
-import { getAllCompleteSaleInvoice } from "./sale-invoice/_lib";
-import { getAllCompleteInvoice } from "./purchase-invoice/_lib";
 import { format } from "date-fns";
-import { CardData, DashboardData, getTotalRevenue, Invoice } from "./_action";
-import ModalAddCash from "@/components/modal-add-cash";
-import { cn, getTimeDescription, parseDateRange } from "@/lib/utils";
-import { DatePickerWithRange } from "@/components/layout/date-picker-with-range";
+
+import { cn } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
-import BackupButton from "@/components/backup-button";
+import { CardData, DashboardData, Invoice } from "./_type";
+import { getTotalRevenue, TodayPurchase, TodaySale } from "./_action";
+import ModalAddCash from "@/components/modal-add-cash";
 
-type Props = {
-  searchParams: searchParamsType;
-};
-
-export default async function FeedDashboard({ searchParams }: Props) {
-  const range = ((await searchParams).range as string) || "";
-  const { startDate, endDate } = parseDateRange(range);
-
+export default async function FeedDashboard() {
   const [totals, completeSaleInvoices, completeInvoices] = await Promise.all([
-    getTotalRevenue(startDate, endDate),
-    getAllCompleteSaleInvoice(startDate, endDate, 1),
-    getAllCompleteInvoice(startDate, endDate, 1),
+    getTotalRevenue(),
+    TodaySale(),
+    TodayPurchase(),
   ]);
 
+  await new Promise((resolve) => setTimeout(resolve, 1000));
   return (
     <div className="flex flex-1 flex-col gap-4 mt-5">
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5 ms-auto w-full lg:max-w-3xl ">
-        <DatePickerWithRange
-          className="w-full max-w-full xl:col-span-2"
-          triggerClassName="w-full max-w-full xl:col-span-2"
-        />
-        <BackupButton />
-        <BackupButton isLocal />
-      </div>{" "}
-      <div className="grid gap-4 md:grid-cols-2 md:gap-8 lg:grid-cols-3 xl:grid-cols-4">
-        {DASHBOARD_CARDS(totals, startDate).map((card, index) => (
+      <div className="grid gap-4 md:grid-cols-2 md:gap-8 xl:grid-cols-3">
+        {DASHBOARD_CARDS(totals).map((card, index) => (
           <StatCard key={index} data={card} />
         ))}
       </div>
@@ -69,9 +46,7 @@ export default async function FeedDashboard({ searchParams }: Props) {
           <CardHeader className="flex flex-col gap-5 sm:flex-row items-center">
             <div className="grid gap-2">
               <CardTitle>کڕینەکان</CardTitle>
-              <CardDescription>
-                کڕینەکان لە ماوەی هەفتەی ڕابردوو
-              </CardDescription>
+              <CardDescription>کڕینەکان لە ماوەی ڕابردوو</CardDescription>
             </div>
             <Button
               asChild
@@ -95,20 +70,18 @@ export default async function FeedDashboard({ searchParams }: Props) {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {!completeInvoices.data?.formattedInvoices.length ? (
+                {!completeInvoices.data?.data?.length ? (
                   <EmptyState message="هیچ کڕینێک تۆمار نەکراوە" />
                 ) : (
-                  completeInvoices.data?.formattedInvoices.map(
-                    (invoice, index) => (
-                      <TableRow key={index}>
-                        <TableCell>
-                          <div>{invoice.name}</div>
-                        </TableCell>
-                        <TableCell>{format(invoice.createdAt, "P")}</TableCell>
-                        <TableCell>{invoice.total.toLocaleString()}-</TableCell>
-                      </TableRow>
-                    )
-                  )
+                  completeInvoices.data?.data?.map((invoice, index) => (
+                    <TableRow key={index}>
+                      <TableCell>
+                        <div>{invoice.name}</div>
+                      </TableCell>
+                      <TableCell>{format(invoice.createdAt, "P")}</TableCell>
+                      <TableCell>{invoice.total.toLocaleString()}-</TableCell>
+                    </TableRow>
+                  ))
                 )}
               </TableBody>
             </Table>
@@ -119,9 +92,7 @@ export default async function FeedDashboard({ searchParams }: Props) {
           <CardHeader className="flex flex-col gap-5 sm:flex-row items-center">
             <div className="grid gap-2">
               <CardTitle>فرۆشتن لەم دواییانەدا</CardTitle>
-              <CardDescription>
-                فرۆشتنەکان لە ماوەی هەفتەی ڕابردوو
-              </CardDescription>
+              <CardDescription>فرۆشتنەکان لە ماوەی ڕابردوو</CardDescription>
             </div>
             <Button
               asChild
@@ -152,153 +123,101 @@ export default async function FeedDashboard({ searchParams }: Props) {
   );
 }
 
-// Dashboard cards data
-const DASHBOARD_CARDS = (
-  totals: DashboardData,
-  startDate: Date
-): CardData[] => [
-  {
-    isMain: true,
-    isCash: true,
-    title: "قاسەی سەرەکی",
-    icon: DollarSign,
-    count: totals?.mainCashData?.value || 0,
-    description: `کۆتا جار ${
-      totals.mainCashData?.last_amount?.toLocaleString() || 0
-    } ${typeAction(totals.mainCashData?.type || "deposit")}`,
-    type: totals.mainCashData?.type as "deposit" | "withdraw",
-  },
-  {
-    isMain: false,
-    isCash: true,
-    title: "قاسەی لاوەکی",
-    icon: Edit,
-    count: totals?.subCashData?.value || 0,
-    description: `کۆتا جار ${
-      totals.subCashData?.last_amount?.toLocaleString() || 0
-    } ${typeAction(totals.subCashData?.type || "deposit")}`,
-    type: totals.subCashData?.type as "deposit" | "withdraw",
-  },
+export const DASHBOARD_CARDS = (totals: DashboardData): CardData[] => [
   {
     isMain: false,
     isCash: false,
-    title: "کۆی فرۆشراوەکان",
+    title: "کۆی فرۆشراوەکانی ئەمڕۆ",
     icon: CreditCard,
     count: totals?.totalSalePrice || 0,
-    description: getTimeDescription(startDate),
+    description: "",
     type: "none",
   },
   {
     isMain: false,
     isCash: false,
-    title: "کۆی کڕدراوەکان",
+    title: "کۆی کڕدراوەکانی ئەمڕۆ",
     icon: Activity,
     count: totals?.totalPurchasePrice || 0,
-    description: getTimeDescription(startDate),
+    description: "",
     type: "none",
   },
+
   {
     isMain: false,
     isCash: false,
-    title: "کۆی فرۆشتن بە قەزر",
-    icon: Activity,
-    count: totals?.totalLoanSales || 0,
-    description: getTimeDescription(startDate),
-    type: "none",
-  },
-  {
-    isMain: false,
-    isCash: false,
-    title: "کۆی فرۆشتن بە کاش",
-    icon: Activity,
-    count: totals?.totalCashSales || 0,
-    description: getTimeDescription(startDate),
-    type: "none",
-  },
-  {
-    isMain: false,
-    isCash: false,
-    title: "کۆی قەرزی دراوە",
-    icon: Activity,
-    count: totals?.totalPaidLoan || 0,
-    description: getTimeDescription(startDate),
-    type: "none",
-  },
-  {
-    isMain: false,
-    isCash: false,
-    title: "کۆی قەرزی ماوە",
-    icon: Activity,
-    count: totals?.totalRemainingLoan || 0,
-    description: getTimeDescription(startDate),
-    type: "none",
-  },
-  {
-    isMain: false,
-    isCash: false,
-    title: "کۆی خەرجی",
+    title: "کۆی خەرجییەکانی ئەمڕۆ",
     icon: Activity,
     count: totals?.totalExpenses || 0,
-    description: getTimeDescription(startDate),
+    description: "",
     type: "none",
   },
 ];
 
 // Memoized components for better performance
-const StatCard = memo(({ data }: { data: CardData }) => (
-  <Card className="hover:scale-105 transition-all duration-300 cursor-pointer hover:bg-muted">
-    <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-      <CardTitle className="text-sm font-medium">{data.title}</CardTitle>
-      {data.isCash ? (
-        data.isMain ? (
-          <ModalAddCash isMain={true} />
-        ) : (
-          <ModalAddCash isMain={false} />
-        )
-      ) : (
-        <data.icon className="h-4 w-4 text-muted-foreground" />
-      )}{" "}
-    </CardHeader>
-    <CardContent>
-      {data.isCash ? (
-        <Link
-          href={
-            data.isMain
-              ? "/history-transaction?type=main-cash"
-              : "/history-transaction"
-          }
-        >
-          <div
-            className={cn("flex gap-1 items-center text-2xl font-bold", {
-              "text-red-400": data.count < 0,
-            })}
-          >
-            <span className="text-xl">IQD </span>
-            <span className={cn("")}>{data.count?.toLocaleString() || 0}</span>
-          </div>
-          <p
-            className={cn("text-xs text-muted-foreground", {
-              "text-green-500": data.type === "deposit",
-              "text-red-500": data.type === "withdraw",
-            })}
-          >
-            {data.description}
-          </p>
-        </Link>
-      ) : (
-        <>
-          <div className="flex gap-1 items-center text-2xl font-bold">
-            <span className="text-xl">IQD </span>
-            <span>{data.count?.toLocaleString() || 0}</span>
-          </div>
-          <p className={cn("text-xs text-muted-foreground")}>
-            {data.description}
-          </p>
-        </>
+export const StatCard = memo(
+  ({ data, className }: { className?: string; data: CardData }) => (
+    <Card
+      className={cn(
+        "hover:scale-105 transition-all duration-300 cursor-pointer hover:bg-muted",
+        className
       )}
-    </CardContent>
-  </Card>
-));
+    >
+      <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+        <CardTitle className="text-sm font-medium">{data.title}</CardTitle>
+        {data.isCash ? (
+          data.isMain ? (
+            <ModalAddCash isMain={true} />
+          ) : (
+            <ModalAddCash isMain={false} />
+          )
+        ) : (
+          <data.icon className="h-4 w-4 text-muted-foreground" />
+        )}{" "}
+      </CardHeader>
+      <CardContent>
+        {data.isCash ? (
+          <Link
+            href={
+              data.isMain
+                ? "/history-transaction?type=main-cash"
+                : "/history-transaction"
+            }
+          >
+            <div
+              className={cn("flex gap-1 items-center text-2xl font-bold", {
+                "text-red-400": data.count < 0,
+              })}
+            >
+              <span className="text-xl">IQD </span>
+              <span className={cn("")}>
+                {data.count?.toLocaleString() || 0}
+              </span>
+            </div>
+            <p
+              className={cn("text-xs text-muted-foreground", {
+                "text-green-500": data.type === "deposit",
+                "text-red-500": data.type === "withdraw",
+              })}
+            >
+              {data.description}
+            </p>
+          </Link>
+        ) : (
+          <>
+            <div className="flex gap-1 items-center text-2xl font-bold">
+              <span className="text-xl">IQD </span>
+              <span>{data.count?.toLocaleString() || 0}</span>
+            </div>
+            <p className={cn("text-xs text-muted-foreground")}>
+              {data.description}
+            </p>
+          </>
+        )}
+      </CardContent>
+    </Card>
+  )
+);
 
 const SaleItem = memo(({ sale }: { sale: Invoice }) => (
   <div className="flex items-center gap-4 ">
@@ -334,7 +253,3 @@ const EmptyState = memo(({ message }: { message: string }) => (
     </TableCell>
   </TableRow>
 ));
-
-function typeAction(value: "deposit" | "withdraw") {
-  return value === "deposit" ? "زیادکراوە" : "کەمکراوە";
-}

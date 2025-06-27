@@ -6,12 +6,17 @@ import { SquareKanban } from "lucide-react";
 import { getPurchasePorudcts } from "../_actions";
 
 type Props = {
-  invoice_id: number;
+  products_purchase: {
+    id: number;
+    product_id: number | null;
+    quantity: number;
+    name: string;
+    barcode: string;
+    sale_price: number;
+  }[];
 };
 
-async function ShownPurchaseProducts({ invoice_id }: Props) {
-  const getUnFinishedProducts = await getPurchasePorudcts(invoice_id);
-  // console.log(getUnFinishedProducts.data);
+async function ShownPurchaseProducts({ products_purchase }: Props) {
   return (
     <div className="sm:px-6 my-10">
       <Title
@@ -20,7 +25,7 @@ async function ShownPurchaseProducts({ invoice_id }: Props) {
         className="mb-8"
       />
       <DataTable
-        data={getUnFinishedProducts.data || []}
+        data={products_purchase || []}
         columns={column}
         havePagination={false}
         isSearch={false}

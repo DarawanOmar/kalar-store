@@ -19,27 +19,33 @@ async function OneLoan({ params }: Props) {
       <div className="flex justify-between items-center w-full  my-10">
         <Link
           href={`/loans`}
-          className="p-1 rounded-full text-soft_primary hover:bg-primary hover:text-white cursor-pointer transition-all duration-500  max-w-max "
+          className="flex rounded-full   hover:text-primary cursor-pointer transition-all duration-500  max-w-max "
         >
           <ChevronRight size={25} strokeWidth={2.5} />
+          قەرزەکان
         </Link>
         <div className="grid grid-cols-2 gap-5">
           <TotalShown
             text="ماوە"
             total={
-              oneLoanDetails.data?.[0]?.Sale_invoice?.remaining_amount || 0
+              oneLoanDetails?.data?.[0]?.Sale_invoice?.remaining_amount || 0
             }
           />
           <TotalShown
-            text="کۆی گشتی"
-            total={oneLoanDetails.data?.[0]?.Sale_invoice?.total_amount || 0}
+            text="کۆی گشتی پارەدان"
+            total={
+              oneLoanDetails?.data?.reduce(
+                (acc, item) => acc + (item.amount || 0),
+                0
+              ) || 0
+            }
           />
         </div>
       </div>
       <div className="my-10">
         <DataTable
           isSearch={false}
-          data={oneLoanDetails.data || []}
+          data={oneLoanDetails?.data || []}
           columns={column}
           havePagination={false}
         />

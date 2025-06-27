@@ -46,7 +46,7 @@ export function NavMain({
                 if (isMobile) setOpenMobile(false);
               }}
               className={cn(
-                "py-[18px] hover:bg-soft_red hover:text-white  transition-all duration-500",
+                "hover:bg-soft_red hover:text-white  transition-all duration-500",
                 {
                   "text-white gradient-blue-left bg-soft_red ":
                     item.url === pathName,

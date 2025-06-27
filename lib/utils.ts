@@ -2,6 +2,7 @@ import { clsx, type ClassValue } from "clsx";
 import { twMerge } from "tailwind-merge";
 import { differenceInMonths, differenceInWeeks } from "date-fns";
 import { unlinkImage } from "./helper";
+import { Prisma } from "@prisma/client";
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
@@ -96,3 +97,47 @@ export async function uploadImageUsingHandler(
     path: (await response.json()).filePath,
   };
 }
+
+export const handlePrismaError = (error: any) => {
+  if (error instanceof Prisma.PrismaClientKnownRequestError) {
+    const errorMessages: Record<string, string> = {
+      P2002: "ئەم تۆمارە پێشتر هەیە",
+      P2003: "پەیوەندی نێوان داتاکان نادروستە",
+      P2025: "تۆمارەکە نەدۆزرایەوە",
+      P2014: "پەیوەندی پێویست نەدۆزرایەوە",
+      P2011: "بەهای پێویست نەنێردراوە",
+      P2012: "بەهای پێویست نەدۆزرایەوە",
+      P2016: "هەڵەی لە داخوازی داتابەیس",
+      P2021: "خشتەی داتابەیس بوونی نییە",
+      P2022: "ستوونی داتابەیس بوونی نییە",
+    };
+
+    return {
+      message: errorMessages[error.code] || `هەڵەی داتابەیس: ${error.code}`,
+      success: false,
+      error_code: error.code,
+    };
+  }
+
+  if (error instanceof Prisma.PrismaClientValidationError) {
+    return {
+      message: "داتا نادروستە - تکایە پێشتر بەهاکان بپشکنەوە",
+      success: false,
+      error_code: "VALIDATION_ERROR",
+    };
+  }
+
+  if (error instanceof Prisma.PrismaClientInitializationError) {
+    return {
+      message: "هەڵەی پەیوەندی بە داتابەیس",
+      success: false,
+      error_code: "DATABASE_CONNECTION_ERROR",
+    };
+  }
+
+  return {
+    message: "هەڵەیەکی نەخوازراو ڕوویدا",
+    success: false,
+    error_code: "UNKNOWN_ERROR",
+  };
+};
