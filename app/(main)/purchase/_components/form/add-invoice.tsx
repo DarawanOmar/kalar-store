@@ -12,6 +12,7 @@ import { CheckCheck } from "lucide-react";
 import { addInvoiceAction } from "../../_actions";
 
 import { TextField } from "@/components/reuseable/input-form-reusable";
+import { useQueryState } from "nuqs";
 
 type Props = {
   invoice: {
@@ -28,13 +29,18 @@ export default function Addinvoice({ invoice }: Props) {
     resolver: zodResolver(addInvoice),
     defaultValues: getDefaultValues(invoice),
   });
-
+  const [_, setInvoice] = useQueryState("invoice_id", {
+    clearOnDefault: true,
+    defaultValue: "",
+    shallow: false,
+  });
   function onSubmit(values: addInvoiceType) {
     setPendding(async () => {
       const result = await addInvoiceAction(values);
       if (result.success) {
         toast.success(result.message);
         form.reset();
+        setInvoice(result?.data?.toString() || "");
       } else {
         toast.error(result.message);
       }

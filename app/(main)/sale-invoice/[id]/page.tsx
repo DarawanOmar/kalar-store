@@ -46,6 +46,7 @@ async function OneSaleInvoice({ params }: Props) {
               total={OneSaleInvoice.data?.discount || 0}
             />
           ) : null}
+          <TotalShown text="کۆی گشتی" total={OneSaleInvoice.data?.total || 0} />
         </div>
         <Link
           href={`/sale-invoice`}

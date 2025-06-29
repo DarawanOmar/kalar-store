@@ -11,6 +11,7 @@ import { addSale, addSaleType } from "../../_type";
 import { createSaleInvoice } from "../../_actions";
 import { TextField } from "@/components/reuseable/input-form-reusable";
 import { SelectField } from "@/components/reuseable/select-form-field";
+import { useQueryState } from "nuqs";
 
 type Props = {
   info: Partial<addSaleType>;
@@ -23,12 +24,18 @@ export default function AddSaleInvoice({ info }: Props) {
     defaultValues: getDefaultValues(info),
   });
 
+  const [invoice, setInvoice] = useQueryState("invoice_id", {
+    clearOnDefault: true,
+    defaultValue: "",
+    shallow: false,
+  });
   function onSubmit(values: addSaleType) {
     setPendding(async () => {
       const result = await createSaleInvoice(values);
       if (result.success) {
         toast.success(result.message);
         form.reset();
+        setInvoice(result?.data?.toString() || "");
       } else {
         toast.error(result.message);
       }

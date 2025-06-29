@@ -33,6 +33,7 @@ async function OneSaleInvoice({ params }: Props) {
               total={format(oneInvoice?.data?.createdAt, "P") || ""}
             />
             <TotalShown text="شوێن" total={oneInvoice.data?.place || ""} />
+            <TotalShown text="کۆی گشتی" total={oneInvoice.data?.total || 0} />
           </div>
           <Link
             href={`/purchase-invoice`}

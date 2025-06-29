@@ -291,7 +291,7 @@ export const createSaleInvoice = async (values: addSaleType) => {
         success: false,
       };
     }
-    await db.sale_invoice.create({
+    const invoice = await db.sale_invoice.create({
       data: {
         ...parasedData.data,
         type: parasedData.data.type as Type_Sale_Purchase,
@@ -302,6 +302,7 @@ export const createSaleInvoice = async (values: addSaleType) => {
     });
     return {
       success: true,
+      data: invoice.id.toString(),
       message: "بە سەرکەوتویی زیاد کرا",
     };
   } catch (error: any) {
@@ -371,48 +372,44 @@ export const completeSaleInvoiceAction = async (
           success: false,
         };
       }
-      if (
-        saleInvoice.type === "cash" ||
-        (saleInvoice.type === "loan" && amount_payment)
-      ) {
-        await tx.mainCash.update({
-          where: { id: 1 },
-          data: {
-            amount: {
-              increment:
-                saleInvoice.type === "cash"
-                  ? discount
-                    ? saleInvoice.total_amount - discount
-                    : saleInvoice.total_amount
-                  : amount_payment,
-            },
-            last_amount:
-              saleInvoice.type === "cash"
-                ? discount
-                  ? saleInvoice.total_amount - discount
-                  : saleInvoice.total_amount
-                : amount_payment,
-            type_action: "deposit",
-          },
-        });
 
-        await tx.historyMainCash.create({
-          data: {
-            amount:
+      await tx.mainCash.update({
+        where: { id: 1 },
+        data: {
+          amount: {
+            increment:
               saleInvoice.type === "cash"
                 ? discount
                   ? saleInvoice.total_amount - discount
                   : saleInvoice.total_amount
                 : amount_payment,
-            type_action: "deposit",
-            added_by: "system",
-            name: ` فرۆشتنی کاڵا بە ${
-              saleInvoice.type === "loan" ? "قەرز" : "کاش"
-            } `,
-            user_email: email,
           },
-        });
-      }
+          last_amount:
+            saleInvoice.type === "cash"
+              ? discount
+                ? saleInvoice.total_amount - discount
+                : saleInvoice.total_amount
+              : amount_payment,
+          type_action: "deposit",
+        },
+      });
+
+      await tx.historyMainCash.create({
+        data: {
+          amount:
+            saleInvoice.type === "cash"
+              ? discount
+                ? saleInvoice.total_amount - discount
+                : saleInvoice.total_amount
+              : amount_payment,
+          type_action: "deposit",
+          added_by: "system",
+          name: ` فرۆشتنی کاڵا بە ${
+            saleInvoice.type === "loan" ? "قەرز" : "کاش"
+          } `,
+          user_email: email,
+        },
+      });
 
       await tx.sale_invoice.update({
         where: { id },

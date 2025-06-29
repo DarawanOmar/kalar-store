@@ -4,9 +4,11 @@ import { getTimeDescription, parseDateRange } from "@/lib/utils";
 import { DatePickerWithRange } from "@/components/layout/date-picker-with-range";
 import { Activity, CreditCard, DollarSign, Edit } from "lucide-react";
 import BackupButton from "@/components/backup-button";
-import { getTotalRevenue } from "./_action";
+import { getBarChartData, getPieChartData, getTotalRevenue } from "./_action";
 import { StatCard } from "../feed-dashboard";
 import SkeletonDashboard from "@/components/skeleton-dashboard";
+import { ChartPie } from "./_components/pie-chart";
+import { ChartBarLabel } from "./_components/area-chart";
 
 type Props = {
   searchParams: searchParamsType;
@@ -26,6 +28,14 @@ const FeedPage = async ({ searchParams }: Props) => {
   const range = ((await searchParams).range as string) || "";
   const { startDate, endDate } = parseDateRange(range);
   const totals = await getTotalRevenue(startDate, endDate);
+  // Use barData.map(item => ({ month: item.monthName, sales: item.sales, purchases: item.purchases, profit: item.profit }))
+  const barData = await getBarChartData(startDate, endDate);
+
+  // Use pieData.revenueDistribution for cash vs loan pie chart
+  // Use pieData.expenseVsRevenue for expense breakdown
+  // Use pieData.productDistribution for top products
+  const pieData = await getPieChartData(startDate, endDate);
+  // console.log("barData Data:", pieData);
   return (
     <div className="flex flex-1 flex-col gap-4 mt-5">
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5 ms-auto w-full lg:max-w-3xl ">
@@ -40,6 +50,10 @@ const FeedPage = async ({ searchParams }: Props) => {
         {DASHBOARD_CARDS(totals, startDate).map((card, index) => (
           <StatCard key={index} data={card} />
         ))}
+      </div>
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
+        <ChartBarLabel data={barData} />
+        <ChartPie data={pieData.expenseVsRevenue} />
       </div>
     </div>
   );

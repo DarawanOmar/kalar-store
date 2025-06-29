@@ -1,7 +1,7 @@
 "use client";
 
 import * as React from "react";
-import { ChevronsUpDown, MonitorCog, UsersRound } from "lucide-react";
+import { MonitorCog, UsersRound } from "lucide-react";
 import dara from "@/public/dara.jpg";
 import { SidebarMenuButton, useSidebar } from "@/components/ui/sidebar";
 import Image from "next/image";
@@ -103,7 +103,7 @@ export function TeamSwitcher({ isName }: { isName: boolean }) {
       >
         <div className="flex flex-col justify-center items-center  rounded-lg p-4">
           <Image
-            src={dara}
+            src={"/dara.jpg"}
             alt="Kalar-Store"
             height={600}
             width={600}

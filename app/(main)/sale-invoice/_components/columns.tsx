@@ -1,7 +1,7 @@
 "use client";
 
 import { ColumnDef } from "@tanstack/react-table";
-import { EditIcon, MoreVertical } from "lucide-react";
+import { EditIcon, MoreVertical, TrashIcon } from "lucide-react";
 import React from "react";
 import { DataTableColumnHeader } from "@/components/reuseable/data-table-column-header";
 import {
@@ -14,6 +14,8 @@ import {
 import { Button } from "@/components/ui/button";
 import CustomDialog from "@/components/reuseable/resusable-dialog";
 import ReturnItemForm from "../form/return_item";
+import ReusableDeleteDailog from "@/components/reuseable/reusable-delete-dialog";
+import { deleteSaleInvoiceItem } from "../_action";
 
 const column: ColumnDef<{
   sale_invoice_item_id: number;
@@ -88,7 +90,7 @@ const column: ColumnDef<{
       const { product_id, sale_invoice_item_id } = row.original;
       return (
         <div className="">
-          <DropdownMenu>
+          <DropdownMenu dir="rtl">
             <DropdownMenuTrigger asChild>
               <Button variant="ghost" className="h-8 w-8 p-0">
                 <span className="sr-only">Open menu</span>
@@ -99,6 +101,19 @@ const column: ColumnDef<{
               <DropdownMenuLabel className="text-center">
                 کردارەکان
               </DropdownMenuLabel>
+              <DropdownMenuSeparator />
+              <ReusableDeleteDailog
+                title="دڵنیایت لە سڕینەوەی کاڵا"
+                isFreshButtonPass
+                button={
+                  <button className="flex gap-2 items-center font-sirwan_reguler  hover:bg-primary hover:text-white p-2 rounded-lg w-full transition-all duration-500">
+                    <TrashIcon height={18} width={18} />
+                    <span className="text-sm">سڕینەوە</span>
+                  </button>
+                }
+                actionDelete={deleteSaleInvoiceItem}
+                id={sale_invoice_item_id}
+              />
               <DropdownMenuSeparator />
               <CustomDialog
                 open={open}

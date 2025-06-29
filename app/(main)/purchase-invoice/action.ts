@@ -63,6 +63,13 @@ export const returnItemPurchaseInvoice = async (
       };
     }
 
+    if (purchase_invoice_item.Products.quantity < quantity_returned) {
+      return {
+        message: "بڕی گەڕاندنەوە زیاترە لە بڕی بەردەست",
+        success: false,
+      };
+    }
+
     const user = await getSession();
     if (!user) {
       return {
@@ -136,6 +143,158 @@ export const returnItemPurchaseInvoice = async (
         returned_quantity: quantity_returned,
         return_amount: return_amount,
         product_name: purchase_invoice_item.product_name,
+      },
+    };
+  } catch (error) {
+    return handlePrismaError(error);
+  }
+};
+
+export const deletePurchaseInvoiceItem = async (
+  purchase_invoice_item_id: number
+) => {
+  try {
+    // Check if the purchase invoice item exists
+    const purchase_invoice_item = await db.purchase_invoice_items.findUnique({
+      where: { id: purchase_invoice_item_id },
+      select: {
+        id: true,
+        quantity: true,
+        product_id: true,
+        unit_price: true,
+        product_name: true,
+        Products: {
+          select: {
+            quantity: true,
+            id: true,
+            name: true,
+          },
+        },
+        Purchase_invoice: {
+          select: {
+            id: true,
+            Purchase_invoice_items: {
+              select: {
+                id: true,
+                unit_price: true,
+                quantity: true,
+              },
+            },
+          },
+        },
+      },
+    });
+
+    if (!purchase_invoice_item) {
+      return {
+        message: "ئەم وەسڵە بوونی نییە",
+        success: false,
+      };
+    }
+
+    // check have the product in stock
+    if (
+      purchase_invoice_item.Products?.quantity! < purchase_invoice_item.quantity
+    ) {
+      return {
+        message: "بڕی وەسڵەکە زیاترە لە بڕی بەردەست",
+        success: false,
+      };
+    }
+
+    // Get user session for logging
+    const user = await getSession();
+    if (!user) {
+      return {
+        message: "تکایە تۆکەنەکە دووبارە بکەوە",
+        success: false,
+      };
+    }
+    const email = user.token.split(",between,")[1];
+
+    // Calculate the total amount that was spent on this item
+    const total_item_amount =
+      purchase_invoice_item.unit_price * purchase_invoice_item.quantity;
+
+    // Calculate total amount of all items in the purchase invoice
+    const total_invoice_amount =
+      purchase_invoice_item.Purchase_invoice?.Purchase_invoice_items.reduce(
+        (sum, item) => sum + item.unit_price * item.quantity,
+        0
+      );
+
+    // Check if this item represents the entire invoice amount
+    const isLastItem =
+      purchase_invoice_item.Purchase_invoice?.Purchase_invoice_items.length ===
+      1;
+    const isFullInvoiceAmount = total_item_amount === total_invoice_amount;
+
+    await db.$transaction(async (tx) => {
+      // Delete the purchase invoice item
+      await tx.purchase_invoice_items.delete({
+        where: {
+          id: purchase_invoice_item_id,
+        },
+      });
+
+      // If this was the last item or represents the full invoice amount, delete the entire invoice
+      if (isLastItem || isFullInvoiceAmount) {
+        await tx.purchase_invoice.delete({
+          where: {
+            id: purchase_invoice_item.Purchase_invoice?.id!,
+          },
+        });
+      }
+
+      await tx.products.update({
+        where: {
+          id: purchase_invoice_item.product_id!,
+        },
+        data: {
+          quantity: {
+            decrement: purchase_invoice_item.quantity,
+          },
+        },
+      });
+
+      // Add back the money to main cash (since we're removing the expense)
+      await tx.mainCash.update({
+        where: {
+          id: 1,
+        },
+        data: {
+          amount: {
+            increment: total_item_amount,
+          },
+          last_amount: total_item_amount,
+          type_action: "deposit",
+        },
+      });
+
+      // Create history record for the deletion
+      await tx.historyMainCash.create({
+        data: {
+          user_email: email,
+          name: `سڕینەوەی ${
+            isLastItem || isFullInvoiceAmount
+              ? "پسوڵەی کڕین تەواو"
+              : "وەسڵەی کڕین"
+          }: ${purchase_invoice_item.product_name}`,
+          amount: total_item_amount,
+          type_action: "deposit",
+          added_by: "person",
+        },
+      });
+    });
+
+    return {
+      message: `وەسڵەی کڕین بە سەرکەوتوی سڕایەوە - کاڵا: ${purchase_invoice_item.product_name} - بڕی پارەی گەڕاو: ${total_item_amount}`,
+      success: true,
+      data: {
+        deleted_item_id: purchase_invoice_item_id,
+        product_name: purchase_invoice_item.product_name,
+        quantity: purchase_invoice_item.quantity,
+        refunded_amount: total_item_amount,
       },
     };
   } catch (error) {

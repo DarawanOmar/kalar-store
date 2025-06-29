@@ -115,7 +115,7 @@ export const handlePrismaError = (error: any) => {
     return {
       message: errorMessages[error.code] || `هەڵەی داتابەیس: ${error.code}`,
       success: false,
-      error_code: error.code,
+      data: error.code,
     };
   }
 
@@ -123,7 +123,7 @@ export const handlePrismaError = (error: any) => {
     return {
       message: "داتا نادروستە - تکایە پێشتر بەهاکان بپشکنەوە",
       success: false,
-      error_code: "VALIDATION_ERROR",
+      data: "VALIDATION_ERROR",
     };
   }
 
@@ -131,13 +131,13 @@ export const handlePrismaError = (error: any) => {
     return {
       message: "هەڵەی پەیوەندی بە داتابەیس",
       success: false,
-      error_code: "DATABASE_CONNECTION_ERROR",
+      data: "DATABASE_CONNECTION_ERROR",
     };
   }
 
   return {
     message: "هەڵەیەکی نەخوازراو ڕوویدا",
     success: false,
-    error_code: "UNKNOWN_ERROR",
+    data: "UNKNOWN_ERROR",
   };
 };

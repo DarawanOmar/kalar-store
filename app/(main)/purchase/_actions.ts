@@ -23,7 +23,10 @@ export const getunFinishedInvoice = async () => {
       data: res,
     };
   } catch (error: any) {
-    return handlePrismaError(error);
+    return {
+      message: "هەڵەیەک هەیە",
+      success: false,
+    };
   }
 };
 
@@ -92,7 +95,10 @@ export const getOneInvoice = async (id: number) => {
       data: resultFormatted,
     };
   } catch (error: any) {
-    return handlePrismaError(error);
+    return {
+      message: "هەڵەیەک هەیە",
+      success: false,
+    };
   }
 };
 
@@ -249,7 +255,7 @@ export const addInvoiceAction = async (values: addInvoiceType) => {
         success: false,
       };
     }
-    await db.purchase_invoice.create({
+    const invoice = await db.purchase_invoice.create({
       data: {
         ...parasedData.data,
         is_done: false,
@@ -257,6 +263,7 @@ export const addInvoiceAction = async (values: addInvoiceType) => {
     });
     return {
       success: true,
+      data: invoice.id,
       message: "بە سەرکەوتویی زیاد کرا",
     };
   } catch (error) {

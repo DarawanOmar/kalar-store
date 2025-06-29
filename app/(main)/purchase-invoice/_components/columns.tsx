@@ -7,12 +7,14 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { ColumnDef } from "@tanstack/react-table";
-import { EditIcon, MoreVertical } from "lucide-react";
+import { EditIcon, MoreVertical, TrashIcon } from "lucide-react";
 import React from "react";
 import { DataTableColumnHeader } from "@/components/reuseable/data-table-column-header";
 import { Button } from "@/components/ui/button";
 import CustomDialog from "@/components/reuseable/resusable-dialog";
 import ReturnPurchaseItemForm from "./form/modal-add-user";
+import ReusableDeleteDailog from "@/components/reuseable/reusable-delete-dialog";
+import { deletePurchaseInvoiceItem } from "../action";
 
 const column: ColumnDef<{
   purchase_invoice_item_id: number;
@@ -92,17 +94,30 @@ const column: ColumnDef<{
       const { product_id, purchase_invoice_item_id } = row.original;
       return (
         <div className="">
-          <DropdownMenu>
+          <DropdownMenu dir="rtl">
             <DropdownMenuTrigger asChild>
               <Button variant="ghost" className="h-8 w-8 p-0">
                 <span className="sr-only">Open menu</span>
                 <MoreVertical className="h-4 w-4" />
               </Button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent className="space-y-1" align="end">
+            <DropdownMenuContent className="space-y-1" align="center">
               <DropdownMenuLabel className="text-center">
                 کردارەکان
               </DropdownMenuLabel>
+              <DropdownMenuSeparator />
+              <ReusableDeleteDailog
+                title="دڵنیایت لە سڕینەوەی کاڵا"
+                isFreshButtonPass
+                button={
+                  <button className="flex gap-2 items-center font-sirwan_reguler  hover:bg-primary hover:text-white p-2 rounded-t-lg w-full transition-all duration-500">
+                    <TrashIcon height={18} width={18} />
+                    <span className="text-sm">سڕینەوە</span>
+                  </button>
+                }
+                actionDelete={deletePurchaseInvoiceItem}
+                id={purchase_invoice_item_id}
+              />
               <DropdownMenuSeparator />
               <CustomDialog
                 open={open}
@@ -111,7 +126,7 @@ const column: ColumnDef<{
                 title="گەڕاندنەوەی کاڵا"
                 classContent="max-w-md"
                 button={
-                  <button className="flex gap-2 items-center font-sirwan_reguler  hover:bg-primary hover:text-white transition-all duration-500 p-2 rounded-lg w-full">
+                  <button className="flex gap-2 items-center font-sirwan_reguler  hover:bg-primary hover:text-white transition-all duration-500 p-2 rounded-b-lg w-full">
                     <EditIcon height={18} width={18} />
                     <span className="text-sm">گەڕاندنەوەی کاڵا</span>
                   </button>
