@@ -48,6 +48,7 @@ export const returnItemSaleInvoice = async (
             total_amount: true,
             paid_amount: true,
             remaining_amount: true,
+            discount: true,
             type: true,
             status: true,
             note: true,
@@ -118,96 +119,66 @@ export const returnItemSaleInvoice = async (
 
       if (sale_invoice_item.Sale_invoice) {
         const invoice = sale_invoice_item.Sale_invoice;
-        const new_total_amount =
-          (sale_invoice_item.Sale_invoice.total_amount || 0) - return_amount;
+        let total_invoice_amount = invoice?.total_amount || 0;
+        let paid_amount = invoice?.paid_amount || 0;
+        let remaining_amount = invoice?.remaining_amount || 0;
+        const is_fully_unpaid_invoice =
+          paid_amount === 0 && remaining_amount === remaining_amount;
+
+        const new_total_amount = (invoice.total_amount || 0) - return_amount;
 
         let mainCash_deduction = 0;
 
         if (invoice.type === "cash") {
-          mainCash_deduction = return_amount;
+          mainCash_deduction = return_amount - invoice.discount!;
         } else if (invoice.type === "loan") {
-          if (invoice.total_amount && invoice.total_amount > 0) {
-            const paid_percentage = invoice.paid_amount / invoice.total_amount;
-            mainCash_deduction = return_amount * paid_percentage;
+          if (is_fully_unpaid_invoice) {
+            mainCash_deduction = 0;
+          } else if (paid_amount === total_invoice_amount) {
+            mainCash_deduction = return_amount;
+            paid_amount = paid_amount - return_amount;
+          } else if (return_amount <= remaining_amount) {
+            remaining_amount -= return_amount;
+            mainCash_deduction = 0;
+          } else {
+            let remedy_amount = return_amount - remaining_amount;
+            remaining_amount = 0;
+            paid_amount = paid_amount - remedy_amount;
+            mainCash_deduction = remedy_amount;
           }
         }
-        if (mainCash_deduction > 0) {
-          await tx.mainCash.update({
-            where: { id: 1 },
-            data: {
-              amount: {
-                decrement: mainCash_deduction,
-              },
-              last_amount: Math.floor(mainCash_deduction),
-              type_action: "withdraw",
+        await tx.mainCash.update({
+          where: { id: 1 },
+          data: {
+            amount: {
+              decrement: mainCash_deduction,
             },
-          });
+            last_amount: mainCash_deduction,
+            type_action: "withdraw",
+          },
+        });
 
-          await tx.historyMainCash.create({
-            data: {
-              user_email: email,
-              name: `گەڕاندنەوەی فرۆشتن: ${sale_invoice_item.product_name} (${
-                invoice.type === "cash" ? "کاش" : "قەرز"
-              })`,
-              amount: mainCash_deduction,
-              type_action: "withdraw",
-              added_by: "person",
-            },
-          });
-        }
-
-        if (new_total_amount <= 0) {
-          console.log("Delete Running");
-          await tx.loanPayment.deleteMany({
-            where: {
-              sale_invoiceId: sale_invoice_item.sale_invoiceId!,
-            },
-          });
-
-          await tx.sale_invoice.delete({
-            where: {
-              id: sale_invoice_item.sale_invoiceId!,
-            },
-          });
-        } else {
-          console.log("Update Running");
-          // new_total_amount  400,000
-          // return_amount  240,000
-          let new_paid_amount = invoice.paid_amount; // 200,000
-          let new_remaining_amount = invoice.remaining_amount; // 200,000
-
-          if (invoice.type === "cash") {
-            new_paid_amount = new_paid_amount - return_amount;
-            new_remaining_amount = new_total_amount - new_paid_amount;
-          } else if (invoice.type === "loan") {
-            // For loan: first reduce remaining_amount, then paid_amount if needed
-            if (new_remaining_amount >= return_amount) {
-              // Case 1: return_amount can be fully covered by remaining_amount
-              new_remaining_amount -= return_amount;
-              // paid_amount stays the same
-            } else {
-              // Case 2: return_amount exceeds remaining_amount
-              const excess_amount = return_amount - new_remaining_amount;
-              new_remaining_amount = 0;
-              new_paid_amount = new_paid_amount - excess_amount;
-            }
-
-            // Recalculate remaining_amount to ensure consistency
-            new_remaining_amount = new_total_amount - new_paid_amount;
-          }
-
-          await tx.sale_invoice.update({
-            where: {
-              id: sale_invoice_item.sale_invoiceId!,
-            },
-            data: {
-              total_amount: new_total_amount,
-              paid_amount: new_paid_amount,
-              remaining_amount: new_remaining_amount,
-              status: new_remaining_amount > 0 ? "remain" : "done",
-            },
-          });
-        }
+        await tx.historyMainCash.create({
+          data: {
+            user_email: email,
+            name: `گەڕاندنەوەی فرۆشتن: ${sale_invoice_item.product_name} (${
+              invoice.type === "cash" ? "کاش" : "قەرز"
+            })`,
+            amount: mainCash_deduction,
+            type_action: "withdraw",
+            added_by: "person",
+          },
+        });
+        await tx.sale_invoice.update({
+          where: {
+            id: invoice.id!,
+          },
+          data: {
+            total_amount: new_total_amount,
+            paid_amount: paid_amount,
+            remaining_amount: remaining_amount,
+          },
+        });
       }
     });
     return {
@@ -237,8 +208,10 @@ export const deleteSaleInvoiceItem = async (sale_invoice_item_id: number) => {
         Sale_invoice: {
           select: {
             id: true,
+            total_amount: true,
             type: true,
             paid_amount: true,
+            discount: true,
             Sale_invoice_items: {
               select: {
                 id: true,
@@ -267,17 +240,15 @@ export const deleteSaleInvoiceItem = async (sale_invoice_item_id: number) => {
       };
     }
     const email = user.token.split(",between,")[1];
+
     const total_item_amount_returned =
       sale_invoice_item.unit_price * sale_invoice_item.quantity;
 
-    const total_item_amount =
-      sale_invoice_item.Sale_invoice?.Sale_invoice_items.reduce(
-        (sum, item) => sum + item.unit_price * item.quantity,
-        0
-      );
+    const total_item_amount = sale_invoice_item.Sale_invoice?.total_amount;
 
     const isLastItem =
       sale_invoice_item.Sale_invoice?.Sale_invoice_items.length === 1;
+
     const isFullInvoiceAmount =
       total_item_amount === total_item_amount_returned;
 
@@ -287,7 +258,7 @@ export const deleteSaleInvoiceItem = async (sale_invoice_item_id: number) => {
     ) {
       return {
         message:
-          "ناتوانیت هیچ کام لە بەرهەکان بسڕیتەوە چونکە پارەی قەرزی دراوەتەوە لەم وەسڵە",
+          "ناتوانیت هیچ کام لە بەرهەکان بسڕیتەوە چونکە پارەی قەرزی دراوەتەوە لەم وەسڵە دەتوانی گەڕانەوە بکەی",
         success: false,
       };
     }
@@ -307,11 +278,11 @@ export const deleteSaleInvoiceItem = async (sale_invoice_item_id: number) => {
           },
         });
       }
-
       let mainCash_deduction = 0;
 
       if (sale_invoice_item.Sale_invoice?.type === "cash") {
-        mainCash_deduction = total_item_amount_returned;
+        mainCash_deduction =
+          total_item_amount_returned - sale_invoice_item.Sale_invoice.discount!;
       } else if (sale_invoice_item.Sale_invoice?.type === "loan") {
         mainCash_deduction = 0;
       }
@@ -327,6 +298,18 @@ export const deleteSaleInvoiceItem = async (sale_invoice_item_id: number) => {
         },
       });
 
+      if (!isLastItem || !isFullInvoiceAmount) {
+        await tx.sale_invoice.update({
+          where: {
+            id: sale_invoice_item.Sale_invoice?.id!,
+          },
+          data: {
+            total_amount: {
+              decrement: total_item_amount_returned,
+            },
+          },
+        });
+      }
       await tx.mainCash.update({
         where: {
           id: 1,
@@ -363,6 +346,9 @@ export const deleteSaleInvoiceItem = async (sale_invoice_item_id: number) => {
       },
     };
   } catch (error) {
-    return handlePrismaError(error);
+    return {
+      message: handlePrismaError(error).message || "هەڵەیەک هەیە",
+      success: false,
+    };
   }
 };

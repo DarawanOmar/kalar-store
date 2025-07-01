@@ -7,7 +7,6 @@ export const getTotalRevenue = async (startDate?: Date, endDate?: Date) => {
       startDate && endDate
         ? { createdAt: { gte: startDate, lte: endDate } }
         : {};
-
     const [
       cashSalesTotal,
       loanSalesTotal,
@@ -19,15 +18,15 @@ export const getTotalRevenue = async (startDate?: Date, endDate?: Date) => {
     ] = await Promise.all([
       db.sale_invoice.aggregate({
         _sum: { total_amount: true },
-        where: { type: "cash", ...dateFilter },
+        where: { is_done: true, type: "cash", ...dateFilter },
       }),
       db.sale_invoice.aggregate({
         _sum: { total_amount: true, remaining_amount: true, paid_amount: true },
-        where: { type: "loan", ...dateFilter },
+        where: { is_done: true, type: "loan", ...dateFilter },
       }),
       db.sale_invoice.aggregate({
         _sum: { total_amount: true },
-        where: { ...dateFilter },
+        where: { is_done: true, ...dateFilter },
       }),
       db.purchase_invoice_items.findMany({
         include: { Products: true },
@@ -345,65 +344,5 @@ export const getPieChartData = async (startDate?: Date, endDate?: Date) => {
     };
   } catch (error) {
     throw new Error("Could not fetch pie chart data. Please try again later.");
-  }
-};
-
-// Additional function for Daily Sales Trend (for line charts if needed)
-export const getDailySalesTrend = async (startDate?: Date, endDate?: Date) => {
-  try {
-    const dateFilter =
-      startDate && endDate
-        ? { createdAt: { gte: startDate, lte: endDate } }
-        : {};
-
-    const salesData = await db.sale_invoice.findMany({
-      where: { ...dateFilter },
-      select: {
-        total_amount: true,
-        type: true,
-        createdAt: true,
-      },
-      orderBy: {
-        createdAt: "asc",
-      },
-    });
-
-    // Group by day
-    const dailyData = new Map();
-
-    salesData.forEach((sale) => {
-      const dayKey = sale.createdAt.toISOString().substring(0, 10); // YYYY-MM-DD format
-      if (!dailyData.has(dayKey)) {
-        dailyData.set(dayKey, {
-          date: dayKey,
-          totalSales: 0,
-          cashSales: 0,
-          loanSales: 0,
-          count: 0,
-        });
-      }
-      const data = dailyData.get(dayKey);
-      data.totalSales += sale.total_amount || 0;
-      data.count += 1;
-      if (sale.type === "cash") {
-        data.cashSales += sale.total_amount || 0;
-      } else {
-        data.loanSales += sale.total_amount || 0;
-      }
-    });
-
-    return Array.from(dailyData.values())
-      .sort((a, b) => a.date.localeCompare(b.date))
-      .map((item) => ({
-        ...item,
-        dateFormatted: new Date(item.date).toLocaleDateString("en-US", {
-          month: "short",
-          day: "numeric",
-        }),
-      }));
-  } catch (error) {
-    throw new Error(
-      "Could not fetch daily sales trend. Please try again later."
-    );
   }
 };

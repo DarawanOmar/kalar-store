@@ -43,6 +43,13 @@ export const getAllCompleteSaleInvoice = async (
       take: pageSize,
     });
 
+    const totalAmountInvoicesPrice = await db.sale_invoice.aggregate({
+      _sum: {
+        total_amount: true,
+      },
+      where,
+    });
+
     const formattedInvoices = invoices.map((invoice) => {
       const total = invoice.Sale_invoice_items.reduce(
         (sum, item) => sum + (item.unit_price || 0) * item.quantity,
@@ -64,6 +71,7 @@ export const getAllCompleteSaleInvoice = async (
 
     return {
       data: {
+        total: totalAmountInvoicesPrice._sum.total_amount || 0,
         data: formattedInvoices,
         totalPage: Math.ceil(
           (await db.sale_invoice.count({ where })) / pageSize
@@ -72,7 +80,10 @@ export const getAllCompleteSaleInvoice = async (
       success: true,
     };
   } catch (error) {
-    return handlePrismaError(error);
+    return {
+      message: handlePrismaError(error).message || "An error occurred",
+      success: false,
+    };
   }
 };
 

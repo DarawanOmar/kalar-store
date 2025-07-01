@@ -9,10 +9,26 @@ export function cn(...inputs: ClassValue[]) {
 }
 export const parseDateRange = (range: string) => {
   if (!range) {
-    // Default: Start of the current month to end of the current month
     const now = new Date();
-    const startDate = new Date(now.getFullYear(), now.getMonth(), 1); // First day of month
-    const endDate = new Date(now.getFullYear(), now.getMonth() + 1, 0); // Last day of month
+    const startDate = new Date(
+      now.getFullYear(),
+      now.getMonth(),
+      1,
+      0,
+      0,
+      0,
+      0
+    );
+    const endDate = new Date(
+      now.getFullYear(),
+      now.getMonth() + 1,
+      0,
+      23,
+      59,
+      59,
+      999
+    );
+
     return { startDate, endDate };
   }
 

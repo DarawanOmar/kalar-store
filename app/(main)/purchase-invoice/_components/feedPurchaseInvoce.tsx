@@ -22,7 +22,7 @@ async function FeedPurchaseInvoice({
     endDate,
     page
   );
-
+  console.log("All Purchase Invoice Data:", allPurchaseInvoice);
   if (allPurchaseInvoice.data?.formattedInvoices.length === 0 && page === 1) {
     return <EmptyImage />;
   }

@@ -38,6 +38,16 @@ export const getAllCompleteInvoice = async (
       skip: (page - 1) * 10,
     });
 
+    const totalAmountPrice = invoices.reduce(
+      (sum, invoice) =>
+        sum +
+        invoice.Purchase_invoice_items.reduce(
+          (itemSum, item) => itemSum + (item.unit_price || 0) * item.quantity,
+          0
+        ),
+      0
+    );
+
     const formattedInvoices = invoices.map((invoice) => {
       const total = invoice.Purchase_invoice_items.reduce(
         (sum, item) => sum + (item.unit_price || 0) * item.quantity,
@@ -56,12 +66,16 @@ export const getAllCompleteInvoice = async (
     return {
       data: {
         formattedInvoices,
+        total: totalAmountPrice,
         totalPage: Math.ceil((await db.purchase_invoice.count()) / 10),
       },
       success: true,
     };
   } catch (error) {
-    return handlePrismaError(error);
+    return {
+      message: handlePrismaError(error),
+      success: false,
+    };
   }
 };
 
@@ -125,9 +139,8 @@ export const getOnePurchaseInvoice = async (id: number) => {
       success: true,
     };
   } catch (error: any) {
-    // return handlePrismaError(error);
     return {
-      message: "هەڵەیەک هەیە",
+      message: handlePrismaError(error),
       success: false,
     };
   }

@@ -4,6 +4,7 @@ import db from "@/lib/prisma";
 import { addProductSaleType, addSale, addSaleType } from "./_type";
 import { Type_Sale_Purchase } from "@prisma/client";
 import { getSession } from "@/lib/utils/cookies";
+import { handlePrismaError } from "@/lib/utils";
 
 // ------------------------DELETE---------------------------
 export const deleteEmptySaleInvoice = async (id: number) => {
@@ -62,6 +63,26 @@ export const deleteSaleItemProdcut = async (id: number) => {
     }
 
     db.$transaction(async (tx) => {
+      const invoice = await tx.sale_invoice.findUnique({
+        where: { id: existItem?.sale_invoiceId! },
+      });
+      if (!invoice) {
+        return {
+          message: "ئەم وەسڵە بوونی نییە",
+          success: false,
+        };
+      }
+      const new_total_amount =
+        (invoice?.total_amount ?? 0) -
+        existItem.quantity * existItem.unit_price;
+
+      await tx.sale_invoice.update({
+        where: { id: invoice.id! },
+        data: {
+          total_amount: new_total_amount,
+        },
+      });
+
       await tx.products.update({
         where: { id: existItem.product_id as number },
         data: { quantity: { increment: existItem.quantity } },
@@ -130,6 +151,7 @@ export const getOneSaleInvoice = async (id: number) => {
         place: true,
         phone: true,
         note: true,
+        total_amount: true,
         Sale_invoice_items: {
           select: {
             id: true,
@@ -161,10 +183,6 @@ export const getOneSaleInvoice = async (id: number) => {
         sale_price: item.unit_price || 0,
       }))
     );
-    const total = Products.reduce(
-      (sum, product) => sum + product.quantity * product.sale_price,
-      0
-    );
 
     const resultFormatted = {
       type: res.type,
@@ -174,7 +192,7 @@ export const getOneSaleInvoice = async (id: number) => {
       place: res.place,
       note: res.note,
       Products,
-      total,
+      total: res.total_amount || 0,
     };
 
     return {
@@ -436,9 +454,8 @@ export const completeSaleInvoiceAction = async (
       message: "بە سەرکەوتویی تەواوکرایەوە",
     };
   } catch (error: any) {
-    console.log("Error => ", error.message);
     return {
-      message: `هەڵەیەک هەیە : ${error.message}`,
+      message: handlePrismaError(error).message || "هەڵەیەک هەیە",
       success: false,
     };
   }

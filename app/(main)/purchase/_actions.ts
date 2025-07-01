@@ -135,6 +135,7 @@ export const getProductByBarcode = async (barcode: string, name: string) => {
   try {
     const res = await db.products.findMany({
       where: {
+        is_active: true,
         OR: [
           {
             barcode: {
@@ -324,6 +325,7 @@ export const deletePurchaseItemProdcut = async (id: number) => {
         success: false,
       };
     }
+
     await db.purchase_invoice_items.delete({
       where: {
         id,

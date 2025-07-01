@@ -27,15 +27,11 @@ export default ReportPage;
 const FeedPage = async ({ searchParams }: Props) => {
   const range = ((await searchParams).range as string) || "";
   const { startDate, endDate } = parseDateRange(range);
-  const totals = await getTotalRevenue(startDate, endDate);
-  // Use barData.map(item => ({ month: item.monthName, sales: item.sales, purchases: item.purchases, profit: item.profit }))
-  const barData = await getBarChartData(startDate, endDate);
-
-  // Use pieData.revenueDistribution for cash vs loan pie chart
-  // Use pieData.expenseVsRevenue for expense breakdown
-  // Use pieData.productDistribution for top products
-  const pieData = await getPieChartData(startDate, endDate);
-  // console.log("barData Data:", pieData);
+  const [totals, barData, pieData] = await Promise.all([
+    getTotalRevenue(startDate, endDate),
+    getBarChartData(startDate, endDate),
+    getPieChartData(startDate, endDate),
+  ]);
   return (
     <div className="flex flex-1 flex-col gap-4 mt-5">
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5 ms-auto w-full lg:max-w-3xl ">
@@ -52,8 +48,8 @@ const FeedPage = async ({ searchParams }: Props) => {
         ))}
       </div>
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
-        <ChartBarLabel data={barData} />
-        <ChartPie data={pieData.expenseVsRevenue} />
+        <ChartBarLabel data={barData} range={range} />
+        <ChartPie data={pieData.expenseVsRevenue} range={range} />
       </div>
     </div>
   );

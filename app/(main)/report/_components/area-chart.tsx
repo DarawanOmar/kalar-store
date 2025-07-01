@@ -24,14 +24,18 @@ const chartConfig = {} satisfies ChartConfig;
 
 type Props = {
   data: any[];
+  range: string;
 };
 
-export function ChartBarLabel({ data }: Props) {
+export function ChartBarLabel({ data, range }: Props) {
+  const [start, end] = range?.split("to");
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Bar Chart - Label</CardTitle>
-        <CardDescription>January - June 2024</CardDescription>
+        <CardTitle>کۆی زانیارەکان</CardTitle>
+        <CardDescription>
+          {start || "00-00-20??"} - {end || "00-00-20??"}
+        </CardDescription>
       </CardHeader>
       <CardContent>
         <ChartContainer config={chartConfig}>
@@ -75,14 +79,6 @@ export function ChartBarLabel({ data }: Props) {
           </BarChart>
         </ChartContainer>
       </CardContent>
-      <CardFooter className="flex-col items-start gap-2 text-sm">
-        <div className="flex gap-2 leading-none font-medium">
-          Trending up by 5.2% this month <TrendingUp className="h-4 w-4" />
-        </div>
-        <div className="text-muted-foreground leading-none">
-          Showing total visitors for the last 6 months
-        </div>
-      </CardFooter>
     </Card>
   );
 }
