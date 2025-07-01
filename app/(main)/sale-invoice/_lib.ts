@@ -1,13 +1,19 @@
 import db from "@/lib/prisma";
 import { handlePrismaError } from "@/lib/utils";
+import { Prisma } from "@prisma/client";
 
 export const getAllCompleteSaleInvoice = async (
   startDate: Date | undefined,
   endDate: Date | undefined,
+  type: "cash" | "loan" | "" = "",
   page: number
 ) => {
   try {
-    let where: any = { is_done: true, total_amount: { gt: 0 } };
+    let where: Prisma.Sale_invoiceWhereInput = {
+      is_done: true,
+      total_amount: { gt: 0 },
+      type: type ? type : undefined,
+    };
     if (startDate && endDate) {
       where = {
         ...where,

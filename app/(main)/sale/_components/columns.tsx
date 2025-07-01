@@ -7,6 +7,7 @@ import { DataTableColumnHeader } from "@/components/reuseable/data-table-column-
 import { SaleInvoiceItem } from "../_type";
 import { deleteSaleItemProdcut } from "../_actions";
 import { toast } from "sonner";
+import { useRouter } from "next/navigation";
 
 const column: ColumnDef<SaleInvoiceItem>[] = [
   {
@@ -64,10 +65,12 @@ const column: ColumnDef<SaleInvoiceItem>[] = [
     ),
     cell: function CellComponent({ row }) {
       const { id } = row.original;
+      const router = useRouter();
       const handleDelete = async () => {
         const res = await deleteSaleItemProdcut(id as number);
         if (res.success) {
           toast.success("بە سەرکەوتویی سڕایەوە");
+          router.refresh();
         } else {
           toast.error("هەڵەیەک هەیە");
         }
