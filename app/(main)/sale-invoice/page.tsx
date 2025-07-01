@@ -9,7 +9,11 @@ import EmptyImage from "@/components/reuseable/empty-image";
 import TotalShown from "@/components/reuseable/total-shown";
 import CardSale from "./_components/card-sale";
 import PaginatedComponent from "@/components/ui/pagination";
+import { Metadata } from "next";
 
+export const metadata: Metadata = {
+  title: "Sale Invoice",
+};
 function SaleInvoice({ searchParams }: { searchParams: searchParamsType }) {
   return (
     <div className="my-10">

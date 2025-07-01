@@ -5,6 +5,11 @@ import { ChevronRight } from "lucide-react";
 import { DataTable } from "@/components/reuseable/table";
 import column from "./_components/column";
 import TotalShown from "@/components/reuseable/total-shown";
+import { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "History Transaction",
+};
 
 type Props = {
   searchParams: searchParamsType;
@@ -12,14 +17,11 @@ type Props = {
 
 async function HistoryTransaction({ searchParams }: Props) {
   const type = (await searchParams).type;
-  console.log("Type => ", type);
   let data;
   if (type === "main-cash") {
     data = await getHistoryMainCash();
-    console.log("Main Run");
   } else {
     data = await getHistorySubCash();
-    console.log("Sub Run");
   }
   const totalIncrease =
     data.data?.reduce((acc: number, item: any) => {

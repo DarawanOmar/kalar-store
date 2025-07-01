@@ -10,6 +10,12 @@ import { getAllUnfinishSaleInvoice, getOneSaleInvoice } from "./_actions";
 import column from "./_components/columns";
 import AddSaleInvoice from "./_components/form/sale-form";
 
+import { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "Sale Products",
+};
+
 async function Sale({ searchParams }: { searchParams: searchParamsType }) {
   const invoice_id = Number((await searchParams).invoice_id);
   const [getAllunfinishInvoice, getActiveInvoice] = await Promise.all([

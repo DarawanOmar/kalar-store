@@ -34,23 +34,22 @@ const column: ColumnDef<{
       return <div>{row.index + 1}</div>;
     },
   },
-
+  // {
+  //     accessorKey: "barcode",
+  //     header: ({ column }) => (
+  //       <DataTableColumnHeader
+  //         column={column}
+  //         title="باڕکۆد"
+  //         className="text-right"
+  //       />
+  //     ),
+  //   },
   {
     accessorKey: "name",
     header: ({ column }) => (
       <DataTableColumnHeader
         column={column}
         title="ناو"
-        className="text-right"
-      />
-    ),
-  },
-  {
-    accessorKey: "barcode",
-    header: ({ column }) => (
-      <DataTableColumnHeader
-        column={column}
-        title="باڕکۆد"
         className="text-right"
       />
     ),
@@ -102,19 +101,6 @@ const column: ColumnDef<{
                 کردارەکان
               </DropdownMenuLabel>
               <DropdownMenuSeparator />
-              <ReusableDeleteDailog
-                title="دڵنیایت لە سڕینەوەی کاڵا"
-                isFreshButtonPass
-                button={
-                  <button className="flex gap-2 items-center font-sirwan_reguler  hover:bg-primary hover:text-white p-2 rounded-lg w-full transition-all duration-500">
-                    <TrashIcon height={18} width={18} />
-                    <span className="text-sm">سڕینەوە</span>
-                  </button>
-                }
-                actionDelete={deleteSaleInvoiceItem}
-                id={sale_invoice_item_id}
-              />
-              <DropdownMenuSeparator />
               <CustomDialog
                 open={open}
                 onOpenChange={setOpen}
@@ -134,6 +120,19 @@ const column: ColumnDef<{
                   handleClose={handleClose}
                 />
               </CustomDialog>
+              <DropdownMenuSeparator />
+              <ReusableDeleteDailog
+                title="دڵنیایت لە سڕینەوەی کاڵا"
+                isFreshButtonPass
+                button={
+                  <button className="flex gap-2 items-center font-sirwan_reguler  hover:bg-primary hover:text-white p-2 rounded-lg w-full transition-all duration-500">
+                    <TrashIcon height={18} width={18} />
+                    <span className="text-sm">سڕینەوە</span>
+                  </button>
+                }
+                actionDelete={deleteSaleInvoiceItem}
+                id={sale_invoice_item_id}
+              />
             </DropdownMenuContent>
           </DropdownMenu>
         </div>

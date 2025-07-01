@@ -179,6 +179,18 @@ export const returnItemSaleInvoice = async (
             remaining_amount: remaining_amount,
           },
         });
+        if (invoice.type === "loan" && return_amount === invoice.total_amount) {
+          await tx.sale_invoice.delete({
+            where: {
+              id: invoice.id!,
+            },
+          });
+          await tx.loanPayment.deleteMany({
+            where: {
+              sale_invoiceId: invoice.id!,
+            },
+          });
+        }
       }
     });
     return {

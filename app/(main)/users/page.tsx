@@ -6,6 +6,11 @@ import Search from "@/components/reuseable/search";
 import Title from "@/components/reuseable/title";
 import { Bot } from "lucide-react";
 import { getAllUsers } from "./_action";
+import { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "Users",
+};
 
 async function UserPage({ searchParams }: { searchParams: searchParamsType }) {
   const page = Number((await searchParams).page || 1);

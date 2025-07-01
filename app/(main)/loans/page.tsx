@@ -6,6 +6,11 @@ import column from "./_components/columns";
 import { getAllLoans } from "./_actions";
 import { DatePickerWithRange } from "@/components/layout/date-picker-with-range";
 import { parseDateRange } from "@/lib/utils";
+import { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "Loans",
+};
 
 async function LoansPage({ searchParams }: { searchParams: searchParamsType }) {
   const range = ((await searchParams).range as string) || "";

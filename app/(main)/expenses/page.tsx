@@ -6,6 +6,12 @@ import ModalAddExpenses from "./components/form/modal-add-expenses";
 import TotalShown from "@/components/reuseable/total-shown";
 import { getAllExpenses } from "./_action";
 
+import { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "Expenses",
+};
+
 async function Expenses({ searchParams }: { searchParams: searchParamsType }) {
   const page = Number((await searchParams).page || 1);
   const search = (await searchParams).search || "";

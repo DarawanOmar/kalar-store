@@ -11,6 +11,11 @@ import EmptyImage from "@/components/reuseable/empty-image";
 import { parseDateRange } from "@/lib/utils";
 import { getAllCompleteInvoice } from "./_lib";
 import TotalShown from "@/components/reuseable/total-shown";
+import { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "Purchase Invoice",
+};
 
 async function PurchaseInvoice({
   searchParams,

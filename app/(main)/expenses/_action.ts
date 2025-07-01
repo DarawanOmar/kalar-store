@@ -53,7 +53,10 @@ export const getAllExpenses = async (search: string, page: number) => {
       data,
     };
   } catch (error) {
-    return handlePrismaError(error);
+    return {
+      message: handlePrismaError(error),
+      success: false,
+    };
   }
 };
 export const getMainCash = async () => {
@@ -113,7 +116,10 @@ export const getHistoryMainCash = async () => {
       data: dataSend,
     };
   } catch (error) {
-    return handlePrismaError(error);
+    return {
+      message: handlePrismaError(error),
+      success: false,
+    };
   }
 };
 export const getHistorySubCash = async () => {
@@ -144,7 +150,10 @@ export const getHistorySubCash = async () => {
       data: dataSend,
     };
   } catch (error) {
-    return handlePrismaError(error);
+    return {
+      message: handlePrismaError(error),
+      success: false,
+    };
   }
 };
 

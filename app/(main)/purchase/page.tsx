@@ -7,6 +7,11 @@ import { FileText } from "lucide-react";
 import GetAllinvoice from "./_components/getAllinvoice";
 import { getOneInvoice, getunFinishedInvoice } from "./_actions";
 import CompletePurchase from "./_components/form/complete-purchase";
+import { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "Purchase Products",
+};
 
 async function Purchase({ searchParams }: { searchParams: searchParamsType }) {
   const invoice_id = Number((await searchParams).invoice_id);

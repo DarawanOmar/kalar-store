@@ -9,6 +9,11 @@ import { StatCard } from "../feed-dashboard";
 import SkeletonDashboard from "@/components/skeleton-dashboard";
 import { ChartPie } from "./_components/pie-chart";
 import { ChartBarLabel } from "./_components/area-chart";
+import { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "Report",
+};
 
 type Props = {
   searchParams: searchParamsType;

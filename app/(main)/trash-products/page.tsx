@@ -2,6 +2,11 @@ import { DataTable } from "@/components/reuseable/table";
 import React from "react";
 import column from "./_components/column";
 import { getAllProducts } from "../products/_action";
+import { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "Trash Products",
+};
 
 type Props = {
   searchParams: searchParamsType;

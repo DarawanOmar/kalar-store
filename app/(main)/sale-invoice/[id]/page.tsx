@@ -1,23 +1,56 @@
 import { DataTable } from "@/components/reuseable/table";
 import { ChevronLeft } from "lucide-react";
-import React from "react";
+import React, { cache, Suspense } from "react";
 import column from "../_components/columns";
 import Link from "next/link";
 import { getOneSaleInvoice } from "../_lib";
 import TotalShown from "@/components/reuseable/total-shown";
 import { format } from "date-fns";
-import EmptyImage from "@/components/reuseable/empty-image";
 import { redirect } from "next/navigation";
+import SkelotonCard from "@/components/reuseable/skeloton-card";
 
 type Props = {
   params: Promise<{
     id: string;
   }>;
 };
+import { Metadata } from "next";
 
-async function OneSaleInvoice({ params }: Props) {
+const getDataOneSaleCache = cache(async (id: number) => {
+  return await getOneSaleInvoice(id);
+});
+
+export const generateMetadata = async ({
+  params,
+}: Props): Promise<Metadata> => {
   const id = (await params).id;
-  const OneSaleInvoice = await getOneSaleInvoice(Number(id));
+  const OneSaleInvoice = await getDataOneSaleCache(Number(id));
+  return {
+    title: OneSaleInvoice.data?.name || "Sale Invoice",
+    description: `Details of sale invoice with ID ${id}`,
+  };
+};
+
+function OneSaleInvoice({ params }: Props) {
+  return (
+    <Suspense
+      fallback={
+        <SkelotonCard
+          height="h-32 rounded-3xl"
+          className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-10"
+        />
+      }
+    >
+      <FeedPage params={params} />
+    </Suspense>
+  );
+}
+
+export default OneSaleInvoice;
+
+async function FeedPage({ params }: Props) {
+  const id = (await params).id;
+  const OneSaleInvoice = await getDataOneSaleCache(Number(id));
   if (OneSaleInvoice.message === "Invoice not found") {
     redirect("/sale-invoice");
   }
@@ -66,5 +99,3 @@ async function OneSaleInvoice({ params }: Props) {
     </div>
   );
 }
-
-export default OneSaleInvoice;

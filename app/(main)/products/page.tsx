@@ -3,6 +3,11 @@ import Search from "@/components/reuseable/search";
 import ModalAddProcut from "./_components/form/modal-add-product";
 import FeedProducts from "./_components/feed-products";
 import SkelotonCard from "@/components/reuseable/skeloton-card";
+import { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "Products",
+};
 
 async function Products({ searchParams }: { searchParams: searchParamsType }) {
   return (
