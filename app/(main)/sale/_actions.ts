@@ -429,22 +429,28 @@ export const completeSaleInvoiceAction = async (
         },
       });
 
+      const is_discount_and_payment = discount && amount_payment;
+      const is_discount_or_payment = discount || amount_payment;
+      const is_discount = discount ? true : false;
+
+      const afterDiscountAndPayment =
+        saleInvoice.total_amount - (discount || 0) - (amount_payment || 0);
+      const afterDiscount = saleInvoice.total_amount - (discount || 0);
+      const afterPayment = saleInvoice.total_amount - (amount_payment || 0);
+
       await tx.sale_invoice.update({
         where: { id },
         data: {
           is_done: true,
           discount: discount || 0,
-          total_amount: discount
-            ? saleInvoice.total_amount - discount
-            : saleInvoice.total_amount,
+          total_amount: is_discount ? afterDiscount : saleInvoice.total_amount,
           is_discount: discount ? true : false,
           paid_amount: amount_payment,
-          remaining_amount:
-            amount_payment && discount
-              ? saleInvoice.total_amount - discount - amount_payment
-              : amount_payment
-              ? saleInvoice.total_amount - amount_payment
-              : saleInvoice.total_amount,
+          remaining_amount: is_discount_and_payment
+            ? afterDiscountAndPayment
+            : is_discount_or_payment
+            ? afterDiscount || afterPayment
+            : saleInvoice.total_amount,
         },
       });
     });

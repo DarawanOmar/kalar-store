@@ -52,6 +52,7 @@ export const returnItemSaleInvoice = async (
             type: true,
             status: true,
             note: true,
+            Sale_invoice_items: true,
           },
         },
       },
@@ -125,12 +126,18 @@ export const returnItemSaleInvoice = async (
         const is_fully_unpaid_invoice =
           paid_amount === 0 && remaining_amount === remaining_amount;
 
-        const new_total_amount = (invoice.total_amount || 0) - return_amount;
+        let new_total_amount = (invoice.total_amount || 0) - return_amount;
+
+        const isLastItem = invoice?.Sale_invoice_items.length === 1;
+        const last_total_amount_after_Discount =
+          return_amount - invoice.discount!;
+        const isFullInvoiceAmount =
+          invoice.total_amount === last_total_amount_after_Discount;
 
         let mainCash_deduction = 0;
 
         if (invoice.type === "cash") {
-          mainCash_deduction = return_amount - invoice.discount!;
+          mainCash_deduction = return_amount;
         } else if (invoice.type === "loan") {
           if (is_fully_unpaid_invoice) {
             mainCash_deduction = 0;
@@ -145,6 +152,16 @@ export const returnItemSaleInvoice = async (
             remaining_amount = 0;
             paid_amount = paid_amount - remedy_amount;
             mainCash_deduction = remedy_amount;
+          }
+        }
+
+        if (isLastItem || isFullInvoiceAmount) {
+          if (invoice.type === "cash") {
+            mainCash_deduction = last_total_amount_after_Discount;
+            new_total_amount = 0;
+            remaining_amount = 0;
+          } else {
+            mainCash_deduction = mainCash_deduction - invoice.discount!;
           }
         }
         await tx.mainCash.update({
@@ -179,6 +196,13 @@ export const returnItemSaleInvoice = async (
             remaining_amount: remaining_amount,
           },
         });
+        if ((invoice.type === "cash" && isLastItem) || isFullInvoiceAmount) {
+          await tx.sale_invoice.delete({
+            where: {
+              id: invoice.id!,
+            },
+          });
+        }
         if (invoice.type === "loan" && return_amount === invoice.total_amount) {
           await tx.sale_invoice.delete({
             where: {
@@ -252,22 +276,24 @@ export const deleteSaleInvoiceItem = async (sale_invoice_item_id: number) => {
       };
     }
     const email = user.token.split(",between,")[1];
-
+    const invoice = sale_invoice_item.Sale_invoice;
+    if (!invoice) {
+      return {
+        message: "ئەم وەسڵە فرۆشتن بوونی نییە",
+        success: false,
+      };
+    }
     const total_item_amount_returned =
       sale_invoice_item.unit_price * sale_invoice_item.quantity;
 
-    const total_item_amount = sale_invoice_item.Sale_invoice?.total_amount;
+    const total_item_amount = invoice?.total_amount;
 
-    const isLastItem =
-      sale_invoice_item.Sale_invoice?.Sale_invoice_items.length === 1;
+    const isLastItem = invoice?.Sale_invoice_items.length === 1;
 
     const isFullInvoiceAmount =
       total_item_amount === total_item_amount_returned;
 
-    if (
-      sale_invoice_item.Sale_invoice?.type === "loan" &&
-      sale_invoice_item.Sale_invoice.paid_amount > 0
-    ) {
+    if (invoice?.type === "loan" && invoice.paid_amount > 0) {
       return {
         message:
           "ناتوانیت هیچ کام لە بەرهەکان بسڕیتەوە چونکە پارەی قەرزی دراوەتەوە لەم وەسڵە دەتوانی گەڕانەوە بکەی",
@@ -283,19 +309,11 @@ export const deleteSaleInvoiceItem = async (sale_invoice_item_id: number) => {
         },
       });
 
-      if (isLastItem || isFullInvoiceAmount) {
-        await tx.sale_invoice.delete({
-          where: {
-            id: sale_invoice_item.Sale_invoice?.id!,
-          },
-        });
-      }
       let mainCash_deduction = 0;
 
-      if (sale_invoice_item.Sale_invoice?.type === "cash") {
-        mainCash_deduction =
-          total_item_amount_returned - sale_invoice_item.Sale_invoice.discount!;
-      } else if (sale_invoice_item.Sale_invoice?.type === "loan") {
+      if (invoice?.type === "cash") {
+        mainCash_deduction = total_item_amount_returned;
+      } else if (invoice?.type === "loan") {
         mainCash_deduction = 0;
       }
 
@@ -310,10 +328,19 @@ export const deleteSaleInvoiceItem = async (sale_invoice_item_id: number) => {
         },
       });
 
-      if (!isLastItem || !isFullInvoiceAmount) {
+      if (isLastItem || isFullInvoiceAmount) {
+        if (invoice.type === "cash") {
+          mainCash_deduction = total_item_amount_returned - invoice.discount!;
+        }
+        await tx.sale_invoice.delete({
+          where: {
+            id: invoice?.id!,
+          },
+        });
+      } else {
         await tx.sale_invoice.update({
           where: {
-            id: sale_invoice_item.Sale_invoice?.id!,
+            id: invoice?.id!,
           },
           data: {
             total_amount: {
