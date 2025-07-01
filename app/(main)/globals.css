@@ -118,3 +118,29 @@
 #burst-12:after {
   transform: rotate(60deg);
 }
+
+#burst-13 {
+  background: #6e2c2a;
+  width: 35px;
+  height: 35px;
+  position: absolute;
+  top: 0;
+  right: 0;
+  text-align: center;
+}
+#burst-13:before,
+#burst-13:after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 35px;
+  width: 35px;
+  background: #6e2c2a;
+}
+#burst-13:before {
+  transform: rotate(30deg);
+}
+#burst-13:after {
+  transform: rotate(60deg);
+}

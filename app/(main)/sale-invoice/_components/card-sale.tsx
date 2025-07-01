@@ -19,6 +19,12 @@ function CardSale({ product }: Props) {
           </div>
         </>
       ) : null}
+
+      <div className="burst-13" id="burst-13"></div>
+      <div className="absolute top-2.5 right-1 text-xs text-white">
+        {product.type === "cash" ? "کاش" : "قەرز"}
+      </div>
+
       <div className="flex flex-col gap-2">
         <div className="p-2 rounded-full bg-primary text-white max-w-max mx-auto">
           <FileText size={20} />
@@ -26,6 +32,7 @@ function CardSale({ product }: Props) {
         <p className="text-muted-foreground text-center text-sm">
           {product.name}
         </p>
+
         <p className="text-muted-foreground text-center text-sm">
           پسووڵەی : {product.invoice_number}
         </p>

@@ -1,6 +1,6 @@
 import { clsx, type ClassValue } from "clsx";
 import { twMerge } from "tailwind-merge";
-import { differenceInMonths, differenceInWeeks } from "date-fns";
+import { addDays, differenceInMonths, differenceInWeeks } from "date-fns";
 import { unlinkImage } from "./helper";
 import { Prisma } from "@prisma/client";
 
@@ -10,7 +10,7 @@ export function cn(...inputs: ClassValue[]) {
 export const parseDateRange = (range: string) => {
   if (!range) {
     const now = new Date();
-    const startDate = new Date(
+    const startDateNow = new Date(
       now.getFullYear(),
       now.getMonth(),
       1,
@@ -19,6 +19,7 @@ export const parseDateRange = (range: string) => {
       0,
       0
     );
+    const startDate = addDays(startDateNow, -1);
     const endDate = new Date(
       now.getFullYear(),
       now.getMonth() + 1,
@@ -39,7 +40,6 @@ export const parseDateRange = (range: string) => {
   };
 };
 
-// Function to get the relative time description (last month, last 2 months, last week, etc.)
 export const getTimeDescription = (startDate: Date): string => {
   const now = new Date();
 

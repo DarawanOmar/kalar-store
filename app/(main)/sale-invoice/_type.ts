@@ -16,5 +16,6 @@ export interface SaleInvoice {
   discount: number | null;
   createdAt: Date;
   place: string;
+  type: string;
   total: number;
 }
