@@ -11,7 +11,7 @@ import { sendLinkToTelegram } from "@/lib/telegramUtils";
 const name = process.env.DB_NAME || "";
 const host = process.env.DB_HOST || "";
 const user = process.env.DB_USER || "";
-const password = process.env.DB_PASSWORD || "";
+const password = process.env.DB_PASS || "";
 const chat_id = process.env.TELEGRAM_CHAT_ID || "";
 const telegram_bot = process.env.TELEGRAM_BOT_TOKEN || "";
 
